@@ -1,7 +1,10 @@
 {
-  "build": { "builder": "nixpacks" },
+  "build": {
+    "builder": "NIXPACKS",
+    "buildCommand": "npm install --legacy-peer-deps && cd packages/shared && npx tsc && cd ../database && npx prisma generate && npx tsc && cd ../api && npx tsc"
+  },
   "deploy": {
-    "startCommand": "cd packages/api && node dist/index.js",
-    "buildCommand": "npm install && cd packages/api && npx tsc"
+    "startCommand": "node packages/api/dist/index.js",
+    "restartPolicyType": "ON_FAILURE"
   }
 }
