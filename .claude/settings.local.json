@@ -12,7 +12,19 @@
       "Bash(git branch:*)",
       "Bash(git push:*)",
       "Bash(node -e \"const a=require\\('./apps/web-site-owner/package.json'\\); const b=require\\('./apps/web-admin/package.json'\\); console.log\\('web-site-owner next:', a.dependencies.next\\); console.log\\('web-admin next:', b.dependencies.next\\);\")",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(mkdir -p C:/zombietech/apps/mobile-operator/assets)",
+      "Bash(node -e ':*)",
+      "Bash(npx expo:*)",
+      "Bash(jobs -l)",
+      "Bash(node -e \"console.log\\(require\\('C:/zombietech/node_modules/ajv/package.json'\\).version\\)\")",
+      "Bash(node -e \"console.log\\(require\\('C:/zombietech/node_modules/ajv-keywords/package.json'\\).version\\)\")",
+      "Bash(node -e \"console.log\\(require\\('./node_modules/ajv/package.json'\\).version\\)\")",
+      "Bash(kill %1)",
+      "Bash(xargs -r taskkill //PID //F)",
+      "Bash(python3 -c \"import sys,json; t=json.load\\(sys.stdin\\); [print\\(x['public_url']\\) for x in t.get\\('tunnels',[]\\)]\")",
+      "Bash(python3 -m json.tool)",
+      "Bash(python3 -c \" import sys, json try: d = json.load\\(sys.stdin\\) print\\('bundleUrl:', d.get\\('bundleUrl',''\\)\\) print\\('hostUri:', d.get\\('hostUri',''\\)\\) print\\('debuggerHost:', d.get\\('debuggerHost',''\\)\\) except: print\\(sys.stdin.read\\(\\)[:500]\\) \")"
     ]
   }
 }
