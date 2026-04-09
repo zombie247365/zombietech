@@ -5,7 +5,14 @@
       "Bash(npx --version)",
       "Bash(git init:*)",
       "Bash(git config:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(grep -E \"\\\\.env$|node_modules|twillio\")",
+      "Bash(git commit -m ':*)",
+      "Bash(git remote:*)",
+      "Bash(git branch:*)",
+      "Bash(git push:*)",
+      "Bash(node -e \"const a=require\\('./apps/web-site-owner/package.json'\\); const b=require\\('./apps/web-admin/package.json'\\); console.log\\('web-site-owner next:', a.dependencies.next\\); console.log\\('web-admin next:', b.dependencies.next\\);\")",
+      "Bash(git commit:*)"
     ]
   }
 }
