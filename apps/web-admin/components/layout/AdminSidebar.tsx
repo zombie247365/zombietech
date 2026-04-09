@@ -6,7 +6,7 @@ import {
   LayoutDashboard, Building2, Users, FileText, Clock,
   AlertTriangle, Banknote, Shield, Settings, LogOut, UserCheck,
 } from 'lucide-react';
-import { COOKIE_NAME } from '../../lib/auth';
+import { COOKIE_NAME } from '../../lib/constants';
 
 const nav = [
   { section: 'Overview', items: [

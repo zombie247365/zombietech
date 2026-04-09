@@ -1,11 +1,11 @@
 /**
  * Server-side auth helpers.
  * Reads the JWT from the `zt_token` httpOnly cookie.
+ * This file must only be imported by server components or server actions.
  */
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-
-export const COOKIE_NAME = 'zt_token';
+export { COOKIE_NAME } from './constants';
 
 /** Get the JWT token from cookies (server components only). */
 export function getToken(): string | undefined {
