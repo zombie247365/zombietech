@@ -19,6 +19,7 @@ import { runAutoRelease } from './jobs/autoRelease';
 import { runDocumentExpiryAlerts } from './jobs/documentExpiry';
 
 const app = express();
+app.set('trust proxy', 1);
 
 // ── Security & parsing middleware ────────────────────────────────────────────
 app.use(helmet());
