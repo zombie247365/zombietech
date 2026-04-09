@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZombieTech — Onboarding Flows</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f8f8f6;color:#1a1a1a;padding:24px;font-size:13px;}
+h1{font-size:20px;font-weight:500;margin-bottom:4px;color:#1d9e75;}
+.top-meta{font-size:12px;color:#888;margin-bottom:20px;}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 28px minmax(0,1fr);gap:0 8px;align-items:start;}
+.col-head{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:600;padding:4px 12px;border-radius:20px;margin-bottom:12px;}
+.sc{background:#fff;border:0.5px solid #e8e8e8;border-radius:10px;padding:8px 10px;cursor:pointer;margin-bottom:7px;display:flex;align-items:flex-start;gap:9px;transition:border-color .12s,background .12s;}
+.sc:hover{background:#f9fafb;}
+.sc.sel{border-color:#1d9e75;background:#f0fdf4;}
+.sn{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;flex-shrink:0;margin-top:1px;}
+.st{font-size:12px;font-weight:500;color:#1a1a1a;line-height:1.3;}
+.ss{font-size:10px;color:#888;margin-top:1px;line-height:1.3;}
+.sc.sel .st{color:#166534;}
+.sc.sel .ss{color:#4ade80;}
+.center-col{display:flex;flex-direction:column;align-items:center;padding-top:32px;}
+.cl-dot{width:8px;height:8px;border-radius:50%;background:#e0e0e0;margin:1px 0;flex-shrink:0;}
+.cl-line{width:1px;flex:1;min-height:10px;background:#f0f0f0;}
+.conv{background:#dcfce7;border:1.5px solid #86efac;border-radius:12px;padding:14px 16px;margin:10px 0;cursor:pointer;transition:background .12s;}
+.conv:hover{background:#bbf7d0;}
+.conv.sel{background:#86efac;border-color:#22c55e;}
+.conv-title{font-size:14px;font-weight:500;color:#166534;display:flex;align-items:center;gap:8px;}
+.conv-dot{width:10px;height:10px;border-radius:50%;background:#1d9e75;}
+.conv-sub{font-size:11px;color:#4ade80;margin-top:3px;}
+.det{background:#fff;border-radius:10px;padding:14px 16px;margin-top:10px;border:0.5px solid #e8e8e8;}
+.det-badge{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:600;padding:3px 9px;border-radius:20px;margin-bottom:8px;}
+.det-title{font-size:14px;font-weight:500;color:#1a1a1a;margin-bottom:6px;}
+.det-body{font-size:12px;color:#666;line-height:1.65;margin-bottom:8px;}
+.dvd{border:none;border-top:0.5px solid #f0f0f0;margin:8px 0;}
+.det-items{display:flex;flex-direction:column;gap:4px;}
+.det-item{display:flex;gap:7px;align-items:flex-start;font-size:11px;color:#666;}
+.di-dot{width:4px;height:4px;border-radius:50%;background:#d0d0d0;flex-shrink:0;margin-top:5px;}
+.placeholder{color:#bbb;font-size:12px;padding:8px 0;}
+</style>
+</head>
+<body>
+<h1>ZombieTech — Dual Onboarding Flows</h1>
+<div class="top-meta">Site owner and operator onboarding journeys run in parallel — both must complete before the contract is born. Click any step to see its detail.</div>
+
+<div class="layout" id="main-layout">
+  <div>
+    <div class="col-head" style="background:#e8f7f0;color:#166534;">Site owner</div>
+    <div id="owner-steps"></div>
+  </div>
+  <div class="center-col" id="center-line"></div>
+  <div>
+    <div class="col-head" style="background:#ede9fe;color:#4c1d95;">Zombie operator</div>
+    <div id="operator-steps"></div>
+  </div>
+</div>
+
+<div class="conv" id="conv-card" onclick="selectStep('conv')">
+  <div class="conv-title"><div class="conv-dot"></div>Contract signed — zombie business born</div>
+  <div class="conv-sub">Both parties digitally sign. ZombieTech generates the standard zombie contract with commercials, risk clauses, and penalties.</div>
+</div>
+
+<div class="layout" style="margin-top:0;">
+  <div id="owner-post"></div>
+  <div></div>
+  <div id="operator-post"></div>
+</div>
+
+<div class="det" id="detail-panel"><div class="placeholder">Click any step on either side — or the contract card — to see its full detail.</div></div>
+
+<script>
+var OWNER=[
+  {id:'o1',side:'owner',title:'Register & verify',sub:'Business + contact details',
+   badge:'Site owner',bc:'#166534',bb:'#dcfce7',
+   body:'Business name, trading category, and physical address. South African company registration or sole proprietor reference required. Mobile verified via OTP.',
+   items:['Business name and trading category','Physical address of the site','Contact name, email, and mobile (OTP verified)','Business registration or sole proprietor reference']},
+  {id:'o2',side:'owner',title:'Upload documents',sub:'Lease, bank statements, utility',
+   badge:'Site owner',bc:'#166534',bb:'#dcfce7',
+   body:'AI parses each document automatically. The lease yields the monthly rental. Bank statements yield average monthly revenue and evening trading pattern. Utility bill yields monthly utility cost and operating hours.',
+   items:['Current lease agreement (PDF)','3 months bank statements (PDF)','Latest utility bill','Landlord consent letter or lease subletting clause confirmation']},
+  {id:'o3',side:'owner',title:'AI fee calculation',sub:'Hourly rate computed & approved',
+   badge:'Site owner',bc:'#166534',bb:'#dcfce7',
+   body:'Platform calculates the blended zombie session fee: (monthly rent ÷ 720) + (monthly utilities ÷ operating hours). Displayed for site owner review before proceeding.',
+   items:['Rent per hour derived from lease','Utility per hour derived from usage','Blended hourly rate displayed for approval','Revenue potential forecast shown based on site location']},
+  {id:'o4',side:'owner',title:'Choose upside model',sub:'Fixed % or variable profit share',
+   badge:'Site owner',bc:'#166534',bb:'#dcfce7',
+   body:'Site owners choose their commercial preference. Fixed gives guaranteed income regardless of zombie performance. Variable is higher-risk but rewards strong operators.',
+   items:['Fixed: guaranteed markup % on the base cost rate','Variable: base fee + % share of zombie net profit','Risk profile explained with illustrated scenarios','Selection locked into contract — cannot change mid-term']},
+  {id:'o5',side:'owner',title:'Define site checklist',sub:'Lock-up points & photo areas',
+   badge:'Site owner',bc:'#166534',bb:'#dcfce7',
+   body:'Site owner defines the specific surfaces and areas that must be photographed before and after each session. This becomes the immutable checklist loaded into the operator app.',
+   items:['Stove tops, burners, prep surfaces','Fridges, cold storage, supply cupboard','Appliances and equipment','Alarm panel, all entry/exit points','Any site-specific areas of concern']},
+];
+
+var OPERATOR=[
+  {id:'p1',side:'operator',title:'Register & profile',sub:'ID, concept, category',
+   badge:'Operator',bc:'#4c1d95',bb:'#ede9fe',
+   body:'Full legal name, South African ID number, trading concept description, and food or service category. Email and mobile verified via OTP.',
+   items:['Full legal name as per ID','SA ID or passport number','Trading concept: what you intend to cook or sell','Food/service category for site matching','Emergency contact name and number']},
+  {id:'p2',side:'operator',title:'Upload documents',sub:'ID, address, food cert, insurance',
+   badge:'Operator',bc:'#4c1d95',bb:'#ede9fe',
+   body:'Document uploads are checked for recency and validity. Food handler certificates are flagged for expiry. Insurance minimum cover is set by ZombieTech.',
+   items:['SA ID or passport with liveness check','Proof of address (under 3 months old)','Food handler certificate (food operators)','Public liability insurance certificate','Business registration (optional but raises trust score)']},
+  {id:'p3',side:'operator',title:'Vetting & KYC',sub:'ID · CIPC · criminal · AML',
+   badge:'Operator',bc:'#4c1d95',bb:'#ede9fe',
+   body:'Digital vetting runs automatically in the background. Most checks complete within 24–48 hours. Any red flags are escalated to ZombieTech admin for manual review before the operator can proceed.',
+   items:['ID verification with biometric liveness check','CIPC check: business registration in good standing','Criminal record check via MIE or LexisNexis','AML and PEP screening per FICA requirements','Credit check (risk-flagging only, not a hard block)']},
+  {id:'p4',side:'operator',title:'Activation fee',sub:'R800 deferred across first 2 sessions',
+   badge:'Operator',bc:'#4c1d95',bb:'#ede9fe',
+   body:'R800 covers ID verification costs, contract generation, and platform onboarding. Deferred across the first two sessions — R400 deducted from session 1 payout, R400 from session 2. No upfront payment required.',
+   items:['R0 due today — activation fee deferred','R400 deducted from session 1 payout','R400 deducted from session 2 payout','Bank account verified for settlement payouts','No hardware starter pack — camera-free platform']},
+  {id:'p5',side:'operator',title:'Browse & book',sub:'Filter, request, await approval',
+   badge:'Operator',bc:'#4c1d95',bb:'#ede9fe',
+   body:'Operators browse available sites filtered by suburb, category, operating nights, and fee range. The revenue forecast for each site is shown before booking. Site owners approve or decline within 48 hours.',
+   items:['Filter by suburb, category, available nights','See fee breakdown and revenue forecast per site','Send booking request with trading concept summary','Site owner has 48 hours to approve or decline','ZombieTech notified if no response within 48 hours']},
+];
+
+var OWNER_POST=[
+  {id:'o6',side:'owner',title:'Site goes live',sub:'Listed on ZombieTech marketplace',
+   badge:'Site owner',bc:'#166534',bb:'#dcfce7',
+   body:'Site appears on the marketplace with availability calendar, fee breakdown, and category tags. Push notifications for new booking requests and session reminders.',
+   items:['Availability calendar set per week','Push alerts for booking requests','Session reminders sent night before','Revenue forecast visible to browsing operators']},
+  {id:'o7',side:'owner',title:'Review & settle',sub:'Sunday confirm — Monday pay',
+   badge:'Site owner',bc:'#166534',bb:'#dcfce7',
+   body:'Site owner receives the AI-scored handover report by Sunday morning. Confirms condition and lodges any claims by Monday 12:00. Settlement processes Monday afternoon.',
+   items:['Receive AI pre-scored handover report','Confirm site in good order or raise a claim','Claims window: Sunday to Monday 12:00','Settlement releases Monday afternoon','Claims escalate to ZombieTech dispute process']},
+];
+
+var OPERATOR_POST=[
+  {id:'p6',side:'operator',title:'Download app',sub:'Photo checklist + session walkthrough',
+   badge:'Operator',bc:'#4c1d95',bb:'#ede9fe',
+   body:'Mandatory app walkthrough before first session. Site-specific checklist loaded. Operator confirms they understand the photo protocol, handover flow, and lock-up sequence.',
+   items:['Download ZombieTech operator app','Complete session flow tutorial (mandatory)','Site-specific checklist loaded into app','Review lock-up sequence for the booked site','Emergency support number confirmed']},
+  {id:'p7',side:'operator',title:'First session',sub:'Go live, build reviews',
+   badge:'Operator',bc:'#4c1d95',bb:'#ede9fe',
+   body:'Full session flow: digital handover → before photos → trading window → after photos → lock-up sequence. Settlement processed Monday. First review score posted.',
+   items:['Digital handover signature at session start time','Before photos: complete site checklist','Trade, sell, deliver through the night','After photos: match every before surface','Lock-up sequence: photos of alarm + all exits']},
+  {id:'p8',side:'operator',title:'Trust score grows',sub:'Unlock premium sites at 90+',
+   badge:'Operator',bc:'#4c1d95',bb:'#ede9fe',
+   body:'Trust score accumulates across sessions. Clean handovers, anomaly-free photo checks, no penalty claims, and timely access all add points. Score is visible to site owners on the marketplace.',
+   items:['Clean session: +3 pts','Anomaly flagged and resolved quickly: +1 pt','Penalty claim lodged against you: −10 pts','90+ score: unlocks premium sites','100 score: priority booking and featured listing']},
+];
+
+var CONV_DETAIL={
+  id:'conv',side:'both',title:'Contract signed — zombie business born',
+  badge:'Both parties',bc:'#166534',bb:'#dcfce7',
+  body:'ZombieTech generates the standard zombie contract using the computed commercials from site onboarding. Both parties receive the contract for review, then sign digitally via OTP confirmation. The signed contract is stored immutably in the document store.',
+  items:['Site fee and upside model locked in','Risk clauses: damages, cleaning, securing','Penalties defined: amounts and trigger conditions','Insurance requirements confirmed by both parties','T&Cs accepted — zombie business is legally born','Session scheduling calendar unlocked']
+};
+
+var sel=null;
+
+function makeStep(s,theme){
+  var num=s.id.replace(/\D/g,'');
+  var bg=theme==='owner'?'#e8f7f0':'#ede9fe';
+  var tc=theme==='owner'?'#166534':'#4c1d95';
+  return '<div class="sc'+(sel===s.id?' sel':'')+'" onclick="selectStep(\''+s.id+'\')">'+'<div class="sn" style="background:'+bg+';color:'+tc+';">'+num+'</div>'+'<div><div class="st">'+s.title+'</div><div class="ss">'+s.sub+'</div></div></div>';
+}
+
+function makeCenterLine(n){
+  var html='';
+  for(var i=0;i<n;i++) html+='<div class="cl-line"></div><div class="cl-dot"></div>';
+  html+='<div class="cl-line"></div>';
+  return html;
+}
+
+function selectStep(id){
+  sel=id;
+  renderAll();
+  document.getElementById('conv-card').classList.toggle('sel',id==='conv');
+  var all=[...OWNER,...OPERATOR,...OWNER_POST,...OPERATOR_POST];
+  var data=all.find(function(s){return s.id===id;});
+  if(!data&&id==='conv') data=CONV_DETAIL;
+  if(!data) return;
+  document.getElementById('detail-panel').innerHTML=
+    '<div class="det-badge" style="background:'+data.bb+';color:'+data.bc+';">'+data.badge+'</div>'+
+    '<div class="det-title">'+data.title+'</div>'+
+    '<div class="det-body">'+data.body+'</div>'+
+    '<div class="dvd"></div>'+
+    '<div class="det-items">'+data.items.map(function(i){return '<div class="det-item"><div class="di-dot" style="background:'+data.bc+';"></div><div>'+i+'</div></div>';}).join('')+'</div>';
+}
+
+function renderAll(){
+  document.getElementById('owner-steps').innerHTML=OWNER.map(function(s){return makeStep(s,'owner');}).join('');
+  document.getElementById('operator-steps').innerHTML=OPERATOR.map(function(s){return makeStep(s,'operator');}).join('');
+  document.getElementById('center-line').innerHTML=makeCenterLine(5);
+  document.getElementById('owner-post').innerHTML=OWNER_POST.map(function(s){return makeStep(s,'owner');}).join('');
+  document.getElementById('operator-post').innerHTML=OPERATOR_POST.map(function(s){return makeStep(s,'operator');}).join('');
+}
+
+renderAll();
+</script>
+</body>
+</html>

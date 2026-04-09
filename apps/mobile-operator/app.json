@@ -1,0 +1,53 @@
+{
+  "expo": {
+    "name": "ZombieTech",
+    "slug": "zombietech-operator",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0f172a"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "co.za.zombietech.operator"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#0f172a"
+      },
+      "package": "co.za.zombietech.operator",
+      "permissions": [
+        "CAMERA",
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "RECEIVE_BOOT_COMPLETED",
+        "VIBRATE"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-camera",
+        { "cameraPermission": "ZombieTech needs camera access to take required session photos." }
+      ],
+      [
+        "expo-location",
+        { "locationWhenInUsePermission": "ZombieTech needs your location to geotag session photos." }
+      ]
+    ],
+    "scheme": "zombietech",
+    "extra": {
+      "apiUrl": "http://localhost:4000/api",
+      "eas": { "projectId": "zombietech-operator" }
+    }
+  }
+}

@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZombieTech — Database Schema</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f8f8f6;color:#1a1a1a;padding:24px;}
+h1{font-size:20px;font-weight:500;margin-bottom:4px;color:#1d9e75;}
+.top-meta{font-size:12px;color:#888;margin-bottom:16px;}
+.domain-legend{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px;}
+.leg-item{display:flex;align-items:center;gap:5px;font-size:11px;color:#555;}
+.leg-dot{width:8px;height:8px;border-radius:2px;}
+.layout{display:grid;grid-template-columns:210px 1fr;gap:12px;align-items:start;}
+.left{display:flex;flex-direction:column;gap:2px;}
+.domain-head{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:#aaa;padding:10px 8px 3px;}
+.tbl-btn{display:flex;align-items:center;gap:7px;padding:6px 8px;border-radius:8px;cursor:pointer;transition:background .1s;border:0.5px solid transparent;}
+.tbl-btn:hover{background:#eee;}
+.tbl-btn.on{background:#efefef;border-color:#ddd;}
+.tbl-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0;}
+.tbl-name{font-size:11px;font-weight:500;color:#555;font-family:'SF Mono','Fira Code',monospace;}
+.tbl-btn.on .tbl-name{color:#1a1a1a;}
+.tbl-count{font-size:9px;color:#bbb;margin-left:auto;}
+.right{background:#fff;border:0.5px solid #e0e0e0;border-radius:12px;padding:16px;min-height:400px;}
+.tbl-header{display:flex;align-items:center;gap:10px;margin-bottom:14px;padding-bottom:12px;border-bottom:0.5px solid #eee;}
+.tbl-icon{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0;}
+.tbl-title{font-size:14px;font-weight:600;font-family:'SF Mono','Fira Code',monospace;}
+.tbl-desc{font-size:11px;color:#777;margin-top:2px;}
+.col-grid{display:grid;grid-template-columns:28px 1fr 100px 1fr;gap:0;margin-bottom:12px;border-radius:8px;overflow:hidden;border:0.5px solid #eee;}
+.col-head{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#aaa;padding:6px 8px;background:#f8f8f6;}
+.col-row{display:contents;}
+.col-cell{padding:6px 8px;border-bottom:0.5px solid #f0f0f0;font-size:11px;display:flex;align-items:center;background:#fff;}
+.col-row:last-child .col-cell{border-bottom:none;}
+.key-icon{font-size:10px;font-weight:600;}
+.col-name{font-family:'SF Mono','Fira Code',monospace;font-size:11px;color:#1a1a1a;}
+.col-name.pk{color:#185fa5;}
+.col-name.fk{color:#3b6d11;}
+.col-type{font-family:'SF Mono','Fira Code',monospace;font-size:10px;color:#aaa;}
+.col-note{font-size:10px;color:#999;line-height:1.4;}
+.rels{margin-top:12px;}
+.rel-head{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#aaa;margin-bottom:6px;}
+.rel-item{display:flex;align-items:center;gap:6px;padding:5px 0;border-bottom:0.5px solid #f0f0f0;font-size:11px;}
+.rel-item:last-child{border-bottom:none;}
+.rel-from{font-family:'SF Mono','Fira Code',monospace;color:#3b6d11;}
+.rel-arrow{color:#ccc;}
+.rel-to{font-family:'SF Mono','Fira Code',monospace;color:#185fa5;}
+.rel-type{font-size:9px;color:#aaa;margin-left:auto;background:#f5f5f5;padding:1px 6px;border-radius:4px;}
+.indexes{margin-top:12px;}
+.idx-item{font-size:10px;color:#aaa;font-family:'SF Mono','Fira Code',monospace;padding:3px 0;border-bottom:0.5px solid #f0f0f0;}
+.idx-item:last-child{border-bottom:none;}
+.placeholder{color:#bbb;font-size:12px;padding:20px 0;}
+@media(max-width:600px){.layout{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<h1>ZombieTech — Database Schema</h1>
+<div class="top-meta">16 tables · 7 domains · PostgreSQL · All monetary values in cents (bigint)</div>
+<div class="domain-legend">
+  <div class="leg-item"><div class="leg-dot" style="background:#185fa5;"></div>Identity</div>
+  <div class="leg-item"><div class="leg-dot" style="background:#1d9e75;"></div>Sites</div>
+  <div class="leg-item"><div class="leg-dot" style="background:#534ab7;"></div>Contracts</div>
+  <div class="leg-item"><div class="leg-dot" style="background:#ef9f27;"></div>Sessions</div>
+  <div class="leg-item"><div class="leg-dot" style="background:#e24b4a;"></div>Financial</div>
+  <div class="leg-item"><div class="leg-dot" style="background:#888780;"></div>Compliance</div>
+  <div class="leg-item"><div class="leg-dot" style="background:#d4537e;"></div>Platform</div>
+</div>
+<div class="layout">
+<div class="left" id="left"></div>
+<div class="right" id="right"><div class="placeholder">Select a table to explore its schema.</div></div>
+</div>
+
+<script>
+var SCHEMA = {
+  identity:[
+    {name:'users',color:'#185fa5',bg:'#e6f1fb',tc:'#0c447c',desc:'Base account for all platform users — site owners, operators, and admins share this table.',
+     cols:[
+      {key:'PK',name:'id',type:'uuid',note:'Primary key'},
+      {key:'',name:'email',type:'varchar(255)',note:'Unique · indexed'},
+      {key:'',name:'mobile',type:'varchar(20)',note:'OTP-verified · indexed'},
+      {key:'',name:'full_name',type:'varchar(255)',note:''},
+      {key:'',name:'role',type:'enum',note:'site_owner | operator | admin'},
+      {key:'',name:'otp_hash',type:'varchar(255)',note:'Bcrypt hashed · nulled after use'},
+      {key:'',name:'otp_expires_at',type:'timestamptz',note:''},
+      {key:'',name:'email_verified_at',type:'timestamptz',note:'Nullable'},
+      {key:'',name:'mobile_verified_at',type:'timestamptz',note:'Nullable'},
+      {key:'',name:'created_at',type:'timestamptz',note:'default now()'},
+      {key:'',name:'updated_at',type:'timestamptz',note:''},
+     ],
+     rels:[],
+     indexes:['idx_users_email (unique)','idx_users_mobile','idx_users_role']},
+
+    {name:'site_owners',color:'#185fa5',bg:'#e6f1fb',tc:'#0c447c',desc:'Extended profile for users with role=site_owner. One-to-one with users.',
+     cols:[
+      {key:'PK',name:'id',type:'uuid',note:''},
+      {key:'FK',name:'user_id',type:'uuid',note:'→ users.id · unique'},
+      {key:'',name:'trading_name',type:'varchar(255)',note:''},
+      {key:'',name:'business_category',type:'varchar(100)',note:''},
+      {key:'',name:'company_reg_number',type:'varchar(50)',note:'Nullable'},
+      {key:'',name:'vat_number',type:'varchar(20)',note:'Nullable'},
+      {key:'',name:'bank_account_ref',type:'varchar(100)',note:'Tokenised — not raw account'},
+      {key:'',name:'payout_verified_at',type:'timestamptz',note:'Bank account verified'},
+      {key:'',name:'site_score',type:'integer',note:'0–100 computed score'},
+      {key:'',name:'score_tier',type:'enum',note:'standard|silver|gold|platinum'},
+      {key:'',name:'created_at',type:'timestamptz',note:''},
+     ],
+     rels:[{from:'site_owners.user_id',to:'users.id',type:'1:1'}],
+     indexes:['idx_site_owners_user_id (unique)','idx_site_owners_score_tier']},
+
+    {name:'operators',color:'#185fa5',bg:'#e6f1fb',tc:'#0c447c',desc:'Extended profile for users with role=operator. Trust score and vetting status live here.',
+     cols:[
+      {key:'PK',name:'id',type:'uuid',note:''},
+      {key:'FK',name:'user_id',type:'uuid',note:'→ users.id · unique'},
+      {key:'',name:'trading_concept',type:'text',note:'Operator\'s business description'},
+      {key:'',name:'food_category',type:'varchar(100)',note:''},
+      {key:'',name:'emergency_contact_name',type:'varchar(255)',note:''},
+      {key:'',name:'emergency_contact_mobile',type:'varchar(20)',note:''},
+      {key:'',name:'bank_account_ref',type:'varchar(100)',note:'Tokenised'},
+      {key:'',name:'payout_verified_at',type:'timestamptz',note:''},
+      {key:'',name:'trust_score',type:'integer',note:'0–100 · platform-wide'},
+      {key:'',name:'activation_fee_balance',type:'integer',note:'Cents remaining to collect'},
+      {key:'',name:'vetting_status',type:'enum',note:'pending|approved|rejected|suspended'},
+      {key:'',name:'vetting_approved_at',type:'timestamptz',note:'Nullable'},
+      {key:'',name:'created_at',type:'timestamptz',note:''},
+     ],
+     rels:[{from:'operators.user_id',to:'users.id',type:'1:1'}],
+     indexes:['idx_operators_user_id (unique)','idx_operators_trust_score','idx_operators_vetting_status']},
+  ],
+
+  sites:[
+    {name:'sites',color:'#1d9e75',bg:'#e1f5ee',tc:'#085041',desc:'A physical commercial premises listed on the platform. One site owner can have many sites.',
+     cols:[
+      {key:'PK',name:'id',type:'uuid',note:''},
+      {key:'FK',name:'site_owner_id',type:'uuid',note:'→ site_owners.id'},
+      {key:'FK',name:'landlord_partner_id',type:'uuid',note:'→ landlord_partners.id · nullable'},
+      {key:'',name:'trading_name',type:'varchar(255)',note:'e.g. ABC Pizza'},
+      {key:'',name:'business_category',type:'varchar(100)',note:''},
+      {key:'',name:'address_line1',type:'varchar(255)',note:''},
+      {key:'',name:'suburb',type:'varchar(100)',note:'Indexed for geo search'},
+      {key:'',name:'city',type:'varchar(100)',note:''},
+      {key:'',name:'latitude',type:'decimal(10,7)',note:'For map listings'},
+      {key:'',name:'longitude',type:'decimal(10,7)',note:''},
+      {key:'',name:'site_opens_time',type:'time',note:'Daily open time'},
+      {key:'',name:'site_closes_time',type:'time',note:'Daily close time'},
+      {key:'',name:'zombie_end_time',type:'time',note:'Default session end'},
+      {key:'',name:'monthly_rent_cents',type:'bigint',note:'From AI lease parse'},
+      {key:'',name:'monthly_utilities_cents',type:'bigint',note:'From AI utility parse'},
+      {key:'',name:'site_operating_hours_per_month',type:'integer',note:'AI inferred'},
+      {key:'',name:'hourly_rate_cents',type:'bigint',note:'Computed: rent/720 + util/hrs'},
+      {key:'',name:'consent_status',type:'enum',note:'pending|uploaded|landlord_verified'},
+      {key:'',name:'site_score',type:'integer',note:'0–100'},
+      {key:'',name:'score_tier',type:'enum',note:'standard|silver|gold|platinum'},
+      {key:'',name:'is_listed',type:'boolean',note:'Visible on marketplace'},
+      {key:'',name:'created_at',type:'timestamptz',note:''},
+     ],
+     rels:[
+      {from:'sites.site_owner_id',to:'site_owners.id',type:'N:1'},
+      {from:'sites.landlord_partner_id',to:'landlord_partners.id',type:'N:1 nullable'},
+     ],
+     indexes:['idx_sites_site_owner_id','idx_sites_suburb','idx_sites_consent_status','idx_sites_is_listed','idx_sites_latlong (geo)']},
+
+    {name:'site_slots',color:'#1d9e75',bg:'#e1f5ee',tc:'#085041',desc:'A specific bookable time window at a site. Each slot can hold one active contract.',
+     cols:[
+      {key:'PK',name:'id',type:'uuid',note:''},
+      {key:'FK',name:'site_id',type:'uuid',note:'→ sites.id'},
+      {key:'',name:'day_of_week',type:'enum',note:'mon|tue|wed|thu|fri|sat|sun · nullable for closed days'},
+      {key:'',name:'is_closed_day',type:'boolean',note:'Full day zombie window'},
+      {key:'',name:'slot_start_time',type:'time',note:''},
+      {key:'',name:'slot_end_time',type:'time',note:''},
+      {key:'',name:'slot_hours',type:'decimal(4,2)',note:'Computed duration'},
+      {key:'',name:'base_fee_cents_per_session',type:'bigint',note:'hourly_rate × slot_hours'},
+      {key:'',name:'upside_model',type:'enum',note:'fixed|variable'},
+      {key:'',name:'upside_fixed_pct',type:'decimal(5,2)',note:'Nullable — fixed model'},
+      {key:'',name:'upside_variable_pct',type:'decimal(5,2)',note:'Nullable — variable model'},
+      {key:'',name:'status',type:'enum',note:'open|booked|suspended'},
+      {key:'',name:'created_at',type:'timestamptz',note:''},
+     ],
+     rels:[{from:'site_slots.site_id',to:'sites.id',type:'N:1'}],
+     indexes:['idx_site_slots_site_id','idx_site_slots_status','idx_site_slots_day_of_week']},
+
+    {name:'site_checklist_items',color:'#1d9e75',bg:'#e1f5ee',tc:'#085041',desc:'Photo areas defined by site owner at onboarding. Immutable once contract is signed.',
+     cols:[
+      {key:'PK',name:'id',type:'uuid',note:''},
+      {key:'FK',name:'site_id',type:'uuid',note:'→ sites.id'},
+      {key:'',name:'area_name',type:'varchar(255)',note:'e.g. Stove tops & burners'},
+      {key:'',name:'area_category',type:'enum',note:'kitchen|equipment|security|custom'},
+      {key:'',name:'sort_order',type:'integer',note:'Sequential — cannot be reordered by operator'},
+      {key:'',name:'is_required',type:'boolean',note:'default true'},
+      {key:'',name:'description',type:'text',note:'Guidance for operator'},
+      {key:'',name:'created_at',type:'timestamptz',note:''},
+     ],
+     rels:[{from:'site_checklist_items.site_id',to:'sites.id',type:'N:1'}],
+     indexes:['idx_checklist_site_id','idx_checklist_sort_order']},
+
+    {name:'landlord_partners',color:'#1d9e75',bg:'#e1f5ee',tc:'#085041',desc:'Portfolio partnership agreements with commercial property groups. Grants blanket consent.',
+     cols:[
+      {key:'PK',name:'id',type:'uuid',note:''},
+      {key:'',name:'company_name',type:'varchar(255)',note:'e.g. Redefine Properties'},
+      {key:'',name:'contact_name',type:'varchar(255)',note:''},
+      {key:'',name:'contact_email',type:'varchar(255)',note:''},
+      {key:'',name:'revenue_share_pct',type:'decimal(5,2)',note:'e.g. 10.00'},
+      {key:'',name:'agreement_signed_at',type:'timestamptz',note:''},
+      {key:'',name:'agreement_document_id',type:'uuid',note:'→ documents.id'},
+      {key:'',name:'portfolio_size',type:'integer',note:'Approx properties enrolled'},
+      {key:'',name:'status',type:'enum',note:'active|suspended|negotiating'},
+      {key:'',name:'created_at',type:'timestamptz',note:''},
+     ],
+     rels:[],
+     indexes:['idx_landlord_partners_status']},
+  ],
+
+  contracts:[
+    {name:'booking_requests',color:'#534ab7',bg:'#eeedfe',tc:'#3c3489',desc:'An operator\'s request to book a slot. 48-hour approval window before auto-expiry.',
+     cols:[
+      {key:'PK',name:'id',type:'uuid',note:''},
+      {key:'FK',name:'site_slot_id',type:'uuid',note:'→ site_slots.id'},
+      {key:'FK',name:'operator_id',type:'uuid',note:'→ operators.id'},
+      {key:'',name:'concept_summary',type:'text',note:'Operator\'s pitch to site owner'},
+      {key:'',name:'requested_start_date',type:'date',note:''},
+      {key:'',name:'recurring',type:'boolean',note:'Weekly recurring request'},
+      {key:'',name:'status',type:'enum',note:'pending|approved|declined|expired'},
+      {key:'',name:'site_owner_response_at',type:'timestamptz',note:'Nullable'},
+      {key:'',name:'expires_at',type:'timestamptz',note:'48hrs from created_at'},
+      {key:'',name:'created_at',type:'timestamptz',note:''},
+     ],
+     rels:[
+      {from:'booking_requests.site_slot_id',to:'site_slots.id',type:'N:1'},
+      {from:'booking_requests.operator_id',to:'operators.id',type:'N:1'},
+     ],
+     indexes:['idx_booking_requests_site_slot_id','idx_booking_requests_operator_id','idx_booking_requests_status','idx_booking_requests_expires_at']},
+
+    {name:'contracts',color:'#534ab7',bg:'#eeedfe',tc:'#3c3489',desc:'The zombie services agreement — atomic unit of the platform. Links one operator to one slot.',
+     cols:[
+      {key:'PK',name:'id',type:'uuid',note:'Human ref: ZT-C-NNNN'},
+      {key:'FK',name:'site_slot_id',type:'uuid',note:'→ site_slots.id'},
+      {key:'FK',name:'operator_id',type:'uuid',note:'→ operators.id'},
+      {key:'FK',name:'booking_request_id',type:'uuid',note:'→ booking_requests.id'},
+      {key:'',name:'contract_ref',type:'varchar(20)',note:'e.g. ZT-C-0284'},
+      {key:'',name:'hourly_rate_cents',type:'bigint',note:'Locked at signing'},
+      {key:'',name:'upside_model',type:'enum',note:'fixed|variable'},
+      {key:'',name:'upside_pct',type:'decimal(5,2)',note:'Locked at signing'},
+      {key:'',name:'platform_fee_pct',type:'decimal(5,2)',note:'10.00 — locked'},
+      {key:'',name:'notice_period_days',type:'integer',note:'default 30'},
+      {key:'',name:'goodwill_threshold_sessions',type:'integer',note:'default 6'},
+      {key:'',name:'goodwill_fee_pct',type:'decimal(5,2)',note:'default 8.00'},
+      {key:'',name:'deactivation_fee_pct',type:'decimal(5,2)',note:'default 15.00'},
+      {key:'',name:'status',type:'enum',note:'active|in_notice|terminated|expired'},
+      {key:'',name:'site_owner_signed_at',type:'timestamptz',note:'OTP confirmed'},
+      {key:'',name:'operator_signed_at',type:'timestamptz',note:'OTP confirmed'},
+      {key:'',name:'terminated_at',type:'timestamptz',note:'Nullable'},
+      {key:'',name:'terminated_by',type:'enum',note:'site_owner|operator|mutual|breach'},
+      {key:'',name:'created_at',type:'timestamptz',note:''},
+     ],
+     rels:[
+      {from:'contracts.site_slot_id',to:'site_slots.id',type:'N:1'},
+      {from:'contracts.operator_id',to:'operators.id',type:'N:1'},
+      {from:'contracts.booking_request_id',to:'booking_requests.id',type:'1:1'},
+     ],
+     indexes:['idx_contracts_site_slot_id','idx_contracts_operator_id','idx_contracts_status','idx_contracts_ref (unique)']},
+  ],
+
+  sessions:[
+    {name:'sessions',color:'#ef9f27',bg:'#faeeda',tc:'#633806',desc:'One zombie trading session. Created when operator starts via app. Legal anchor for all evidence.',
+     cols:[
+      {key:'PK',name:'id',type:'uuid',note:'Human ref: ZT-S-NNNN'},
+      {key:'FK',name:'contract_id',type:'uuid',note:'→ contracts.id'},
+      {key:'',name:'session_ref',type:'varchar(20)',note:'e.g. ZT-S-1042'},
+      {key:'',name:'session_date',type:'date',note:'Calendar date of session'},
+      {key:'',name:'scheduled_start',type:'timestamptz',note:''},
+      {key:'',name:'scheduled_end',type:'timestamptz',note:''},
+      {key:'',name:'actual_start',type:'timestamptz',note:'Dual OTP handover timestamp'},
+      {key:'',name:'actual_end',type:'timestamptz',note:'Lock-up complete timestamp'},
+      {key:'',name:'site_owner_handover_signed_at',type:'timestamptz',note:''},
+      {key:'',name:'operator_handover_signed_at',type:'timestamptz',note:''},
+      {key:'',name:'gross_revenue_cents',type:'bigint',note:'Card payments collected'},
+      {key:'',name:'status',type:'enum',note:'scheduled|active|completed|disputed|cancelled'},
+      {key:'',name:'before_photos_complete',type:'boolean',note:'All checklist items captured'},
+      {key:'',name:'after_photos_complete',type:'boolean',note:''},
+      {key:'',name:'lockup_complete',type:'boolean',note:''},
+      {key:'',name:'ai_handover_score',type:'integer',note:'0–100 AI comparison score'},
+      {key:'',name:'ai_flags_count',type:'integer',note:'Number of flagged surface pairs'},
+      {key:'',name:'site_owner_confirmed_at',type:'timestamptz',note:'Sunday morning sign-off'},
+      {key:'',name:'site_owner_confirmed_good_order',type:'boolean',note:'Nullable until confirmed'},
+      {key:'',name:'created_at',type:'timestamptz',note:''},
+     ],
+     rels:[{from:'sessions.contract_id',to:'contracts.id',type:'N:1'}],
+     indexes:['idx_sessions_contract_id','idx_sessions_status','idx_sessions_session_date','idx_sessions_site_owner_confirmed_at']},
+
+    {name:'session_photos',color:'#ef9f27',bg:'#faeeda',tc:'#633806',desc:'Individual photos taken in-app. GPS and timestamp generated by platform — gallery uploads blocked.',
+     cols:[
+      {key:'PK',name:'id',type:'uuid',note:''},
+      {key:'FK',name:'session_id',type:'uuid',note:'→ sessions.id'},
+      {key:'FK',name:'checklist_item_id',type:'uuid',note:'→ site_checklist_items.id'},
+      {key:'',name:'photo_type',type:'enum',note:'before|after|lockup'},
+      {key:'',name:'storage_key',type:'varchar(500)',note:'S3/GCS object key'},
+      {key:'',name:'storage_url',type:'text',note:'Signed URL generated on demand'},
+      {key:'',name:'latitude',type:'decimal(10,7)',note:'Platform-captured GPS'},
+      {key:'',name:'longitude',type:'decimal(10,7)',note:'Platform-captured GPS'},
+      {key:'',name:'device_timestamp',type:'timestamptz',note:'Device clock at capture'},
+      {key:'',name:'server_timestamp',type:'timestamptz',note:'Server receipt time — authoritative'},
+      {key:'',name:'hash',type:'varchar(64)',note:'SHA-256 for tamper detection'},
+      {key:'',name:'created_at',type:'timestamptz',note:''},
+     ],
+     rels:[
+      {from:'session_photos.session_id',to:'sessions.id',type:'N:1'},
+      {from:'session_photos.checklist_item_id',to:'site_checklist_items.id',type:'N:1'},
+     ],
+     indexes:['idx_photos_session_id','idx_photos_type','idx_photos_checklist_item_id']},
+
+    {name:'photo_comparisons',color:'#ef9f27',bg:'#faeeda',tc:'#633806',desc:'AI comparison result for each before/after pair. One row per checklist item per session.',
+     cols:[
+      {key:'PK',name:'id',type:'uuid',note:''},
+      {key:'FK',name:'session_id',type:'uuid',note:'→ sessions.id'},
+      {key:'FK',name:'checklist_item_id',type:'uuid',note:'→ site_checklist_items.id'},
+      {key:'FK',name:'before_photo_id',type:'uuid',note:'→ session_photos.id'},
+      {key:'FK',name:'after_photo_id',type:'uuid',note:'→ session_photos.id · nullable'},
+      {key:'',name:'ai_result',type:'enum',note:'clean|flagged|inconclusive'},
+      {key:'',name:'ai_confidence',type:'decimal(5,2)',note:'0.00–100.00'},
+      {key:'',name:'ai_description',type:'text',note:'Natural language flag description'},
+      {key:'',name:'admin_override',type:'enum',note:'clean|flagged · nullable'},
+      {key:'',name:'admin_override_by',type:'uuid',note:'→ users.id · nullable'},
+      {key:'',name:'created_at',type:'timestamptz',note:''},
+     ],
+     rels:[
+      {from:'photo_comparisons.session_id',to:'sessions.id',type:'N:1'},
+      {from:'photo_comparisons.before_photo_id',to:'session_photos.id',type:'N:1'},
+      {from:'photo_comparisons.after_photo_id',to:'session_photos.id',type:'N:1'},
+     ],
+     indexes:['idx_comparisons_session_id','idx_comparisons_ai_result']},
+  ],
+
+  financial:[
+    {name:'settlements',color:'#e24b4a',bg:'#fcebeb',tc:'#791f1f',desc:'Weekly settlement batch. One per operator per weekend cycle. Holds until site owner confirms.',
+     cols:[
+      {key:'PK',name:'id',type:'uuid',note:''},
+      {key:'FK',name:'operator_id',type:'uuid',note:'→ operators.id'},
+      {key:'',name:'settlement_ref',type:'varchar(20)',note:'e.g. ZT-P-0412'},
+      {key:'',name:'period_start',type:'date',note:'Thursday of the trading week'},
+      {key:'',name:'period_end',type:'date',note:'Sunday of the trading week'},
+      {key:'',name:'gross_revenue_cents',type:'bigint',note:'Sum of session revenues'},
+      {key:'',name:'platform_fee_cents',type:'bigint',note:'ZombieTech 10%'},
+      {key:'',name:'site_fees_cents',type:'bigint',note:'Total site owner fees'},
+      {key:'',name:'landlord_share_cents',type:'bigint',note:'Landlord partner share'},
+      {key:'',name:'penalty_deductions_cents',type:'bigint',note:'Dispute awards deducted'},
+      {key:'',name:'activation_deduction_cents',type:'bigint',note:'Activation fee instalments'},
+      {key:'',name:'operator_payout_cents',type:'bigint',note:'Final amount to operator'},
+      {key:'',name:'status',type:'enum',note:'pending|ready|released|held|failed'},
+      {key:'',name:'released_at',type:'timestamptz',note:'Nullable'},
+      {key:'',name:'payment_provider_ref',type:'varchar(255)',note:'Peach/PayFast transaction ref'},
+      {key:'',name:'created_at',type:'timestamptz',note:''},
+     ],
+     rels:[{from:'settlements.operator_id',to:'operators.id',type:'N:1'}],
+     indexes:['idx_settlements_operator_id','idx_settlements_status','idx_settlements_period_start','idx_settlements_ref (unique)']},
+
+    {name:'settlement_line_items',color:'#e24b4a',bg:'#fcebeb',tc:'#791f1f',desc:'Per-session breakdown within a settlement. Full transparency on every payout.',
+     cols:[
+      {key:'PK',name:'id',type:'uuid',note:''},
+      {key:'FK',name:'settlement_id',type:'uuid',note:'→ settlements.id'},
+      {key:'FK',name:'session_id',type:'uuid',note:'→ sessions.id'},
+      {key:'FK',name:'site_slot_id',type:'uuid',note:'→ site_slots.id'},
+      {key:'',name:'line_type',type:'enum',note:'revenue|platform_fee|site_fee|landlord_share|penalty|activation'},
+      {key:'',name:'amount_cents',type:'bigint',note:'Positive = credit · negative = debit'},
+      {key:'',name:'description',type:'varchar(255)',note:'Human-readable label'},
+      {key:'',name:'created_at',type:'timestamptz',note:''},
+     ],
+     rels:[
+      {from:'settlement_line_items.settlement_id',to:'settlements.id',type:'N:1'},
+      {from:'settlement_line_items.session_id',to:'sessions.id',type:'N:1'},
+     ],
+     indexes:['idx_line_items_settlement_id','idx_line_items_line_type']},
+
+    {name:'disputes',color:'#e24b4a',bg:'#fcebeb',tc:'#791f1f',desc:'Damage or breach claims lodged by either party. Blocks settlement until resolved.',
+     cols:[
+      {key:'PK',name:'id',type:'uuid',note:'Human ref: ZT-D-NNNN'},
+      {key:'FK',name:'session_id',type:'uuid',note:'→ sessions.id'},
+      {key:'FK',name:'raised_by_user_id',type:'uuid',note:'→ users.id'},
+      {key:'',name:'dispute_ref',type:'varchar(20)',note:'e.g. ZT-D-0041'},
+      {key:'',name:'claim_type',type:'enum',note:'damage|cleaning|theft|breach|false_claim'},
+      {key:'',name:'claim_amount_cents',type:'bigint',note:'Amount requested by claimant'},
+      {key:'',name:'description',type:'text',note:'Claimant\'s description'},
+      {key:'',name:'ai_recommendation',type:'enum',note:'award_full|award_partial|reject'},
+      {key:'',name:'ai_confidence',type:'decimal(5,2)',note:''},
+      {key:'',name:'ai_reasoning',type:'text',note:'Natural language AI rationale'},
+      {key:'',name:'admin_decision',type:'enum',note:'award_full|award_partial|reject · nullable'},
+      {key:'',name:'admin_decided_by',type:'uuid',note:'→ users.id · nullable'},
+      {key:'',name:'awarded_amount_cents',type:'bigint',note:'Final award after admin decision'},
+      {key:'',name:'status',type:'enum',note:'open|under_review|resolved|escalated'},
+      {key:'',name:'deadline_at',type:'timestamptz',note:'Must resolve before settlement run'},
+      {key:'',name:'resolved_at',type:'timestamptz',note:'Nullable'},
+      {key:'',name:'created_at',type:'timestamptz',note:''},
+     ],
+     rels:[
+      {from:'disputes.session_id',to:'sessions.id',type:'N:1'},
+      {from:'disputes.raised_by_user_id',to:'users.id',type:'N:1'},
+     ],
+     indexes:['idx_disputes_session_id','idx_disputes_status','idx_disputes_deadline_at','idx_disputes_ref (unique)']},
+  ],
+
+  compliance:[
+    {name:'documents',color:'#888780',bg:'#f1efe8',tc:'#444441',desc:'All uploaded files — leases, bank statements, IDs, certificates. Immutably stored.',
+     cols:[
+      {key:'PK',name:'id',type:'uuid',note:''},
+      {key:'FK',name:'owner_user_id',type:'uuid',note:'→ users.id'},
+      {key:'',name:'document_type',type:'enum',note:'lease|bank_statement|utility_bill|id_document|proof_of_address|food_cert|insurance|consent_letter|contract_pdf|other'},
+      {key:'',name:'storage_key',type:'varchar(500)',note:'S3/GCS key — immutable'},
+      {key:'',name:'file_name',type:'varchar(255)',note:'Original filename'},
+      {key:'',name:'mime_type',type:'varchar(100)',note:''},
+      {key:'',name:'file_size_bytes',type:'bigint',note:''},
+      {key:'',name:'hash',type:'varchar(64)',note:'SHA-256 tamper detection'},
+      {key:'',name:'ai_parsed',type:'boolean',note:'AI extraction run'},
+      {key:'',name:'ai_extracted_data',type:'jsonb',note:'Extracted key-value pairs'},
+      {key:'',name:'expires_at',type:'date',note:'Nullable — certs and insurance'},
+      {key:'',name:'expiry_alerted_at',type:'timestamptz',note:'Nullable — reminder sent'},
+      {key:'',name:'created_at',type:'timestamptz',note:'Immutable after upload'},
+     ],
+     rels:[{from:'documents.owner_user_id',to:'users.id',type:'N:1'}],
+     indexes:['idx_documents_owner_user_id','idx_documents_document_type','idx_documents_expires_at']},
+
+    {name:'vetting_records',color:'#888780',bg:'#f1efe8',tc:'#444441',desc:'Individual check results for operator vetting. One row per check per operator.',
+     cols:[
+      {key:'PK',name:'id',type:'uuid',note:''},
+      {key:'FK',name:'operator_id',type:'uuid',note:'→ operators.id'},
+      {key:'',name:'check_type',type:'enum',note:'id_biometric|address|criminal|cipc|aml_pep|food_cert|insurance|credit'},
+      {key:'',name:'provider',type:'varchar(100)',note:'e.g. Smile Identity, MIE, LexisNexis'},
+      {key:'',name:'provider_ref',type:'varchar(255)',note:'External reference ID'},
+      {key:'',name:'result',type:'enum',note:'pass|fail|flag|pending'},
+      {key:'',name:'confidence_score',type:'decimal(5,2)',note:'Nullable — where provider returns one'},
+      {key:'',name:'raw_response',type:'jsonb',note:'Provider response stored verbatim'},
+      {key:'',name:'flag_reason',type:'text',note:'Nullable — human readable'},
+      {key:'',name:'requires_manual_review',type:'boolean',note:'Triggers admin queue'},
+      {key:'',name:'reviewed_by',type:'uuid',note:'→ users.id · nullable'},
+      {key:'',name:'reviewed_at',type:'timestamptz',note:'Nullable'},
+      {key:'',name:'created_at',type:'timestamptz',note:''},
+     ],
+     rels:[{from:'vetting_records.operator_id',to:'operators.id',type:'N:1'}],
+     indexes:['idx_vetting_operator_id','idx_vetting_check_type','idx_vetting_requires_manual_review','idx_vetting_result']},
+  ],
+
+  platform:[
+    {name:'trust_score_events',color:'#d4537e',bg:'#fbeaf0',tc:'#72243e',desc:'Every trust score change for operators and site owners. Immutable audit trail.',
+     cols:[
+      {key:'PK',name:'id',type:'uuid',note:''},
+      {key:'FK',name:'subject_user_id',type:'uuid',note:'→ users.id — operator or site owner'},
+      {key:'FK',name:'contract_id',type:'uuid',note:'→ contracts.id · nullable'},
+      {key:'FK',name:'session_id',type:'uuid',note:'→ sessions.id · nullable'},
+      {key:'FK',name:'dispute_id',type:'uuid',note:'→ disputes.id · nullable'},
+      {key:'',name:'event_type',type:'enum',note:'clean_session|penalty_claim|breach|dispute_raised|dispute_won|dispute_lost|response_rate|satisfaction'},
+      {key:'',name:'points_delta',type:'integer',note:'Positive or negative'},
+      {key:'',name:'score_before',type:'integer',note:''},
+      {key:'',name:'score_after',type:'integer',note:''},
+      {key:'',name:'description',type:'varchar(255)',note:'Human readable reason'},
+      {key:'',name:'created_at',type:'timestamptz',note:'Immutable'},
+     ],
+     rels:[
+      {from:'trust_score_events.subject_user_id',to:'users.id',type:'N:1'},
+      {from:'trust_score_events.session_id',to:'sessions.id',type:'N:1 nullable'},
+     ],
+     indexes:['idx_tse_subject_user_id','idx_tse_event_type','idx_tse_created_at']},
+
+    {name:'notifications',color:'#d4537e',bg:'#fbeaf0',tc:'#72243e',desc:'Push and in-app notifications. Delivery and read receipts tracked.',
+     cols:[
+      {key:'PK',name:'id',type:'uuid',note:''},
+      {key:'FK',name:'user_id',type:'uuid',note:'→ users.id'},
+      {key:'',name:'notification_type',type:'enum',note:'booking_request|booking_approved|session_reminder|handover_due|report_ready|settlement_released|dispute_opened|dispute_resolved|vetting_complete|score_change'},
+      {key:'FK',name:'related_entity_id',type:'uuid',note:'Polymorphic — session/contract/etc'},
+      {key:'',name:'related_entity_type',type:'varchar(50)',note:'sessions|contracts|disputes|etc'},
+      {key:'',name:'title',type:'varchar(255)',note:''},
+      {key:'',name:'body',type:'text',note:''},
+      {key:'',name:'channel',type:'enum',note:'push|in_app|sms|email'},
+      {key:'',name:'status',type:'enum',note:'pending|sent|delivered|read|failed'},
+      {key:'',name:'sent_at',type:'timestamptz',note:'Nullable'},
+      {key:'',name:'read_at',type:'timestamptz',note:'Nullable'},
+      {key:'',name:'created_at',type:'timestamptz',note:''},
+     ],
+     rels:[{from:'notifications.user_id',to:'users.id',type:'N:1'}],
+     indexes:['idx_notif_user_id','idx_notif_status','idx_notif_type']},
+
+    {name:'audit_log',color:'#d4537e',bg:'#fbeaf0',tc:'#72243e',desc:'Immutable record of every platform event. Non-deletable. Forms the legal evidence layer.',
+     cols:[
+      {key:'PK',name:'id',type:'uuid',note:''},
+      {key:'FK',name:'actor_user_id',type:'uuid',note:'→ users.id · nullable for system events'},
+      {key:'',name:'event_type',type:'varchar(100)',note:'namespaced: session.started, contract.signed, etc'},
+      {key:'',name:'entity_type',type:'varchar(50)',note:'users|sessions|contracts|etc'},
+      {key:'FK',name:'entity_id',type:'uuid',note:'The record affected'},
+      {key:'',name:'ip_address',type:'inet',note:'Nullable'},
+      {key:'',name:'user_agent',type:'text',note:'Nullable'},
+      {key:'',name:'payload',type:'jsonb',note:'Full event payload at time of event'},
+      {key:'',name:'created_at',type:'timestamptz',note:'Immutable — no updates ever allowed'},
+     ],
+     rels:[{from:'audit_log.actor_user_id',to:'users.id',type:'N:1 nullable'}],
+     indexes:['idx_audit_entity (entity_type, entity_id)','idx_audit_actor_user_id','idx_audit_event_type','idx_audit_created_at']},
+  ]
+};
+
+var DOMAINS=['identity','sites','contracts','sessions','financial','compliance','platform'];
+var DOMAIN_LABELS={identity:'Identity',sites:'Sites',contracts:'Contracts',sessions:'Sessions',financial:'Financial',compliance:'Compliance',platform:'Platform'};
+var DOMAIN_COLORS={identity:'#185fa5',sites:'#1d9e75',contracts:'#534ab7',sessions:'#ef9f27',financial:'#e24b4a',compliance:'#888780',platform:'#d4537e'};
+var sel=null;
+
+function buildLeft(){
+  var html='';
+  DOMAINS.forEach(function(d){
+    html+='<div class="domain-head">'+DOMAIN_LABELS[d]+'</div>';
+    SCHEMA[d].forEach(function(t){
+      html+='<div class="tbl-btn'+(sel===t.name?' on':'')+'" onclick="showTable(\''+t.name+'\')">';
+      html+='<div class="tbl-dot" style="background:'+DOMAIN_COLORS[d]+';"></div>';
+      html+='<div class="tbl-name">'+t.name+'</div>';
+      html+='<div class="tbl-count">'+t.cols.length+'c</div>';
+      html+='</div>';
+    });
+  });
+  document.getElementById('left').innerHTML=html;
+}
+
+function showTable(name){
+  sel=name;
+  buildLeft();
+  var t=null,color='',bg='',tc='';
+  DOMAINS.forEach(function(d){
+    SCHEMA[d].forEach(function(tt){
+      if(tt.name===name){t=tt;color=DOMAIN_COLORS[d];bg=tt.bg;tc=tt.tc;}
+    });
+  });
+  if(!t) return;
+  var html='';
+  html+='<div class="tbl-header">';
+  html+='<div class="tbl-icon" style="background:'+bg+';color:'+tc+';">'+name.slice(0,2).toUpperCase()+'</div>';
+  html+='<div><div class="tbl-title" style="color:'+color+';">'+name+'</div><div class="tbl-desc">'+t.desc+'</div></div>';
+  html+='</div>';
+  html+='<div class="col-grid">';
+  html+='<div class="col-head">Key</div><div class="col-head">Column</div><div class="col-head">Type</div><div class="col-head">Notes</div>';
+  t.cols.forEach(function(c){
+    html+='<div class="col-row">';
+    html+='<div class="col-cell" style="justify-content:center;">';
+    if(c.key==='PK') html+='<span class="key-icon" style="color:#185fa5;">PK</span>';
+    else if(c.key==='FK') html+='<span class="key-icon" style="color:#3b6d11;">FK</span>';
+    html+='</div>';
+    html+='<div class="col-cell"><span class="col-name'+(c.key==='PK'?' pk':c.key==='FK'?' fk':'')+'">'+c.name+'</span></div>';
+    html+='<div class="col-cell"><span class="col-type">'+c.type+'</span></div>';
+    html+='<div class="col-cell"><span class="col-note">'+c.note+'</span></div>';
+    html+='</div>';
+  });
+  html+='</div>';
+  if(t.rels&&t.rels.length){
+    html+='<div class="rels"><div class="rel-head">Relationships</div>';
+    t.rels.forEach(function(r){
+      html+='<div class="rel-item"><span class="rel-from">'+r.from+'</span><span class="rel-arrow">→</span><span class="rel-to">'+r.to+'</span><span class="rel-type">'+r.type+'</span></div>';
+    });
+    html+='</div>';
+  }
+  if(t.indexes&&t.indexes.length){
+    html+='<div class="indexes"><div class="rel-head" style="margin-top:12px;">Indexes</div>';
+    t.indexes.forEach(function(i){
+      html+='<div class="idx-item">'+i+'</div>';
+    });
+    html+='</div>';
+  }
+  document.getElementById('right').innerHTML=html;
+}
+
+buildLeft();
+showTable('users');
+</script>
+</body>
+</html>

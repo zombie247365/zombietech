@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZombieTech — Unified Commercial Model</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f8f8f6;color:#1a1a1a;padding:24px;font-size:14px;}
+h1{font-size:20px;font-weight:500;margin-bottom:4px;color:#1d9e75;}
+.top-meta{font-size:12px;color:#888;margin-bottom:20px;}
+.sec{background:#fff;border:0.5px solid #e8e8e8;border-radius:12px;padding:1rem 1.25rem;margin-bottom:10px;}
+.sec-alt{background:#f8f8f6;}
+.sh{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+.sn{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;flex-shrink:0;}
+.st{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:#bbb;margin:0;}
+.g2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}
+.g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;}
+.g4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;}
+.mc{background:#f2f2f0;border-radius:8px;padding:10px 12px;}
+.mc.white{background:#fff;border:0.5px solid #e8e8e8;}
+.mlb{font-size:11px;color:#888;margin-bottom:3px;}
+.mv{font-size:18px;font-weight:500;}
+.mv.green{color:#166534;}.mv.blue{color:#1e40af;}.mv.amber{color:#92400e;}.mv.red{color:#991b1b;}
+.lbl{font-size:12px;color:#666;display:block;margin-bottom:4px;}
+.fd{margin-bottom:10px;}
+.irow{display:flex;align-items:center;gap:5px;}
+.px{font-size:13px;color:#888;}
+input[type=number]{padding:5px 8px;border:0.5px solid #e0e0e0;border-radius:8px;background:#f8f8f6;color:#1a1a1a;font-size:14px;width:100%;max-width:110px;}
+input[type=range]{width:100%;}
+.sr{display:flex;align-items:center;gap:8px;}
+.sv{font-size:13px;font-weight:500;min-width:32px;text-align:right;}
+.dvd{border:none;border-top:0.5px solid #f0f0f0;margin:10px 0;}
+.tb{display:flex;gap:5px;flex-wrap:wrap;margin-top:4px;margin-bottom:8px;}
+.t{flex:1;min-width:44px;padding:5px 7px;border-radius:8px;border:0.5px solid #e0e0e0;background:#f8f8f6;color:#888;font-size:11px;cursor:pointer;text-align:center;transition:all .12s;}
+.t:hover{background:#f0f0f0;}
+.t.on{background:#dbeafe;color:#1e40af;border-color:#93c5fd;font-weight:500;}
+.day{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;border:0.5px solid #e8e8e8;cursor:pointer;user-select:none;margin-bottom:5px;transition:all .12s;background:#f8f8f6;}
+.day.on{background:#dcfce7;border-color:#86efac;}
+.dck{width:14px;height:14px;border-radius:3px;border:1.5px solid #e0e0e0;display:flex;align-items:center;justify-content:center;font-size:10px;transition:all .12s;}
+.day.on .dck{background:#1d9e75;border-color:#1d9e75;color:#fff;}
+.dn{font-size:13px;font-weight:500;flex:1;}
+.day.on .dn{color:#166534;}
+.dt{font-size:11px;color:#bbb;}
+.dh{font-size:11px;font-weight:500;color:#bbb;}
+.day.on .dt,.day.on .dh{color:#4ade80;}
+.orow{display:flex;align-items:center;gap:10px;padding:8px 12px;background:#f8f8f6;border-radius:8px;margin-bottom:12px;flex-wrap:wrap;border:0.5px solid #e8e8e8;}
+.flow-arrow{text-align:center;font-size:11px;color:#bbb;padding:4px 0;margin-bottom:8px;display:flex;align-items:center;gap:8px;}
+.flow-arrow::before,.flow-arrow::after{content:'';flex:1;border-top:0.5px dashed #e0e0e0;}
+.br{display:flex;align-items:center;gap:8px;margin-bottom:5px;}
+.brl{font-size:11px;color:#888;width:160px;flex-shrink:0;text-align:right;}
+.brt{flex:1;background:#f8f8f6;border-radius:3px;height:20px;overflow:hidden;border:0.5px solid #f0f0f0;}
+.brf{height:100%;border-radius:3px;display:flex;align-items:center;padding-left:6px;transition:width .25s;}
+.bra{font-size:10px;font-weight:500;color:#fff;white-space:nowrap;}
+.warn{font-size:12px;color:#854d0e;background:#fef9c3;border-radius:8px;padding:7px 10px;margin-top:8px;border:0.5px solid #fcd34d;}
+.good{font-size:12px;color:#166534;background:#dcfce7;border-radius:8px;padding:7px 10px;margin-top:8px;border:0.5px solid #86efac;}
+.note{font-size:11px;color:#bbb;margin-top:6px;line-height:1.5;}
+.strip{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:#888;}
+.strip strong{color:#1a1a1a;}
+.tog-up{flex:1;padding:10px;border-radius:10px;border:1.5px solid #e8e8e8;cursor:pointer;transition:all .12s;text-align:left;background:#f8f8f6;}
+.tog-up.sel{border-color:#1d9e75;background:#dcfce7;}
+.tog-title{font-size:12px;font-weight:500;color:#555;}
+.tog-up.sel .tog-title{color:#166534;}
+.tog-sub{font-size:10px;color:#bbb;margin-top:2px;}
+.tog-up.sel .tog-sub{color:#4ade80;}
+</style>
+</head>
+<body>
+<h1>ZombieTech — Unified Commercial Model</h1>
+<div class="top-meta">Revenue forecast → P&L for all three parties → ZombieTech at scale. All sections are live and interactive.</div>
+
+<!-- SECTION 1: SITE & SCHEDULE -->
+<div class="sec">
+  <div class="sh"><div class="sn" style="background:#dbeafe;color:#1e40af;">1</div><p class="st">Site & schedule</p></div>
+  <div class="g2">
+    <div class="fd"><span class="lbl">Monthly rent</span><div class="irow"><span class="px">R</span><input type="number" id="rent" value="15000" step="500"></div></div>
+    <div class="fd"><span class="lbl">Monthly utilities</span><div class="irow"><span class="px">R</span><input type="number" id="util" value="3000" step="100"></div></div>
+    <div class="fd"><span class="lbl">Site operating hrs/month</span><div class="irow"><input type="number" id="sHrs" value="330" step="10" style="max-width:80px;"><span class="px">hrs</span></div></div>
+  </div>
+  <div class="day on" data-hrs="6" onclick="toggleDay(this)"><div class="dck">✓</div><span class="dn">Thursday</span><span class="dt">20:00–02:00</span><span class="dh" style="margin-left:auto;">6 hrs</span></div>
+  <div class="day on" data-hrs="8" onclick="toggleDay(this)"><div class="dck">✓</div><span class="dn">Friday</span><span class="dt">20:00–04:00</span><span class="dh" style="margin-left:auto;">8 hrs</span></div>
+  <div class="day on" data-hrs="8" onclick="toggleDay(this)"><div class="dck">✓</div><span class="dn">Saturday</span><span class="dt">20:00–04:00</span><span class="dh" style="margin-left:auto;">8 hrs</span></div>
+  <div class="dvd"></div>
+  <div class="strip" id="s1"></div>
+</div>
+
+<div class="flow-arrow">Hourly cost rate + zombie hours/month</div>
+
+<!-- SECTION 2: REVENUE FORECAST -->
+<div class="sec">
+  <div class="sh"><div class="sn" style="background:#dcfce7;color:#166534;">2</div><p class="st">Revenue forecast</p></div>
+  <div class="g2">
+    <div class="fd"><span class="lbl">Site monthly revenue (bank statements)</span><div class="irow"><span class="px">R</span><input type="number" id="sRev" value="150000" step="5000"></div></div>
+    <div class="fd"><span class="lbl">Evening share (AI-inferred)</span><div class="sr"><input type="range" min="20" max="70" value="45" id="eShare" step="5"><span class="sv" id="esO">45%</span></div></div>
+  </div>
+  <div class="g2">
+    <div class="fd"><span class="lbl">Population within 10km</span>
+      <div class="tb">
+        <div class="t on" data-g="pop" data-v="0.7" onclick="setT(this)">&lt;50k</div>
+        <div class="t" data-g="pop" data-v="0.9" onclick="setT(this)">50–150k</div>
+        <div class="t" data-g="pop" data-v="1.1" onclick="setT(this)">150–300k</div>
+        <div class="t" data-g="pop" data-v="1.3" onclick="setT(this)">300k+</div>
+      </div>
+    </div>
+    <div class="fd"><span class="lbl">Area LSM band</span>
+      <div class="tb">
+        <div class="t" data-g="inc" data-v="0.85" onclick="setT(this)">1–4</div>
+        <div class="t on" data-g="inc" data-v="1.0" onclick="setT(this)">5–7</div>
+        <div class="t" data-g="inc" data-v="1.2" onclick="setT(this)">8–10</div>
+      </div>
+    </div>
+  </div>
+  <div class="fd"><span class="lbl">Competitor delivery density (5 = clear market)</span>
+    <div class="sr"><input type="range" min="1" max="5" value="3" id="comp" step="1"><span class="sv" id="compO">3</span></div>
+  </div>
+  <div class="fd"><span class="lbl">Operating model</span>
+    <div class="tb">
+      <div class="t on" id="tb-hybrid" onclick="setOp('hybrid')">Dine-in + delivery</div>
+      <div class="t" id="tb-delivery" onclick="setOp('delivery')">Delivery only</div>
+    </div>
+  </div>
+  <div id="delExtra" style="display:none;" class="g2">
+    <div class="fd"><span class="lbl">Platform commission</span><div class="irow"><input type="number" style="max-width:60px;" id="delC" value="27" min="15" max="35"><span class="px">%</span></div></div>
+    <div class="fd"><span class="lbl">Delivery radius</span>
+      <div class="tb">
+        <div class="t" data-g="rad" data-v="0.85" onclick="setT(this)">3km</div>
+        <div class="t on" data-g="rad" data-v="1.0" onclick="setT(this)">5km</div>
+        <div class="t" data-g="rad" data-v="1.18" onclick="setT(this)">8km</div>
+      </div>
+    </div>
+  </div>
+  <div class="fd"><span class="lbl">Operator ramp-up stage</span>
+    <div class="tb">
+      <div class="t on" data-g="ramp" data-v="0.45" onclick="setT(this)">Mth 1–3</div>
+      <div class="t" data-g="ramp" data-v="0.65" onclick="setT(this)">Mth 4–6</div>
+      <div class="t" data-g="ramp" data-v="0.82" onclick="setT(this)">Mth 7–12</div>
+      <div class="t" data-g="ramp" data-v="1.0" onclick="setT(this)">12mth+</div>
+    </div>
+  </div>
+  <!-- Revenue bands -->
+  <div style="display:flex;border-radius:10px;overflow:hidden;border:0.5px solid #e8e8e8;margin:10px 0;" id="revBand"></div>
+  <div class="strip" id="s2"></div>
+</div>
+
+<div class="flow-arrow">Base case revenue feeds directly into P&L below</div>
+
+<!-- SECTION 3: FULL P&L -->
+<div class="sec">
+  <div class="sh"><div class="sn" style="background:#fef9c3;color:#854d0e;">3</div><p class="st">Full P&L — all three parties</p></div>
+  <div class="orow">
+    <span style="font-size:12px;color:#888;">Revenue:</span>
+    <span style="font-size:13px;font-weight:500;" id="revLbl">Forecast base case</span>
+    <span style="flex:1;"></span>
+    <label style="font-size:12px;color:#888;display:flex;align-items:center;gap:5px;cursor:pointer;">
+      <input type="checkbox" id="ovChk" onchange="toggleOv()"> Override
+    </label>
+    <div id="ovInp" style="display:none;"><div class="irow"><span class="px">R</span><input type="number" id="manRev" value="40000" step="1000"></div></div>
+  </div>
+  <div class="g2">
+    <div class="fd"><span class="lbl">COGS %</span><div class="irow"><input type="number" style="max-width:60px;" id="cogs" value="40" min="0" max="90"><span class="px">%</span></div></div>
+    <div class="fd"><span class="lbl">Labour</span><div class="irow"><span class="px">R</span><input type="number" id="lab" value="8000" step="500"></div></div>
+    <div class="fd"><span class="lbl">Packaging / other</span><div class="irow"><span class="px">R</span><input type="number" id="oth" value="2000" step="200"></div></div>
+    <div class="fd"><span class="lbl">ZombieTech transaction fee</span><div class="irow"><input type="number" style="max-width:60px;" id="platP" value="10" min="0" max="25"><span class="px">%</span></div></div>
+  </div>
+  <div class="dvd"></div>
+  <div class="fd"><span class="lbl">Site owner upside model</span>
+    <div style="display:flex;gap:8px;margin-top:4px;">
+      <div class="tog-up sel" id="tb-fixed" onclick="setUp('fixed')">
+        <div class="tog-title">Fixed % markup</div>
+        <div class="tog-sub">Guaranteed income regardless of performance</div>
+      </div>
+      <div class="tog-up" id="tb-variable" onclick="setUp('variable')">
+        <div class="tog-title">Variable % of net profit</div>
+        <div class="tog-sub">Base fee + share of zombie net profit</div>
+      </div>
+    </div>
+  </div>
+  <div id="fixInp"><div class="fd"><span class="lbl">Guaranteed markup on base site fee</span><div class="irow"><input type="number" style="max-width:60px;" id="fxP" value="30" min="0" max="200"><span class="px">%</span></div></div></div>
+  <div id="varInp" style="display:none;"><div class="fd"><span class="lbl">Share of zombie net profit paid to site owner</span><div class="irow"><input type="number" style="max-width:60px;" id="vrP" value="20" min="0" max="80"><span class="px">%</span></div></div></div>
+  <div class="dvd"></div>
+  <div id="plBars" style="margin-bottom:14px;"></div>
+  <div class="g4" id="plM" style="margin-bottom:8px;"></div>
+  <div id="plW" style="display:none;" class="warn"></div>
+  <p class="note" id="spNote"></p>
+</div>
+
+<div class="flow-arrow">ZombieTech fee per operator × active operators = platform P&L</div>
+
+<!-- SECTION 4: SCALE -->
+<div class="sec sec-alt">
+  <div class="sh"><div class="sn" style="background:#ede9fe;color:#4c1d95;">4</div><p class="st">ZombieTech at scale</p></div>
+  <div class="fd"><span class="lbl">Active operators on platform</span>
+    <div class="sr"><input type="range" min="10" max="500" value="100" id="opN" step="10"><span class="sv" id="opO">100</span></div>
+  </div>
+  <div class="g3" id="scM" style="margin-bottom:14px;"></div>
+  <div style="display:flex;flex-wrap:wrap;gap:14px;margin-bottom:8px;font-size:12px;color:#888;" id="cLeg"></div>
+  <div style="position:relative;width:100%;height:220px;"><canvas id="sCh"></canvas></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+var S={pop:0.7,inc:1.0,rad:1.0,ramp:0.45,op:'hybrid',up:'fixed'};
+var sCh=null;
+
+function setT(el){
+  var g=el.dataset.g;
+  document.querySelectorAll('[data-g="'+g+'"]').forEach(function(e){e.classList.remove('on');});
+  el.classList.add('on');
+  S[g]=parseFloat(el.dataset.v);
+  calc();
+}
+
+function setOp(m){
+  S.op=m;
+  document.getElementById('tb-hybrid').classList.toggle('on',m==='hybrid');
+  document.getElementById('tb-delivery').classList.toggle('on',m==='delivery');
+  document.getElementById('delExtra').style.display=m==='delivery'?'grid':'none';
+  calc();
+}
+
+function setUp(u){
+  S.up=u;
+  document.getElementById('tb-fixed').classList.toggle('sel',u==='fixed');
+  document.getElementById('tb-variable').classList.toggle('sel',u==='variable');
+  document.getElementById('fixInp').style.display=u==='fixed'?'':'none';
+  document.getElementById('varInp').style.display=u==='variable'?'':'none';
+  calc();
+}
+
+function toggleOv(){
+  var on=document.getElementById('ovChk').checked;
+  document.getElementById('ovInp').style.display=on?'':'none';
+  calc();
+}
+
+function toggleDay(el){
+  el.classList.toggle('on');
+  el.querySelector('.dck').textContent=el.classList.contains('on')?'✓':'';
+  calc();
+}
+
+function R(n){return isNaN(n)?'--':'R '+Math.round(n).toLocaleString();}
+function v(id){return +(document.getElementById(id)?document.getElementById(id).value:0)||0;}
+
+function calc(){
+  var rent=v('rent'),util=v('util'),sHrs=v('sHrs')||1;
+  var hrlyR=rent/720,hrlyU=util/sHrs,hrlyRate=hrlyR+hrlyU;
+  var hrsWk=0;
+  document.querySelectorAll('.day.on').forEach(function(d){hrsWk+=(+d.dataset.hrs||0);});
+  var hrsMth=hrsWk*52/12;
+  var baseFee=hrlyRate*hrsMth;
+  document.getElementById('s1').innerHTML=
+    '<span>Hourly rate: <strong>'+R(hrlyRate)+'/hr</strong></span>'+
+    '<span>Zombie hrs/month: <strong>'+hrsMth.toFixed(1)+'</strong></span>'+
+    '<span>Base site fee: <strong>'+R(baseFee)+'/mth</strong></span>';
+
+  var sRev=v('sRev'),eShare=v('eShare')/100,comp=v('comp'),delC=v('delC')||27;
+  document.getElementById('esO').textContent=Math.round(eShare*100)+'%';
+  document.getElementById('compO').textContent=comp;
+  var sHrly=sRev/(sHrs||1);
+  var eHrly=sHrly*(1+eShare*0.6);
+  var raw=eHrly*hrsMth*0.42;
+  var locM=S.pop*S.inc*(0.7+comp*0.06);
+  var delM=S.op==='delivery'?S.rad*1.15:1.0;
+  var commH=S.op==='delivery'?(1-delC/100):1.0;
+  var full=raw*locM*delM*commH;
+  var baseRev=full*S.ramp;
+  var cons=baseRev*0.75,opti=baseRev*1.35;
+  var locScore=Math.min(100,Math.round(locM*55));
+  document.getElementById('revBand').innerHTML=[
+    {l:'Conservative',a:cons,bg:'#dbeafe',c:'#1e40af',s:'75th pct downside'},
+    {l:'Base case',a:baseRev,bg:'#dcfce7',c:'#166534',s:'Expected trajectory'},
+    {l:'Optimistic',a:opti,bg:'#fef9c3',c:'#854d0e',s:'Strong execution'}
+  ].map(function(b){return '<div style="flex:1;padding:10px 12px;text-align:center;background:'+b.bg+';">'+
+    '<div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;color:'+b.c+';">'+b.l+'</div>'+
+    '<div style="font-size:17px;font-weight:500;color:'+b.c+';">'+R(b.a)+'</div>'+
+    '<div style="font-size:10px;margin-top:2px;color:'+b.c+';opacity:.7;">'+b.s+'</div></div>';}).join('');
+  document.getElementById('s2').innerHTML=
+    '<span>Site hrly: <strong>'+R(sHrly)+'/hr</strong></span>'+
+    '<span>Evening-weighted: <strong>'+R(eHrly)+'/hr</strong></span>'+
+    '<span>Location score: <strong>'+locScore+'/100</strong></span>'+
+    '<span>Full potential: <strong>'+R(full/S.ramp)+'/mth</strong></span>';
+
+  var ov=document.getElementById('ovChk').checked;
+  var revenue=ov?v('manRev'):baseRev;
+  document.getElementById('revLbl').textContent=(ov?'Manual override — ':'Forecast base case — ')+R(Math.round(baseRev))+'/month';
+
+  var cogsAmt=revenue*v('cogs')/100;
+  var labAmt=v('lab'),othAmt=v('oth');
+  var ztFee=revenue*v('platP')/100;
+  var fxP=v('fxP')/100,vrP=v('vrP')/100;
+  var siteOwner,zombieNet;
+  if(S.up==='fixed'){
+    siteOwner=baseFee*(1+fxP);
+    zombieNet=revenue-cogsAmt-labAmt-othAmt-ztFee-siteOwner;
+  } else {
+    var bNet=revenue-cogsAmt-labAmt-othAmt-ztFee-baseFee;
+    var vShare=Math.max(0,bNet)*vrP;
+    siteOwner=baseFee+vShare;
+    zombieNet=bNet-vShare;
+  }
+  var margin=revenue>0?zombieNet/revenue*100:0;
+
+  var bars=[
+    {l:'Revenue',a:revenue,col:'#3266ad'},
+    {l:'COGS',a:cogsAmt,col:'#ef4444'},
+    {l:'Labour',a:labAmt,col:'#f59e0b'},
+    {l:'Packaging / other',a:othAmt,col:'#9ca3af'},
+    {l:'ZombieTech fee',a:ztFee,col:'#7c3aed'},
+    {l:'Site owner',a:siteOwner,col:'#0f766e'},
+    {l:'Zombie operator net',a:zombieNet,col:zombieNet>=0?'#16a34a':'#dc2626'},
+  ];
+  document.getElementById('plBars').innerHTML=bars.map(function(b){
+    var pct=Math.min(100,Math.max(0,Math.abs(b.a)/(Math.max(revenue,1))*100));
+    return '<div class="br"><div class="brl">'+b.l+'</div>'+
+      '<div class="brt"><div class="brf" style="width:'+pct.toFixed(1)+'%;background:'+b.col+';">'+
+      '<span class="bra">'+R(b.a)+'</span></div></div></div>';
+  }).join('');
+
+  document.getElementById('plM').innerHTML=[
+    {l:'Site owner',v:R(siteOwner),c:'#166534'},
+    {l:'ZombieTech/mth',v:R(ztFee),c:'#4c1d95'},
+    {l:'Zombie net profit',v:R(zombieNet),c:zombieNet>=0?'#166534':'#991b1b'},
+    {l:'Operator margin',v:Math.round(margin)+'%',c:'#888'},
+  ].map(function(m){return '<div class="mc"><div class="mlb">'+m.l+'</div><div class="mv" style="color:'+m.c+';">'+m.v+'</div></div>';}).join('');
+
+  var pw=document.getElementById('plW');
+  if(zombieNet<0){pw.style.display='';pw.textContent='Operator is loss-making at these inputs. Consider reducing COGS, site fee, or platform fee — or growing revenue.';}
+  else pw.style.display='none';
+  document.getElementById('spNote').textContent='ZombieTech starter pack / activation fee collected once per operator at sign-on — not included in recurring monthly figures above.';
+
+  updateScale(ztFee);
+}
+
+function updateScale(ztPerOp){
+  var ops=v('opN');
+  document.getElementById('opO').textContent=ops;
+  var mth=Math.round(ztPerOp*ops),ann=mth*12;
+  document.getElementById('scM').innerHTML=[
+    {l:'Monthly recurring',v:'R '+mth.toLocaleString()},
+    {l:'Annual recurring',v:'R '+ann.toLocaleString()},
+    {l:'Revenue per operator',v:'R '+Math.round(ztPerOp).toLocaleString()+'/mth'},
+  ].map(function(m){return '<div class="mc white"><div class="mlb">'+m.l+'</div><div class="mv" style="font-size:15px;">'+m.v+'</div></div>';}).join('');
+
+  var pts=[10,25,50,100,150,200,300,500];
+  var mData=pts.map(function(n){return Math.round(ztPerOp*n);});
+  var aData=pts.map(function(n){return Math.round(ztPerOp*n*12);});
+  document.getElementById('cLeg').innerHTML=
+    '<span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:2px;background:#534ab7;display:inline-block;"></span>Monthly recurring</span>'+
+    '<span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:2px;background:#1d9e75;display:inline-block;"></span>Annual recurring</span>';
+  if(sCh){sCh.destroy();}
+  sCh=new Chart(document.getElementById('sCh'),{
+    type:'bar',
+    data:{
+      labels:pts.map(function(n){return n+' ops';}),
+      datasets:[
+        {label:'Monthly',data:mData,backgroundColor:'#534ab7',borderRadius:3,barPercentage:0.6},
+        {label:'Annual',data:aData,backgroundColor:'#1d9e75',borderRadius:3,barPercentage:0.6}
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return 'R '+c.parsed.y.toLocaleString();}}}},
+      scales:{
+        x:{ticks:{autoSkip:false,maxRotation:0,font:{size:11}},grid:{display:false}},
+        y:{ticks:{callback:function(v){return v>=1000000?'R'+(v/1000000).toFixed(1)+'M':v>=1000?'R'+(v/1000).toFixed(0)+'k':'R'+v;},font:{size:11}},grid:{color:'rgba(0,0,0,0.04)'}}
+      }
+    }
+  });
+}
+
+document.querySelectorAll('input[type=number],input[type=range]').forEach(function(i){i.addEventListener('input',calc);});
+calc();
+</script>
+</body>
+</html>

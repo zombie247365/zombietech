@@ -1,0 +1,7 @@
+{
+  "build": { "builder": "nixpacks" },
+  "deploy": {
+    "startCommand": "cd packages/api && node dist/index.js",
+    "buildCommand": "npm install && cd packages/api && npx tsc"
+  }
+}

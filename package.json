@@ -1,0 +1,27 @@
+{
+  "name": "zombietech",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "type-check": "turbo run type-check",
+    "db:migrate": "turbo run db:migrate --filter=@zombietech/database",
+    "db:seed": "turbo run db:seed --filter=@zombietech/database",
+    "db:generate": "turbo run db:generate --filter=@zombietech/database"
+  },
+  "devDependencies": {
+    "turbo": "^2.3.3",
+    "typescript": "^5.7.2",
+    "@types/node": "^22.10.0",
+    "prettier": "^3.4.2"
+  },
+  "packageManager": "npm@10.9.2",
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

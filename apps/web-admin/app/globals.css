@@ -1,0 +1,55 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: #f8f8f6;
+  color: #1a1a1a;
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+}
+
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-white text-sm font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed;
+    background: #1d9e75;
+  }
+  .btn-primary:hover:not(:disabled) { background: #166534; }
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-[#e0e0e0] bg-white text-sm font-medium text-[#555] transition-colors hover:bg-[#f5f5f5] disabled:opacity-40;
+  }
+  .btn-danger {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-red-600 text-white text-sm font-medium transition-colors hover:bg-red-700 disabled:opacity-40;
+  }
+  .btn-amber {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-amber-500 text-white text-sm font-medium transition-colors hover:bg-amber-600 disabled:opacity-40;
+  }
+  .card { @apply rounded-xl border border-[#e8e8e8] p-4; background: #f8f8f6; }
+  .card-white { @apply bg-white rounded-xl border border-[#e8e8e8] p-4; }
+  .input {
+    @apply w-full h-9 border border-[#e0e0e0] rounded-lg px-3 text-sm text-[#1a1a1a] placeholder:text-[#aaa] focus:outline-none transition-colors;
+    background: #f8f8f6;
+  }
+  .input:focus { border-color: #1d9e75; background: #fff; }
+  .label { @apply block text-xs text-[#666] mb-1; }
+  .section-title { @apply text-[10px] font-semibold uppercase tracking-widest text-[#bbb] mb-2.5; }
+  .pill-green  { @apply inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-green-100 text-green-800; }
+  .pill-amber  { @apply inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-800; }
+  .pill-blue   { @apply inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-blue-100 text-blue-800; }
+  .pill-purple { @apply inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-purple-100 text-purple-800; }
+  .pill-red    { @apply inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-red-100 text-red-800; }
+  .pill-gray   { @apply inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 border border-gray-200; }
+  .row-item    { @apply flex justify-between items-center py-2 border-b border-[#f0f0f0] last:border-0; }
+  .page-title  { @apply text-xl font-medium mb-1; }
+  .page-sub    { @apply text-sm text-[#666] mb-5 leading-relaxed; }
+  .stat-card {
+    @apply card-white flex flex-col gap-1;
+  }
+  .stat-val  { @apply text-2xl font-medium; }
+  .stat-lbl  { @apply text-xs text-[#888]; }
+  .table-row { @apply flex items-center gap-3 px-4 py-3 border-b border-[#f0f0f0] last:border-0 hover:bg-[#fafafa] transition-colors; }
+  .table-hd  { @apply flex items-center gap-3 px-4 py-2 bg-[#f8f8f6] border-b border-[#e8e8e8] rounded-t-xl; }
+}

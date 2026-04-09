@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZombieTech — Platform Architecture</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f8f8f6;color:#1a1a1a;padding:24px;font-size:13px;}
+h1{font-size:20px;font-weight:500;margin-bottom:4px;color:#1d9e75;}
+.top-meta{font-size:12px;color:#888;margin-bottom:20px;}
+.arch-wrap{background:#fff;border-radius:16px;border:0.5px solid #e8e8e8;padding:24px;overflow-x:auto;}
+svg{display:block;max-width:100%;}
+.detail-panel{background:#fff;border:0.5px solid #e8e8e8;border-radius:12px;padding:16px;margin-top:16px;min-height:80px;}
+.det-title{font-size:14px;font-weight:500;margin-bottom:6px;}
+.det-body{font-size:12px;color:#666;line-height:1.65;margin-bottom:8px;}
+.det-items{display:flex;flex-direction:column;gap:4px;}
+.det-item{display:flex;gap:7px;align-items:flex-start;font-size:11px;color:#666;}
+.di-dot{width:4px;height:4px;border-radius:50%;flex-shrink:0;margin-top:5px;}
+.det-badge{display:inline-flex;font-size:10px;font-weight:600;padding:3px 10px;border-radius:20px;margin-bottom:8px;}
+.placeholder{color:#bbb;font-size:12px;}
+</style>
+</head>
+<body>
+<h1>ZombieTech — Platform Architecture</h1>
+<div class="top-meta">Three-layer architecture: client interfaces → API gateway → platform services → data layer. Click any node to explore its role.</div>
+
+<div class="arch-wrap">
+<svg width="100%" viewBox="0 0 680 395" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+<path d="M2 1L8 5L2 9" fill="none" stroke="#888" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+</marker>
+</defs>
+
+<!-- Outer container -->
+<rect x="20" y="15" width="640" height="365" rx="16" fill="#f8f8f6" stroke="#e0e0e0" stroke-width="0.5"/>
+
+<!-- Layer label: client interfaces -->
+<text x="40" y="37" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="10" font-weight="600" fill="#bbb" letter-spacing="0.08em">CLIENT INTERFACES</text>
+
+<!-- Site owner app -->
+<g style="cursor:pointer;" onclick="showDetail('site-owner-app')">
+  <rect x="40" y="48" width="175" height="56" rx="8" fill="#ede9fe" stroke="#c4b5fd" stroke-width="0.5"/>
+  <text x="127" y="71" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="13" font-weight="500" fill="#4c1d95">Site owner app</text>
+  <text x="127" y="89" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11" fill="#7c3aed">Web + mobile</text>
+</g>
+
+<!-- Operator app -->
+<g style="cursor:pointer;" onclick="showDetail('operator-app')">
+  <rect x="252" y="48" width="175" height="56" rx="8" fill="#ede9fe" stroke="#c4b5fd" stroke-width="0.5"/>
+  <text x="339" y="71" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="13" font-weight="500" fill="#4c1d95">Operator app</text>
+  <text x="339" y="89" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11" fill="#7c3aed">Mobile only</text>
+</g>
+
+<!-- Admin portal -->
+<g style="cursor:pointer;" onclick="showDetail('admin-portal')">
+  <rect x="465" y="48" width="175" height="56" rx="8" fill="#ede9fe" stroke="#c4b5fd" stroke-width="0.5"/>
+  <text x="552" y="71" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="13" font-weight="500" fill="#4c1d95">Admin portal</text>
+  <text x="552" y="89" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11" fill="#7c3aed">Internal tooling</text>
+</g>
+
+<!-- Arrows down to API gateway -->
+<line x1="127" y1="104" x2="127" y2="136" stroke="#888" stroke-width="1" marker-end="url(#arrow)"/>
+<line x1="339" y1="104" x2="339" y2="136" stroke="#888" stroke-width="1" marker-end="url(#arrow)"/>
+<line x1="552" y1="104" x2="552" y2="136" stroke="#888" stroke-width="1" marker-end="url(#arrow)"/>
+
+<!-- Layer label: API gateway -->
+<text x="40" y="130" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="10" font-weight="600" fill="#bbb" letter-spacing="0.08em">API GATEWAY</text>
+
+<!-- API gateway bar -->
+<g style="cursor:pointer;" onclick="showDetail('api-gateway')">
+  <rect x="40" y="136" width="600" height="38" rx="8" fill="#dbeafe" stroke="#93c5fd" stroke-width="0.5"/>
+  <text x="340" y="155" text-anchor="middle" dominant-baseline="central" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="13" font-weight="500" fill="#1e40af">API gateway &amp; authentication middleware</text>
+</g>
+
+<!-- Arrows down to platform services -->
+<line x1="109" y1="174" x2="109" y2="192" stroke="#888" stroke-width="1" marker-end="url(#arrow)"/>
+<line x1="263" y1="174" x2="263" y2="192" stroke="#888" stroke-width="1" marker-end="url(#arrow)"/>
+<line x1="417" y1="174" x2="417" y2="192" stroke="#888" stroke-width="1" marker-end="url(#arrow)"/>
+<line x1="571" y1="174" x2="571" y2="192" stroke="#888" stroke-width="1" marker-end="url(#arrow)"/>
+
+<!-- Layer label: platform services -->
+<text x="40" y="186" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="10" font-weight="600" fill="#bbb" letter-spacing="0.08em">PLATFORM SERVICES</text>
+
+<!-- AI engine -->
+<g style="cursor:pointer;" onclick="showDetail('ai-engine')">
+  <rect x="40" y="192" width="138" height="58" rx="8" fill="#ccfbf1" stroke="#5eead4" stroke-width="0.5"/>
+  <text x="109" y="215" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="13" font-weight="500" fill="#134e4a">AI engine</text>
+  <text x="109" y="234" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11" fill="#0f766e">Photo &amp; forecast</text>
+</g>
+
+<!-- Contracts -->
+<g style="cursor:pointer;" onclick="showDetail('contracts-service')">
+  <rect x="194" y="192" width="138" height="58" rx="8" fill="#ccfbf1" stroke="#5eead4" stroke-width="0.5"/>
+  <text x="263" y="215" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="13" font-weight="500" fill="#134e4a">Contracts</text>
+  <text x="263" y="234" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11" fill="#0f766e">Generate · sign</text>
+</g>
+
+<!-- Vetting & KYC -->
+<g style="cursor:pointer;" onclick="showDetail('vetting-kyc')">
+  <rect x="348" y="192" width="138" height="58" rx="8" fill="#ccfbf1" stroke="#5eead4" stroke-width="0.5"/>
+  <text x="417" y="215" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="13" font-weight="500" fill="#134e4a">Vetting &amp; KYC</text>
+  <text x="417" y="234" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11" fill="#0f766e">ID · CIPC · AML</text>
+</g>
+
+<!-- Payments -->
+<g style="cursor:pointer;" onclick="showDetail('payments-service')">
+  <rect x="502" y="192" width="138" height="58" rx="8" fill="#ccfbf1" stroke="#5eead4" stroke-width="0.5"/>
+  <text x="571" y="215" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="13" font-weight="500" fill="#134e4a">Payments</text>
+  <text x="571" y="234" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11" fill="#0f766e">Collect &amp; settle</text>
+</g>
+
+<!-- Arrows down to data layer -->
+<line x1="109" y1="250" x2="109" y2="274" stroke="#888" stroke-width="1" marker-end="url(#arrow)"/>
+<line x1="263" y1="250" x2="263" y2="274" stroke="#888" stroke-width="1" marker-end="url(#arrow)"/>
+<path d="M417 250 L417 262 L480 262 L480 274" fill="none" stroke="#888" stroke-width="1" marker-end="url(#arrow)"/>
+<line x1="571" y1="250" x2="571" y2="274" stroke="#888" stroke-width="1" marker-end="url(#arrow)"/>
+
+<!-- Layer label: data layer -->
+<text x="40" y="268" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="10" font-weight="600" fill="#bbb" letter-spacing="0.08em">DATA LAYER</text>
+
+<!-- Document store -->
+<g style="cursor:pointer;" onclick="showDetail('document-store')">
+  <rect x="40" y="274" width="180" height="56" rx="8" fill="#fee2e2" stroke="#fca5a5" stroke-width="0.5"/>
+  <text x="130" y="297" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="13" font-weight="500" fill="#991b1b">Document store</text>
+  <text x="130" y="316" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11" fill="#b91c1c">Leases, IDs, contracts</text>
+</g>
+
+<!-- Photo & evidence -->
+<g style="cursor:pointer;" onclick="showDetail('photo-evidence')">
+  <rect x="250" y="274" width="180" height="56" rx="8" fill="#fee2e2" stroke="#fca5a5" stroke-width="0.5"/>
+  <text x="340" y="297" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="13" font-weight="500" fill="#991b1b">Photo &amp; evidence</text>
+  <text x="340" y="316" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11" fill="#b91c1c">Session records</text>
+</g>
+
+<!-- Event & audit log -->
+<g style="cursor:pointer;" onclick="showDetail('audit-log')">
+  <rect x="460" y="274" width="180" height="56" rx="8" fill="#fee2e2" stroke="#fca5a5" stroke-width="0.5"/>
+  <text x="550" y="297" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="13" font-weight="500" fill="#991b1b">Event &amp; audit log</text>
+  <text x="550" y="316" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11" fill="#b91c1c">All platform events</text>
+</g>
+
+<!-- Legend -->
+<rect x="40" y="348" width="12" height="12" rx="2" fill="#ede9fe" stroke="#c4b5fd" stroke-width="0.5"/>
+<text x="58" y="359" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="10" fill="#888">Client apps</text>
+<rect x="140" y="348" width="12" height="12" rx="2" fill="#dbeafe" stroke="#93c5fd" stroke-width="0.5"/>
+<text x="158" y="359" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="10" fill="#888">API gateway</text>
+<rect x="250" y="348" width="12" height="12" rx="2" fill="#ccfbf1" stroke="#5eead4" stroke-width="0.5"/>
+<text x="268" y="359" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="10" fill="#888">Platform services</text>
+<rect x="390" y="348" width="12" height="12" rx="2" fill="#fee2e2" stroke="#fca5a5" stroke-width="0.5"/>
+<text x="408" y="359" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="10" fill="#888">Data layer</text>
+
+</svg>
+</div>
+
+<div class="detail-panel" id="detail-panel">
+  <div class="placeholder">Click any node in the diagram to see its role, responsibilities, and integrations.</div>
+</div>
+
+<script>
+var DETAILS={
+  'site-owner-app':{
+    title:'Site owner app',badge:'Client interface',bc:'#4c1d95',bb:'#ede9fe',
+    body:'Web-first with mobile as secondary. Site owners do most of their work at a desk — document uploads, reviewing bookings, checking settlement reports on Sunday morning. Relatively low frequency, high stakes interactions.',
+    items:['Registration and document upload (lease, bank statements, utility bill)','AI fee calculation review and approval','Slot scheduler — define zombie availability windows','Upside model selection: fixed % or variable profit share','Site checklist builder — photo areas locked into contract','Booking request review — approve or decline within 48 hours','Active session monitoring during zombie nights','Sunday morning handover report review and confirmation','Monday settlement tracking and performance dashboard']
+  },
+  'operator-app':{
+    title:'Operator app',badge:'Client interface',bc:'#4c1d95',bb:'#ede9fe',
+    body:'Mobile-only by design. Used on a phone at midnight in a kitchen — one-handed, low light, time-pressured. Every screen is ruthlessly simple. The photo flow, handover sequence, and lock-up checklist are the heart of the product experience.',
+    items:['Browse sites on map with revenue forecasts (pre-registration)','Registration, document upload, and vetting pipeline','Booking request flow with concept summary','Contract preview and OTP digital signing','Pre-session checklist before arriving at site','Digital handover — dual OTP sign-off with site owner','In-app camera only — GPS + timestamp locked, gallery blocked','Before photos, after photos, and lock-up sequence','Live trading dashboard — revenue, orders, time remaining','Settlement tracking and trust score profile']
+  },
+  'admin-portal':{
+    title:'Admin portal',badge:'Client interface',bc:'#4c1d95',bb:'#ede9fe',
+    body:'Internal ZombieTech tooling. Functional over beautiful, but critical — it is the human layer above all automation. Dispute resolution, vetting escalations, landlord partnership management, platform health monitoring.',
+    items:['Platform dashboard — active contracts, live sessions, revenue, open disputes','Vetting queue — manual review of flagged AML, criminal, and expired cert cases','Site management — consent status, scoring, listing management','Operator management — trust scores, churn flags, suspension','Contract management — lifecycle, notice periods, termination processing','Live session monitor — photo compliance flags, revenue anomaly alerts','Settlement queue — approve, hold, chase, or dispute-lock payouts','Dispute adjudication — AI recommendation + admin override','Landlord partner management — portfolio uptake, revenue share tracking','Analytics — funnel, churn, LTV, revenue breakdown']
+  },
+  'api-gateway':{
+    title:'API gateway & authentication middleware',badge:'Infrastructure',bc:'#1e40af',bb:'#dbeafe',
+    body:'All three client apps communicate exclusively through this layer. Handles authentication, rate limiting, request routing, and session management. JWT tokens issued on OTP verification and refreshed per session.',
+    items:['JWT authentication — issued on OTP, scoped by user role (site_owner | operator | admin)','Rate limiting per user and per endpoint to prevent abuse','Request routing to platform services','Webhook endpoint for payment provider callbacks (Peach Payments, PayFast)','API versioning — v1 stable, v2 in development for R2 features','Request logging to audit_log for every state-changing operation','CORS policy — operator app (mobile), site owner app (web), admin portal (internal only)']
+  },
+  'ai-engine':{
+    title:'AI engine',badge:'Platform service',bc:'#134e4a',bb:'#ccfbf1',
+    body:'Three distinct AI capabilities bundled into one service: document parsing at onboarding, photo comparison at session close, and revenue forecasting at site browse. The photo comparison is the most operationally critical — it runs automatically after every after-photo is submitted and pre-scores the handover report before the site owner opens it.',
+    items:['Document parsing: extract rent, utilities, operating hours, revenue from uploaded PDFs','Lease scanning: detect anti-alienation and subletting clauses, flag for manual review','Revenue forecasting: combine site financials + location data + ramp-up stage','Photo comparison: before vs after surface-by-surface, confidence score + natural language flag','AI result stored in photo_comparisons table with admin override capability','Evening revenue pattern inference from bank statement transaction timing','Location attractiveness scoring: population density × income band × competitor density']
+  },
+  'contracts-service':{
+    title:'Contracts service',badge:'Platform service',bc:'#134e4a',bb:'#ccfbf1',
+    body:'Generates, stores, and manages all zombie services agreements. The contract is produced from structured data — it is never hand-written. Every commercial term computed at onboarding is locked into the contract at signing. The signed PDF is immutably stored.',
+    items:['Contract generation from structured onboarding data — no manual drafting','Commercials locked: hourly rate, upside model %, platform fee %, notice period','Risk clauses: damages schedule, cleaning obligations, security requirements','Penalty schedule (Schedule A): amounts and trigger conditions','Goodwill and deactivation fee terms disclosed and locked at signing','OTP-based digital signing — both parties, timestamped, legally binding','Immutable PDF stored in document store — SHA-256 hash for tamper detection','Contract state machine: active → in_notice → terminated / expired']
+  },
+  'vetting-kyc':{
+    title:'Vetting & KYC service',badge:'Platform service',bc:'#134e4a',bb:'#ccfbf1',
+    body:'Orchestrates all third-party identity and compliance checks for operator onboarding. Most checks run automatically and complete within 24–48 hours. Cases that fail the auto-approve threshold are escalated to the admin queue for manual review. All raw provider responses are stored verbatim.',
+    items:['ID verification + biometric liveness: Smile Identity or Onfido','Criminal record check: MIE or LexisNexis','CIPC check: company registration status and directorship','AML/PEP screening: FICA-compliant sanctions and politically exposed persons check','Credit check: risk-flagging only — not a hard block','Food handler certificate validity and expiry tracking','Insurance coverage verification and minimum threshold enforcement','Auto-approve if all checks pass and trust score prediction ≥ 60','Manual review queue for flagged, ambiguous, or conflicting results']
+  },
+  'payments-service':{
+    title:'Payments service',badge:'Platform service',bc:'#134e4a',bb:'#ccfbf1',
+    body:'Handles all money movement on the platform. Card-only — no cash at any point. Weekend revenue is collected and held in escrow until the site owner confirms the handover report. Settlement runs Monday afternoon after the claims window closes.',
+    items:['Card-only collection via Peach Payments or PayFast — no cash accepted','Revenue held in platform escrow from session end to Monday settlement','Settlement split computation: operator payout, site fee, ZombieTech fee, landlord share','Activation fee instalment deduction from operator payouts (sessions 1 and 2)','Penalty and goodwill fee deduction from held funds before payout release','Dispute hold: payment frozen until admin resolves open claims','Bank account verification for all payouts — tokenised, never stored raw','Auto-release rule: if site owner does not respond by Monday 12:00, payout releases automatically']
+  },
+  'document-store':{
+    title:'Document store',badge:'Data layer',bc:'#991b1b',bb:'#fee2e2',
+    body:'Immutable storage for all uploaded and generated documents. Nothing is ever deleted. Every file has a SHA-256 hash computed at upload — if a file is tampered with, the hash will not match. AI-extracted data is stored alongside the original file as structured JSON.',
+    items:['Leases, bank statements, utility bills uploaded at site onboarding','SA IDs, proof of address, food handler certs, insurance at operator onboarding','Landlord consent letters and portfolio partnership agreements','Generated contract PDFs — immutable after signing','AI extraction results stored as JSONB alongside originals','Certificate expiry tracking — automated alerts before expiry','SHA-256 hash on every file — tamper detection','Encrypted at rest, access controlled by user role']
+  },
+  'photo-evidence':{
+    title:'Photo & evidence store',badge:'Data layer',bc:'#991b1b',bb:'#fee2e2',
+    body:'Session photos are the platform\'s legal evidence layer. Every photo stores platform-generated GPS coordinates and server timestamp alongside the image. The device timestamp is also recorded but the server timestamp is authoritative. SHA-256 hashing provides chain of custody.',
+    items:['In-app camera captures only — gallery uploads technically blocked','Platform-generated GPS coordinates on every photo','Dual timestamp: device clock + server receipt time (server is authoritative)','SHA-256 hash on every photo — chain of custody for litigation','Photos linked to checklist item, session, and contract','Before, after, and lock-up photo types stored separately','AI comparison results linked to before/after pairs','Signed URLs generated on demand — photos never publicly accessible','Retention policy: minimum 7 years for dispute and legal purposes']
+  },
+  'audit-log':{
+    title:'Event & audit log',badge:'Data layer',bc:'#991b1b',bb:'#fee2e2',
+    body:'Append-only, non-deletable record of every platform event. Forms the legal evidence layer alongside photos. Every state change — contract signed, session started, payment released, dispute raised — is recorded with the full payload at the time of the event. No event is ever modified or deleted.',
+    items:['Append-only — no UPDATE or DELETE operations ever permitted','Full event payload stored as JSONB at time of event — not a reference','Actor user ID, IP address, and user agent recorded for every action','System events (automated jobs, scheduled triggers) recorded with null actor','Namespaced event types: session.started, contract.signed, dispute.raised, etc.','Indexed by entity type + entity ID for fast lookup in dispute investigations','Used by admin portal for dispute adjudication and evidence collection','Feeds trust score computation engine — clean session events trigger score updates']
+  }
+};
+
+function showDetail(id){
+  var d=DETAILS[id];
+  if(!d) return;
+  document.getElementById('detail-panel').innerHTML=
+    '<div class="det-badge" style="background:'+d.bb+';color:'+d.bc+';">'+d.badge+'</div>'+
+    '<div class="det-title">'+d.title+'</div>'+
+    '<div class="det-body">'+d.body+'</div>'+
+    '<div class="det-items">'+d.items.map(function(i){
+      return '<div class="det-item"><div class="di-dot" style="background:'+d.bc+';"></div><div>'+i+'</div></div>';
+    }).join('')+'</div>';
+}
+</script>
+</body>
+</html>

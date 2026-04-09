@@ -1,0 +1,754 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────────────────────────
+// ENUMS
+// ─────────────────────────────────────────────────
+
+enum UserRole {
+  site_owner
+  operator
+  admin
+}
+
+enum ScoreTier {
+  standard
+  silver
+  gold
+  platinum
+}
+
+enum VettingStatus {
+  pending
+  approved
+  rejected
+  suspended
+}
+
+enum ConsentStatus {
+  pending
+  uploaded
+  landlord_verified
+}
+
+enum DayOfWeek {
+  mon
+  tue
+  wed
+  thu
+  fri
+  sat
+  sun
+}
+
+enum UpsideModel {
+  fixed
+  variable
+}
+
+enum SiteSlotStatus {
+  open
+  booked
+  suspended
+}
+
+enum AreaCategory {
+  kitchen
+  equipment
+  security
+  custom
+}
+
+enum BookingRequestStatus {
+  pending
+  approved
+  declined
+  expired
+}
+
+enum ContractStatus {
+  active
+  in_notice
+  terminated
+  expired
+}
+
+enum TerminatedBy {
+  site_owner
+  operator
+  mutual
+  breach
+}
+
+enum SessionStatus {
+  scheduled
+  active
+  completed
+  disputed
+  cancelled
+}
+
+enum PhotoType {
+  before
+  after
+  lockup
+}
+
+enum AiResult {
+  clean
+  flagged
+  inconclusive
+}
+
+enum AdminOverride {
+  clean
+  flagged
+}
+
+enum SettlementStatus {
+  pending
+  ready
+  released
+  held
+  failed
+}
+
+enum LineType {
+  revenue
+  platform_fee
+  site_fee
+  landlord_share
+  penalty
+  activation
+}
+
+enum DisputeStatus {
+  open
+  under_review
+  resolved
+  escalated
+}
+
+enum ClaimType {
+  damage
+  cleaning
+  theft
+  breach
+  false_claim
+}
+
+enum AiRecommendation {
+  award_full
+  award_partial
+  reject
+}
+
+enum DocumentType {
+  lease
+  bank_statement
+  utility_bill
+  id_document
+  proof_of_address
+  food_cert
+  insurance
+  consent_letter
+  contract_pdf
+  other
+}
+
+enum CheckType {
+  id_biometric
+  address
+  criminal
+  cipc
+  aml_pep
+  food_cert
+  insurance
+  credit
+}
+
+enum VettingResult {
+  pass
+  fail
+  flag
+  pending
+}
+
+enum TrustScoreEventType {
+  clean_session
+  penalty_claim
+  breach
+  dispute_raised
+  dispute_won
+  dispute_lost
+  response_rate
+  satisfaction
+}
+
+enum NotificationType {
+  booking_request
+  booking_approved
+  session_reminder
+  handover_due
+  report_ready
+  settlement_released
+  dispute_opened
+  dispute_resolved
+  vetting_complete
+  score_change
+}
+
+enum NotificationChannel {
+  push
+  in_app
+  sms
+  email
+}
+
+enum NotificationStatus {
+  pending
+  sent
+  delivered
+  read
+  failed
+}
+
+enum LandlordPartnerStatus {
+  active
+  suspended
+  negotiating
+}
+
+// ─────────────────────────────────────────────────
+// IDENTITY DOMAIN
+// ─────────────────────────────────────────────────
+
+model User {
+  id                  String    @id @default(uuid())
+  email               String    @unique @db.VarChar(255)
+  mobile              String    @db.VarChar(20)
+  full_name           String    @db.VarChar(255)
+  role                UserRole
+  otp_hash            String?   @db.VarChar(255)
+  otp_expires_at      DateTime? @db.Timestamptz()
+  email_verified_at   DateTime? @db.Timestamptz()
+  mobile_verified_at  DateTime? @db.Timestamptz()
+  created_at          DateTime  @default(now()) @db.Timestamptz()
+  updated_at          DateTime  @updatedAt @db.Timestamptz()
+
+  // Relations
+  site_owner          SiteOwner?
+  operator            Operator?
+  documents           Document[]
+  notifications       Notification[]
+  audit_logs          AuditLog[]
+  disputes_raised     Dispute[]           @relation("DisputeRaisedBy")
+  admin_decisions     Dispute[]           @relation("AdminDecidedBy")
+  photo_overrides     PhotoComparison[]   @relation("AdminOverrideBy")
+  vetting_reviews     VettingRecord[]     @relation("ReviewedBy")
+  trust_score_events  TrustScoreEvent[]   @relation("SubjectUser")
+
+  @@index([email], name: "idx_users_email")
+  @@index([mobile], name: "idx_users_mobile")
+  @@index([role], name: "idx_users_role")
+  @@map("users")
+}
+
+model SiteOwner {
+  id                  String    @id @default(uuid())
+  user_id             String    @unique
+  trading_name        String    @db.VarChar(255)
+  business_category   String    @db.VarChar(100)
+  company_reg_number  String?   @db.VarChar(50)
+  vat_number          String?   @db.VarChar(20)
+  bank_account_ref    String?   @db.VarChar(100)
+  payout_verified_at  DateTime? @db.Timestamptz()
+  site_score          Int       @default(50)
+  score_tier          ScoreTier @default(standard)
+  created_at          DateTime  @default(now()) @db.Timestamptz()
+
+  // Relations
+  user                User      @relation(fields: [user_id], references: [id])
+  sites               Site[]
+
+  @@map("site_owners")
+}
+
+model Operator {
+  id                       String        @id @default(uuid())
+  user_id                  String        @unique
+  trading_concept          String        @db.Text
+  food_category            String        @db.VarChar(100)
+  emergency_contact_name   String        @db.VarChar(255)
+  emergency_contact_mobile String        @db.VarChar(20)
+  bank_account_ref         String?       @db.VarChar(100)
+  payout_verified_at       DateTime?     @db.Timestamptz()
+  trust_score              Int           @default(50)
+  activation_fee_balance   Int           @default(0)
+  vetting_status           VettingStatus @default(pending)
+  vetting_approved_at      DateTime?     @db.Timestamptz()
+  created_at               DateTime      @default(now()) @db.Timestamptz()
+
+  // Relations
+  user                     User              @relation(fields: [user_id], references: [id])
+  booking_requests         BookingRequest[]
+  contracts                Contract[]
+  settlements              Settlement[]
+  vetting_records          VettingRecord[]
+
+  @@map("operators")
+}
+
+// ─────────────────────────────────────────────────
+// SITES DOMAIN
+// ─────────────────────────────────────────────────
+
+model LandlordPartner {
+  id                    String                @id @default(uuid())
+  company_name          String                @db.VarChar(255)
+  contact_name          String                @db.VarChar(255)
+  contact_email         String                @db.VarChar(255)
+  revenue_share_pct     Decimal               @db.Decimal(5, 2)
+  agreement_signed_at   DateTime              @db.Timestamptz()
+  agreement_document_id String?
+  portfolio_size        Int
+  status                LandlordPartnerStatus @default(negotiating)
+  created_at            DateTime              @default(now()) @db.Timestamptz()
+
+  // Relations
+  sites                 Site[]
+
+  @@map("landlord_partners")
+}
+
+model Site {
+  id                             String        @id @default(uuid())
+  site_owner_id                  String
+  landlord_partner_id            String?
+  trading_name                   String        @db.VarChar(255)
+  business_category              String        @db.VarChar(100)
+  address_line1                  String        @db.VarChar(255)
+  suburb                         String        @db.VarChar(100)
+  city                           String        @db.VarChar(100)
+  latitude                       Decimal       @db.Decimal(10, 7)
+  longitude                      Decimal       @db.Decimal(10, 7)
+  site_opens_time                String        @db.VarChar(8)
+  site_closes_time               String        @db.VarChar(8)
+  zombie_end_time                String        @db.VarChar(8)
+  monthly_rent_cents             BigInt
+  monthly_utilities_cents        BigInt
+  site_operating_hours_per_month Int
+  hourly_rate_cents              BigInt
+  consent_status                 ConsentStatus @default(pending)
+  site_score                     Int           @default(50)
+  score_tier                     ScoreTier     @default(standard)
+  is_listed                      Boolean       @default(false)
+  created_at                     DateTime      @default(now()) @db.Timestamptz()
+
+  // Relations
+  site_owner                     SiteOwner        @relation(fields: [site_owner_id], references: [id])
+  landlord_partner               LandlordPartner? @relation(fields: [landlord_partner_id], references: [id])
+  site_slots                     SiteSlot[]
+  site_checklist_items           SiteChecklistItem[]
+
+  @@index([site_owner_id])
+  @@index([city])
+  @@index([is_listed])
+  @@map("sites")
+}
+
+model SiteSlot {
+  id                        String         @id @default(uuid())
+  site_id                   String
+  day_of_week               DayOfWeek?
+  is_closed_day             Boolean        @default(false)
+  slot_start_time           String         @db.VarChar(8)
+  slot_end_time             String         @db.VarChar(8)
+  slot_hours                Decimal        @db.Decimal(4, 2)
+  base_fee_cents_per_session BigInt
+  upside_model              UpsideModel
+  upside_fixed_pct          Decimal?       @db.Decimal(5, 2)
+  upside_variable_pct       Decimal?       @db.Decimal(5, 2)
+  status                    SiteSlotStatus @default(open)
+  created_at                DateTime       @default(now()) @db.Timestamptz()
+
+  // Relations
+  site                      Site             @relation(fields: [site_id], references: [id])
+  booking_requests          BookingRequest[]
+  contracts                 Contract[]
+  settlement_line_items     SettlementLineItem[]
+
+  @@index([site_id])
+  @@index([status])
+  @@map("site_slots")
+}
+
+model SiteChecklistItem {
+  id            String       @id @default(uuid())
+  site_id       String
+  area_name     String       @db.VarChar(255)
+  area_category AreaCategory
+  sort_order    Int
+  is_required   Boolean      @default(true)
+  description   String       @db.Text
+  created_at    DateTime     @default(now()) @db.Timestamptz()
+
+  // Relations
+  site              Site              @relation(fields: [site_id], references: [id])
+  session_photos    SessionPhoto[]
+  photo_comparisons PhotoComparison[]
+
+  @@index([site_id, sort_order])
+  @@map("site_checklist_items")
+}
+
+// ─────────────────────────────────────────────────
+// CONTRACTS DOMAIN
+// ─────────────────────────────────────────────────
+
+model BookingRequest {
+  id                      String               @id @default(uuid())
+  site_slot_id            String
+  operator_id             String
+  concept_summary         String               @db.Text
+  requested_start_date    DateTime             @db.Date
+  recurring               Boolean              @default(false)
+  status                  BookingRequestStatus @default(pending)
+  site_owner_response_at  DateTime?            @db.Timestamptz()
+  expires_at              DateTime             @db.Timestamptz()
+  created_at              DateTime             @default(now()) @db.Timestamptz()
+
+  // Relations
+  site_slot               SiteSlot   @relation(fields: [site_slot_id], references: [id])
+  operator                Operator   @relation(fields: [operator_id], references: [id])
+  contracts               Contract[]
+
+  @@index([site_slot_id])
+  @@index([operator_id])
+  @@index([status])
+  @@map("booking_requests")
+}
+
+model Contract {
+  id                          String         @id @default(uuid())
+  contract_ref                String         @unique @db.VarChar(20)
+  site_slot_id                String
+  operator_id                 String
+  booking_request_id          String
+  hourly_rate_cents           BigInt
+  upside_model                UpsideModel
+  upside_pct                  Decimal        @db.Decimal(5, 2)
+  platform_fee_pct            Decimal        @db.Decimal(5, 2) @default(10.00)
+  notice_period_days          Int            @default(30)
+  goodwill_threshold_sessions Int            @default(6)
+  goodwill_fee_pct            Decimal        @db.Decimal(5, 2) @default(8.00)
+  deactivation_fee_pct        Decimal        @db.Decimal(5, 2) @default(15.00)
+  status                      ContractStatus @default(active)
+  site_owner_signed_at        DateTime?      @db.Timestamptz()
+  operator_signed_at          DateTime?      @db.Timestamptz()
+  terminated_at               DateTime?      @db.Timestamptz()
+  terminated_by               TerminatedBy?
+  created_at                  DateTime       @default(now()) @db.Timestamptz()
+
+  // Relations
+  site_slot                   SiteSlot       @relation(fields: [site_slot_id], references: [id])
+  operator                    Operator       @relation(fields: [operator_id], references: [id])
+  booking_request             BookingRequest @relation(fields: [booking_request_id], references: [id])
+  sessions                    Session[]
+  trust_score_events          TrustScoreEvent[] @relation("ContractTrustEvent")
+
+  @@index([operator_id])
+  @@index([status])
+  @@map("contracts")
+}
+
+// ─────────────────────────────────────────────────
+// SESSIONS DOMAIN
+// ─────────────────────────────────────────────────
+
+model Session {
+  id                              String        @id @default(uuid())
+  session_ref                     String        @unique @db.VarChar(20)
+  contract_id                     String
+  session_date                    DateTime      @db.Date
+  scheduled_start                 DateTime      @db.Timestamptz()
+  scheduled_end                   DateTime      @db.Timestamptz()
+  actual_start                    DateTime?     @db.Timestamptz()
+  actual_end                      DateTime?     @db.Timestamptz()
+  site_owner_handover_signed_at   DateTime?     @db.Timestamptz()
+  operator_handover_signed_at     DateTime?     @db.Timestamptz()
+  gross_revenue_cents             BigInt        @default(0)
+  status                          SessionStatus @default(scheduled)
+  before_photos_complete          Boolean       @default(false)
+  after_photos_complete           Boolean       @default(false)
+  lockup_complete                 Boolean       @default(false)
+  ai_handover_score               Int?
+  ai_flags_count                  Int?
+  site_owner_confirmed_at         DateTime?     @db.Timestamptz()
+  site_owner_confirmed_good_order Boolean?
+  created_at                      DateTime      @default(now()) @db.Timestamptz()
+
+  // Relations
+  contract                        Contract             @relation(fields: [contract_id], references: [id])
+  session_photos                  SessionPhoto[]
+  photo_comparisons               PhotoComparison[]
+  settlement_line_items           SettlementLineItem[]
+  disputes                        Dispute[]
+  trust_score_events              TrustScoreEvent[]    @relation("SessionTrustEvent")
+
+  @@index([contract_id])
+  @@index([session_date])
+  @@index([status])
+  @@map("sessions")
+}
+
+model SessionPhoto {
+  id                String    @id @default(uuid())
+  session_id        String
+  checklist_item_id String
+  photo_type        PhotoType
+  storage_key       String    @db.VarChar(500)
+  storage_url       String    @db.Text
+  latitude          Decimal   @db.Decimal(10, 7)
+  longitude         Decimal   @db.Decimal(10, 7)
+  device_timestamp  DateTime  @db.Timestamptz()
+  server_timestamp  DateTime  @default(now()) @db.Timestamptz()
+  hash              String    @db.VarChar(64)
+  created_at        DateTime  @default(now()) @db.Timestamptz()
+
+  // Relations
+  session                    Session           @relation(fields: [session_id], references: [id])
+  checklist_item             SiteChecklistItem @relation(fields: [checklist_item_id], references: [id])
+  before_comparisons         PhotoComparison[] @relation("BeforePhoto")
+  after_comparisons          PhotoComparison[] @relation("AfterPhoto")
+
+  @@index([session_id, photo_type])
+  @@map("session_photos")
+}
+
+model PhotoComparison {
+  id                String         @id @default(uuid())
+  session_id        String
+  checklist_item_id String
+  before_photo_id   String
+  after_photo_id    String?
+  ai_result         AiResult
+  ai_confidence     Decimal        @db.Decimal(5, 2)
+  ai_description    String         @db.Text
+  admin_override    AdminOverride?
+  admin_override_by String?
+  created_at        DateTime       @default(now()) @db.Timestamptz()
+
+  // Relations
+  session           Session           @relation(fields: [session_id], references: [id])
+  checklist_item    SiteChecklistItem @relation(fields: [checklist_item_id], references: [id])
+  before_photo      SessionPhoto      @relation("BeforePhoto", fields: [before_photo_id], references: [id])
+  after_photo       SessionPhoto?     @relation("AfterPhoto", fields: [after_photo_id], references: [id])
+  override_user     User?             @relation("AdminOverrideBy", fields: [admin_override_by], references: [id])
+
+  @@index([session_id])
+  @@map("photo_comparisons")
+}
+
+// ─────────────────────────────────────────────────
+// FINANCIAL DOMAIN
+// ─────────────────────────────────────────────────
+
+model Settlement {
+  id                         String           @id @default(uuid())
+  operator_id                String
+  settlement_ref             String           @unique @db.VarChar(20)
+  period_start               DateTime         @db.Date
+  period_end                 DateTime         @db.Date
+  gross_revenue_cents        BigInt           @default(0)
+  platform_fee_cents         BigInt           @default(0)
+  site_fees_cents            BigInt           @default(0)
+  landlord_share_cents       BigInt           @default(0)
+  penalty_deductions_cents   BigInt           @default(0)
+  activation_deduction_cents BigInt           @default(0)
+  operator_payout_cents      BigInt           @default(0)
+  status                     SettlementStatus @default(pending)
+  released_at                DateTime?        @db.Timestamptz()
+  payment_provider_ref       String?          @db.VarChar(255)
+  created_at                 DateTime         @default(now()) @db.Timestamptz()
+
+  // Relations
+  operator                   Operator              @relation(fields: [operator_id], references: [id])
+  line_items                 SettlementLineItem[]
+
+  @@index([operator_id])
+  @@index([status])
+  @@map("settlements")
+}
+
+model SettlementLineItem {
+  id            String   @id @default(uuid())
+  settlement_id String
+  session_id    String
+  site_slot_id  String
+  line_type     LineType
+  amount_cents  BigInt
+  description   String   @db.VarChar(255)
+  created_at    DateTime @default(now()) @db.Timestamptz()
+
+  // Relations
+  settlement    Settlement @relation(fields: [settlement_id], references: [id])
+  session       Session    @relation(fields: [session_id], references: [id])
+  site_slot     SiteSlot   @relation(fields: [site_slot_id], references: [id])
+
+  @@index([settlement_id])
+  @@map("settlement_line_items")
+}
+
+model Dispute {
+  id                   String            @id @default(uuid())
+  session_id           String
+  raised_by_user_id    String
+  dispute_ref          String            @unique @db.VarChar(20)
+  claim_type           ClaimType
+  claim_amount_cents   BigInt
+  description          String            @db.Text
+  ai_recommendation    AiRecommendation?
+  ai_confidence        Decimal?          @db.Decimal(5, 2)
+  ai_reasoning         String?           @db.Text
+  admin_decision       AiRecommendation?
+  admin_decided_by     String?
+  awarded_amount_cents BigInt?
+  status               DisputeStatus     @default(open)
+  deadline_at          DateTime          @db.Timestamptz()
+  resolved_at          DateTime?         @db.Timestamptz()
+  created_at           DateTime          @default(now()) @db.Timestamptz()
+
+  // Relations
+  session              Session  @relation(fields: [session_id], references: [id])
+  raised_by            User     @relation("DisputeRaisedBy", fields: [raised_by_user_id], references: [id])
+  decided_by           User?    @relation("AdminDecidedBy", fields: [admin_decided_by], references: [id])
+  trust_score_events   TrustScoreEvent[] @relation("DisputeTrustEvent")
+
+  @@index([session_id])
+  @@index([status])
+  @@map("disputes")
+}
+
+// ─────────────────────────────────────────────────
+// COMPLIANCE DOMAIN
+// ─────────────────────────────────────────────────
+
+model Document {
+  id                String       @id @default(uuid())
+  owner_user_id     String
+  document_type     DocumentType
+  storage_key       String       @db.VarChar(500)
+  file_name         String       @db.VarChar(255)
+  mime_type         String       @db.VarChar(100)
+  file_size_bytes   BigInt
+  hash              String       @db.VarChar(64)
+  ai_parsed         Boolean      @default(false)
+  ai_extracted_data Json?
+  expires_at        DateTime?    @db.Date
+  expiry_alerted_at DateTime?    @db.Timestamptz()
+  created_at        DateTime     @default(now()) @db.Timestamptz()
+
+  // Relations
+  owner             User @relation(fields: [owner_user_id], references: [id])
+
+  @@index([owner_user_id])
+  @@index([document_type])
+  @@map("documents")
+}
+
+model VettingRecord {
+  id                    String        @id @default(uuid())
+  operator_id           String
+  check_type            CheckType
+  provider              String        @db.VarChar(100)
+  provider_ref          String        @db.VarChar(255)
+  result                VettingResult @default(pending)
+  confidence_score      Decimal?      @db.Decimal(5, 2)
+  raw_response          Json?
+  flag_reason           String?       @db.Text
+  requires_manual_review Boolean      @default(false)
+  reviewed_by           String?
+  reviewed_at           DateTime?     @db.Timestamptz()
+  created_at            DateTime      @default(now()) @db.Timestamptz()
+
+  // Relations
+  operator              Operator @relation(fields: [operator_id], references: [id])
+  reviewer              User?    @relation("ReviewedBy", fields: [reviewed_by], references: [id])
+
+  @@index([operator_id])
+  @@map("vetting_records")
+}
+
+// ─────────────────────────────────────────────────
+// PLATFORM DOMAIN
+// ─────────────────────────────────────────────────
+
+model TrustScoreEvent {
+  id              String              @id @default(uuid())
+  subject_user_id String
+  contract_id     String?
+  session_id      String?
+  dispute_id      String?
+  event_type      TrustScoreEventType
+  points_delta    Int
+  score_before    Int
+  score_after     Int
+  description     String              @db.VarChar(255)
+  created_at      DateTime            @default(now()) @db.Timestamptz()
+
+  // Relations — immutable, no updates
+  subject_user    User      @relation("SubjectUser", fields: [subject_user_id], references: [id])
+  contract        Contract? @relation("ContractTrustEvent", fields: [contract_id], references: [id])
+  session         Session?  @relation("SessionTrustEvent", fields: [session_id], references: [id])
+  dispute         Dispute?  @relation("DisputeTrustEvent", fields: [dispute_id], references: [id])
+
+  @@index([subject_user_id])
+  @@map("trust_score_events")
+}
+
+model Notification {
+  id                   String             @id @default(uuid())
+  user_id              String
+  notification_type    NotificationType
+  related_entity_id    String
+  related_entity_type  String             @db.VarChar(50)
+  title                String             @db.VarChar(255)
+  body                 String             @db.Text
+  channel              NotificationChannel
+  status               NotificationStatus @default(pending)
+  sent_at              DateTime?          @db.Timestamptz()
+  read_at              DateTime?          @db.Timestamptz()
+  created_at           DateTime           @default(now()) @db.Timestamptz()
+
+  // Relations
+  user                 User @relation(fields: [user_id], references: [id])
+
+  @@index([user_id, status])
+  @@map("notifications")
+}
+
+model AuditLog {
+  id            String   @id @default(uuid())
+  actor_user_id String?
+  event_type    String   @db.VarChar(100)
+  entity_type   String   @db.VarChar(50)
+  entity_id     String
+  ip_address    String?  @db.VarChar(45)
+  user_agent    String?  @db.Text
+  payload       Json
+  created_at    DateTime @default(now()) @db.Timestamptz()
+
+  // Relations — append-only, no updates ever
+  actor         User? @relation(fields: [actor_user_id], references: [id])
+
+  @@index([entity_type, entity_id])
+  @@index([actor_user_id])
+  @@map("audit_log")
+}

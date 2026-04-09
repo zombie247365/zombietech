@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZombieTech — Operator App</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f8f8f6;padding:24px;}
+h1{font-size:20px;font-weight:500;margin-bottom:4px;color:#1d9e75;}
+.top-meta{font-size:12px;color:#888;margin-bottom:20px;}
+.wrap{display:flex;gap:24px;align-items:flex-start;}
+.nav-col{display:flex;flex-direction:column;gap:0;width:160px;flex-shrink:0;background:#fff;border-radius:12px;border:0.5px solid #e5e7eb;overflow:hidden;padding:8px 0;}
+.phase-lbl{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:#bbb;padding:10px 10px 4px;}
+.ni{display:flex;align-items:center;gap:7px;padding:6px 10px;cursor:pointer;border-left:2px solid transparent;transition:all .1s;}
+.ni:hover{background:#f9fafb;}
+.ni.on{background:#f0fdf4;border-left-color:#22c55e;}
+.ni-dot{width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:600;flex-shrink:0;}
+.ni-lbl{font-size:10px;color:#888;}
+.ni.on .ni-lbl{color:#1a1a1a;font-weight:500;}
+.phone-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:12px;}
+.nav-strip{display:flex;gap:8px;align-items:center;}
+.nav-btn{padding:5px 14px;border-radius:20px;border:0.5px solid #e5e7eb;background:#fff;color:#666;font-size:11px;cursor:pointer;transition:all .1s;}
+.nav-btn:hover{background:#f9fafb;}
+.nav-btn.pri{background:#1d9e75;border-color:#1d9e75;color:#fff;}
+.nav-btn:disabled{opacity:.35;cursor:default;}
+.screen-name{font-size:11px;color:#aaa;text-align:center;min-width:140px;}
+.phone{background:#111;border-radius:40px;width:290px;padding:8px;border:5px solid #1a1a1a;box-shadow:0 20px 60px rgba(0,0,0,.3);}
+.notch{width:90px;height:22px;background:#111;border-radius:0 0 14px 14px;margin:0 auto 6px;}
+.screen{background:#111;border-radius:30px;overflow:hidden;min-height:540px;display:flex;flex-direction:column;}
+.pg{display:none;flex-direction:column;min-height:540px;}.pg.on{display:flex;}
+.sbar{padding:12px 14px 8px;display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.sbar-title{font-size:13px;font-weight:500;color:#fff;flex:1;}
+.sbar-sub{font-size:10px;color:rgba(255,255,255,.4);}
+.sbar-badge{font-size:9px;font-weight:600;padding:2px 7px;border-radius:20px;}
+.body{flex:1;padding:0 14px 14px;display:flex;flex-direction:column;gap:8px;overflow:hidden;}
+.h2m{font-size:16px;font-weight:500;color:#fff;margin-bottom:3px;}
+.subm{font-size:11px;color:rgba(255,255,255,.45);line-height:1.5;}
+.card-d{background:#1a1a1a;border-radius:14px;padding:12px 14px;border:0.5px solid #2a2a2a;}
+.card-d.green{background:#0a2016;border-color:#1d5a38;}
+.card-d.blue{background:#0a1628;border-color:#1a3a5c;}
+.card-d.amber{background:#1e1200;border-color:#4a3000;}
+.card-d.purple{background:#120e20;border-color:#2e2456;}
+.mlb-d{font-size:9px;color:rgba(255,255,255,.35);margin-bottom:2px;text-transform:uppercase;letter-spacing:.05em;}
+.mv-d{font-size:18px;font-weight:500;color:#fff;}
+.mv-d.green{color:#5dcaa5;}.mv-d.blue{color:#85b7eb;}.mv-d.amber{color:#ef9f27;}
+.g2m{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.g3m{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;}
+.row-d{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:0.5px solid #222;}
+.row-d:last-child{border-bottom:none;}
+.rl-d{font-size:11px;color:rgba(255,255,255,.4);}
+.rv-d{font-size:11px;font-weight:500;color:#fff;}
+.pill-d{display:inline-flex;align-items:center;font-size:9px;font-weight:600;padding:2px 7px;border-radius:20px;}
+.pill-d.green{background:#0f3822;color:#5dcaa5;}
+.pill-d.amber{background:#2a1800;color:#ef9f27;}
+.pill-d.blue{background:#0a1e36;color:#85b7eb;}
+.pill-d.red{background:#2a0a0a;color:#f09595;}
+.pill-d.purple{background:#1a1030;color:#afa9ec;}
+.pill-d.gray{background:#222;color:rgba(255,255,255,.35);}
+.btn-d{border-radius:12px;padding:13px 16px;text-align:center;font-size:13px;font-weight:500;cursor:pointer;margin-top:auto;}
+.btn-d.pri{background:#1d9e75;color:#fff;}
+.btn-d.sec{background:#1a1a1a;color:rgba(255,255,255,.6);border:0.5px solid #2a2a2a;}
+.btn-d.danger{background:#2a0a0a;color:#f09595;border:0.5px solid #4a1a1a;}
+.btn-d.purple{background:#7f77dd;color:#fff;}
+.btn-d.amber{background:#ef9f27;color:#111;}
+.btn-row{display:flex;gap:6px;margin-top:auto;}
+.check-d{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:10px;border:0.5px solid #2a2a2a;background:#1a1a1a;margin-bottom:5px;}
+.check-d.done{background:#0a2016;border-color:#1d5a38;}
+.check-d.active{border-color:#1d9e75;background:#0d2e1e;}
+.check-d.locked{opacity:.4;}
+.ck{width:18px;height:18px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;}
+.check-d.done .ck{background:#1d9e75;color:#fff;}
+.check-d.active .ck{border:1.5px solid #1d9e75;color:#1d9e75;}
+.check-d:not(.done):not(.active):not(.locked) .ck{background:#222;border:0.5px solid #333;}
+.ck-text{font-size:11px;color:rgba(255,255,255,.6);flex:1;line-height:1.3;}
+.check-d.done .ck-text{color:#5dcaa5;}
+.check-d.active .ck-text{color:#fff;font-weight:500;}
+.upload-d{border:1.5px dashed #2a2a2a;border-radius:12px;padding:12px;text-align:center;margin-bottom:6px;}
+.upload-d.done{border-style:solid;border-color:#1d5a38;background:#0a2016;}
+.upload-title-d{font-size:11px;font-weight:500;color:rgba(255,255,255,.6);margin-bottom:2px;}
+.upload-d.done .upload-title-d{color:#5dcaa5;}
+.upload-sub-d{font-size:9px;color:rgba(255,255,255,.25);}
+.upload-d.done .upload-sub-d{color:rgba(93,202,165,.5);}
+.site-card{background:#1a1a1a;border-radius:14px;padding:12px;border:0.5px solid #2a2a2a;margin-bottom:7px;cursor:pointer;}
+.site-card.featured{border-color:#1d5a38;background:#0a2016;}
+.sc-name{font-size:13px;font-weight:500;color:#fff;margin-bottom:2px;}
+.sc-meta{font-size:10px;color:rgba(255,255,255,.35);margin-bottom:6px;}
+.sc-forecast{display:flex;gap:4px;margin-top:6px;}
+.fc-band{flex:1;border-radius:6px;padding:4px 6px;text-align:center;}
+.fc-lbl{font-size:8px;font-weight:500;opacity:.7;}
+.fc-val{font-size:11px;font-weight:500;}
+.progress-d{height:4px;border-radius:2px;background:#222;margin:4px 0;overflow:hidden;}
+.prog-fill-d{height:100%;border-radius:2px;}
+.otp-row{display:flex;gap:5px;justify-content:center;margin:8px 0;}
+.otp-box{width:36px;height:42px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:500;}
+.otp-box.filled{background:#1a2e1a;border:0.5px solid #1d5a38;color:#5dcaa5;}
+.otp-box.cursor{background:#0d2e1e;border:1.5px solid #1d9e75;color:#1d9e75;}
+.otp-box.empty{background:#1a1a1a;border:0.5px solid #2a2a2a;}
+.photo-box-d{border-radius:10px;height:62px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;}
+.photo-box-d.before{background:#1e1c14;border:0.5px solid #3a3620;}
+.photo-box-d.captured{background:#0a2016;border:0.5px solid #1d5a38;}
+.photo-box-d.active-p{border:1.5px solid #1d9e75;background:#0d2e1e;}
+.photo-box-d.pending-p{background:#1a1a1a;border:0.5px solid #222;}
+.pb-dot{width:14px;height:14px;border-radius:3px;}
+.pb-lbl{font-size:8px;font-weight:500;}
+.photo-box-d.before .pb-lbl{color:rgba(255,255,255,.35);}
+.photo-box-d.captured .pb-lbl{color:#5dcaa5;}
+.photo-box-d.active-p .pb-lbl{color:#fff;}
+.photo-box-d.pending-p .pb-lbl{color:rgba(255,255,255,.2);}
+.alert-d{border-radius:10px;padding:9px 12px;font-size:11px;line-height:1.5;}
+.alert-d.info{background:#0a1628;color:#85b7eb;border:0.5px solid #1a3a5c;}
+.alert-d.warn{background:#1e1200;color:#ef9f27;border:0.5px solid #4a3000;}
+.alert-d.success{background:#0a2016;color:#5dcaa5;border:0.5px solid #1d5a38;}
+.bar-d{height:5px;border-radius:3px;background:#222;overflow:hidden;margin-top:4px;}
+.bar-fill-d{height:100%;border-radius:3px;}
+.live-ring{width:9px;height:9px;border-radius:50%;background:#1d9e75;flex-shrink:0;}
+.inp-d{height:38px;background:#1a1a1a;border:0.5px solid #2a2a2a;border-radius:10px;padding:0 12px;display:flex;align-items:center;font-size:12px;color:rgba(255,255,255,.6);margin-bottom:6px;}
+.inp-d.filled{color:#fff;border-color:#333;}
+.search-bar{height:34px;background:#1a1a1a;border-radius:10px;border:0.5px solid #2a2a2a;display:flex;align-items:center;padding:0 10px;font-size:11px;color:rgba(255,255,255,.3);margin-bottom:8px;}
+</style>
+</head>
+<body>
+<h1>ZombieTech — Operator App</h1>
+<div class="top-meta">17 screens · Mobile-only · Dark interface · One hand, low light, time pressure</div>
+
+<div class="wrap">
+<div class="nav-col">
+  <div class="phase-lbl">Discovery</div>
+  <div class="ni on" onclick="go(0)" id="ni0"><div class="ni-dot" style="background:#0a2016;color:#5dcaa5;border:0.5px solid #1d5a38;">1</div><div class="ni-lbl">Browse sites</div></div>
+  <div class="ni" onclick="go(1)" id="ni1"><div class="ni-dot" style="background:#0a2016;color:#5dcaa5;border:0.5px solid #1d5a38;">2</div><div class="ni-lbl">Site detail</div></div>
+  <div class="phase-lbl">Onboarding</div>
+  <div class="ni" onclick="go(2)" id="ni2"><div class="ni-dot" style="background:#0a1628;color:#85b7eb;border:0.5px solid #1a3a5c;">3</div><div class="ni-lbl">Register</div></div>
+  <div class="ni" onclick="go(3)" id="ni3"><div class="ni-dot" style="background:#0a1628;color:#85b7eb;border:0.5px solid #1a3a5c;">4</div><div class="ni-lbl">Upload docs</div></div>
+  <div class="ni" onclick="go(4)" id="ni4"><div class="ni-dot" style="background:#0a1628;color:#85b7eb;border:0.5px solid #1a3a5c;">5</div><div class="ni-lbl">Vetting</div></div>
+  <div class="ni" onclick="go(5)" id="ni5"><div class="ni-dot" style="background:#0a1628;color:#85b7eb;border:0.5px solid #1a3a5c;">6</div><div class="ni-lbl">Book a slot</div></div>
+  <div class="ni" onclick="go(6)" id="ni6"><div class="ni-dot" style="background:#0a1628;color:#85b7eb;border:0.5px solid #1a3a5c;">7</div><div class="ni-lbl">Sign contract</div></div>
+  <div class="phase-lbl">Session night</div>
+  <div class="ni" onclick="go(7)" id="ni7"><div class="ni-dot" style="background:#0a2016;color:#5dcaa5;border:0.5px solid #1d5a38;">8</div><div class="ni-lbl">Home</div></div>
+  <div class="ni" onclick="go(8)" id="ni8"><div class="ni-dot" style="background:#0a2016;color:#5dcaa5;border:0.5px solid #1d5a38;">9</div><div class="ni-lbl">Pre-session</div></div>
+  <div class="ni" onclick="go(9)" id="ni9"><div class="ni-dot" style="background:#0a2016;color:#5dcaa5;border:0.5px solid #1d5a38;">10</div><div class="ni-lbl">Handover sign</div></div>
+  <div class="ni" onclick="go(10)" id="ni10"><div class="ni-dot" style="background:#0a2016;color:#5dcaa5;border:0.5px solid #1d5a38;">11</div><div class="ni-lbl">Before photos</div></div>
+  <div class="ni" onclick="go(11)" id="ni11"><div class="ni-dot" style="background:#0a2016;color:#5dcaa5;border:0.5px solid #1d5a38;">12</div><div class="ni-lbl">Trading live</div></div>
+  <div class="ni" onclick="go(12)" id="ni12"><div class="ni-dot" style="background:#1e1200;color:#ef9f27;border:0.5px solid #4a3000;">13</div><div class="ni-lbl">After photos</div></div>
+  <div class="ni" onclick="go(13)" id="ni13"><div class="ni-dot" style="background:#1e1200;color:#ef9f27;border:0.5px solid #4a3000;">14</div><div class="ni-lbl">Lock-up</div></div>
+  <div class="ni" onclick="go(14)" id="ni14"><div class="ni-dot" style="background:#0a2016;color:#5dcaa5;border:0.5px solid #1d5a38;">15</div><div class="ni-lbl">Session close</div></div>
+  <div class="phase-lbl">After the night</div>
+  <div class="ni" onclick="go(15)" id="ni15"><div class="ni-dot" style="background:#120e20;color:#afa9ec;border:0.5px solid #2e2456;">16</div><div class="ni-lbl">Settlement</div></div>
+  <div class="ni" onclick="go(16)" id="ni16"><div class="ni-dot" style="background:#120e20;color:#afa9ec;border:0.5px solid #2e2456;">17</div><div class="ni-lbl">Trust & profile</div></div>
+</div>
+
+<div class="phone-wrap">
+  <div class="nav-strip">
+    <button class="nav-btn" id="bp" onclick="go(cur-1)">← Prev</button>
+    <div class="screen-name" id="sn">Browse sites</div>
+    <button class="nav-btn pri" id="bn" onclick="go(cur+1)">Next →</button>
+  </div>
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="screen">
+
+    <div class="pg on" id="pg0">
+      <div class="sbar" style="background:#0a2016;"><span class="sbar-title">Find a zombie site</span><span class="sbar-badge" style="background:#1d5a38;color:#5dcaa5;">Browse</span></div>
+      <div class="body">
+        <div class="search-bar">Suburb or area...</div>
+        <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:4px;">
+          <div class="pill-d green">Landlord verified</div>
+          <div class="pill-d blue">Fri/Sat slots</div>
+          <div class="pill-d gray">Food</div>
+          <div class="pill-d gray">&lt; R4k/mth</div>
+        </div>
+        <div class="site-card featured" onclick="go(1)">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+            <div><div class="sc-name">ABC Pizza</div><div class="sc-meta">14 Main Rd, Bryanston · 2.1km · Pizza kitchen</div></div>
+            <div class="pill-d green">Verified</div>
+          </div>
+          <div style="display:flex;gap:4px;margin-bottom:4px;"><div class="pill-d blue">Fri 21:00–04:00</div><div class="pill-d blue">Sat 21:00–04:00</div></div>
+          <div style="font-size:9px;color:rgba(255,255,255,.25);margin-bottom:4px;">Revenue forecast — base case</div>
+          <div class="sc-forecast">
+            <div class="fc-band" style="background:#0a1628;"><div class="fc-lbl" style="color:#378add;">Conservative</div><div class="fc-val" style="color:#85b7eb;">R28k</div></div>
+            <div class="fc-band" style="background:#0d2e1e;border:0.5px solid #1d5a38;"><div class="fc-lbl" style="color:#1d9e75;">Base case</div><div class="fc-val" style="color:#5dcaa5;">R38k</div></div>
+            <div class="fc-band" style="background:#1e1200;"><div class="fc-lbl" style="color:#ba7517;">Optimistic</div><div class="fc-val" style="color:#ef9f27;">R52k</div></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:9px;color:rgba(255,255,255,.25);margin-top:5px;"><span>Site fee: R3,225/mth</span><span>Site score: 82</span></div>
+        </div>
+        <div class="site-card">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+            <div><div class="sc-name">Tokyo Kitchen</div><div class="sc-meta">88 Oxford Rd, Rosebank · 4.3km · Asian kitchen</div></div>
+            <div class="pill-d amber">Consent uploaded</div>
+          </div>
+          <div class="sc-forecast" style="margin-top:4px;">
+            <div class="fc-band" style="background:#0a1628;"><div class="fc-lbl" style="color:#378add;">Conservative</div><div class="fc-val" style="color:#85b7eb;">R22k</div></div>
+            <div class="fc-band" style="background:#0a1628;"><div class="fc-lbl" style="color:#1d9e75;">Base</div><div class="fc-val" style="color:#5dcaa5;">R31k</div></div>
+            <div class="fc-band" style="background:#1e1200;"><div class="fc-lbl" style="color:#ba7517;">Optimistic</div><div class="fc-val" style="color:#ef9f27;">R43k</div></div>
+          </div>
+        </div>
+        <div class="site-card">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+            <div><div class="sc-name">Bella Napoli</div><div class="sc-meta">22 Rivonia Rd, Sandton · 5.8km · Italian kitchen</div></div>
+            <div class="pill-d green">Verified</div>
+          </div>
+          <div class="sc-forecast" style="margin-top:4px;">
+            <div class="fc-band" style="background:#0a1628;"><div class="fc-lbl" style="color:#378add;">Conservative</div><div class="fc-val" style="color:#85b7eb;">R31k</div></div>
+            <div class="fc-band" style="background:#0a1628;"><div class="fc-lbl" style="color:#1d9e75;">Base</div><div class="fc-val" style="color:#5dcaa5;">R44k</div></div>
+            <div class="fc-band" style="background:#1e1200;"><div class="fc-lbl" style="color:#ba7517;">Optimistic</div><div class="fc-val" style="color:#ef9f27;">R61k</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pg" id="pg1">
+      <div class="sbar" style="background:#0a2016;"><span style="font-size:11px;color:rgba(255,255,255,.35);">← Browse</span><span class="sbar-title" style="font-size:12px;margin-left:6px;">ABC Pizza</span></div>
+      <div class="body">
+        <div class="card-d green">
+          <div style="font-size:14px;font-weight:500;color:#fff;margin-bottom:2px;">ABC Pizza · Bryanston</div>
+          <div style="font-size:10px;color:rgba(255,255,255,.35);margin-bottom:7px;">14 Main Rd · Pizza kitchen · Site score 82 · Gold tier</div>
+          <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:7px;"><div class="pill-d green">Landlord verified</div><div class="pill-d blue">Fri 21:00–04:00</div><div class="pill-d blue">Sat 21:00–04:00</div></div>
+          <div style="font-size:9px;color:rgba(255,255,255,.3);margin-bottom:4px;">Monthly earnings forecast (Fri+Sat)</div>
+          <div class="sc-forecast">
+            <div class="fc-band" style="background:#0a1628;"><div class="fc-lbl" style="color:#378add;">Conservative</div><div class="fc-val" style="color:#85b7eb;">R28k</div></div>
+            <div class="fc-band" style="background:#111;border:1.5px solid #1d9e75;"><div class="fc-lbl" style="color:#1d9e75;">Base</div><div class="fc-val" style="color:#5dcaa5;">R38k</div></div>
+            <div class="fc-band" style="background:#1e1200;"><div class="fc-lbl" style="color:#ba7517;">Optimistic</div><div class="fc-val" style="color:#ef9f27;">R52k</div></div>
+          </div>
+        </div>
+        <div class="card-d">
+          <div style="font-size:10px;color:rgba(255,255,255,.35);margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em;">Site fee breakdown</div>
+          <div class="row-d"><span class="rl-d">Rent recovery/hr</span><span class="rv-d">R20.83</span></div>
+          <div class="row-d"><span class="rl-d">Utility recovery/hr</span><span class="rv-d">R9.03</span></div>
+          <div class="row-d"><span class="rl-d">30% upside markup</span><span class="rv-d">R8.96</span></div>
+          <div class="row-d" style="border-top:0.5px solid #2a2a2a;"><span style="font-size:11px;color:#5dcaa5;font-weight:500;">Your cost/hr</span><span style="font-size:12px;font-weight:500;color:#5dcaa5;">R38.82/hr</span></div>
+        </div>
+        <div class="card-d">
+          <div class="row-d"><span class="rl-d">Kitchen</span><span class="rv-d">Pizza oven, 6-burner</span></div>
+          <div class="row-d"><span class="rl-d">Best suited for</span><span class="rv-d">Baked, grilled, cooked</span></div>
+        </div>
+        <div class="btn-d pri" onclick="go(2)">Register to book this site →</div>
+      </div>
+    </div>
+
+    <div class="pg" id="pg2">
+      <div class="sbar"><span class="sbar-title">Create account</span><div class="pill-d gray">1 of 5</div></div>
+      <div class="body">
+        <div class="h2m">Let's get you started</div>
+        <div class="subm" style="margin-bottom:8px;">Free to browse. Registration required to book.</div>
+        <div class="inp-d filled">Priya Naidoo</div>
+        <div class="inp-d filled">priya@zombiebao.co.za</div>
+        <div class="inp-d filled">+27 72 441 0983</div>
+        <div class="inp-d" style="color:rgba(255,255,255,.25);">Trading concept — what do you want to cook?</div>
+        <div class="alert-d info" style="margin-top:4px;">OTP sent to +27 72 441 0983</div>
+        <div class="otp-row">
+          <div class="otp-box filled">4</div><div class="otp-box filled">9</div><div class="otp-box filled">2</div><div class="otp-box filled">7</div><div class="otp-box cursor">|</div><div class="otp-box empty"></div>
+        </div>
+        <div class="btn-d pri" onclick="go(3)">Verify & continue →</div>
+      </div>
+    </div>
+
+    <div class="pg" id="pg3">
+      <div class="sbar"><span class="sbar-title">Your documents</span><div class="pill-d gray">2 of 5</div></div>
+      <div class="body">
+        <div class="subm" style="margin-bottom:8px;">Processed securely — never shared with site owners.</div>
+        <div class="upload-d done"><div class="upload-title-d">SA ID / Passport + liveness check</div><div class="upload-sub-d">Priya_ID.pdf · Liveness verified · ✓</div></div>
+        <div class="upload-d done"><div class="upload-title-d">Proof of address</div><div class="upload-sub-d">Nedbank_Statement_Oct24.pdf · Oct 2024 · ✓</div></div>
+        <div class="upload-d done"><div class="upload-title-d">Food handler certificate</div><div class="upload-sub-d">FoodHandler_Cert_2024.pdf · Expires Mar 2026 · ✓</div></div>
+        <div class="upload-d done"><div class="upload-title-d">Public liability insurance</div><div class="upload-sub-d">OUTsurance_Policy.pdf · Cover R5M · ✓</div></div>
+        <div class="upload-d"><div class="upload-title-d" style="color:rgba(255,255,255,.35);">Business registration (optional)</div><div class="upload-sub-d">Adds +5 pts to your trust score</div></div>
+        <div class="btn-d pri" onclick="go(4)">Submit for vetting →</div>
+      </div>
+    </div>
+
+    <div class="pg" id="pg4">
+      <div class="sbar"><span class="sbar-title">Vetting & KYC</span><div class="pill-d gray">3 of 5</div></div>
+      <div class="body">
+        <div class="alert-d success" style="margin-bottom:8px;">All checks passed — 14 hours elapsed</div>
+        <div class="card-d">
+          <div style="font-size:10px;color:rgba(255,255,255,.35);margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em;">Vetting results</div>
+          <div class="check-d done"><div class="ck">✓</div><div class="ck-text">ID verified — biometric liveness passed</div></div>
+          <div class="check-d done"><div class="ck">✓</div><div class="ck-text">Address verified — utility bill confirmed</div></div>
+          <div class="check-d done"><div class="ck">✓</div><div class="ck-text">Criminal record — clear</div></div>
+          <div class="check-d done"><div class="ck">✓</div><div class="ck-text">CIPC — no adverse findings</div></div>
+          <div class="check-d done"><div class="ck">✓</div><div class="ck-text">AML/PEP screening — clear</div></div>
+          <div class="check-d done"><div class="ck">✓</div><div class="ck-text">Food handler cert — valid until Mar 2026</div></div>
+        </div>
+        <div class="card-d amber">
+          <div style="font-size:10px;color:#ef9f27;margin-bottom:5px;font-weight:500;">Activation fee</div>
+          <div style="font-size:11px;color:rgba(239,159,39,.65);line-height:1.5;">R800 total — deducted R400 from your first two sessions. Pay nothing now.</div>
+          <div style="font-size:13px;font-weight:500;color:#ef9f27;margin-top:6px;">R0 due today</div>
+        </div>
+        <div class="btn-d pri" onclick="go(5)">Browse & book a site →</div>
+      </div>
+    </div>
+
+    <div class="pg" id="pg5">
+      <div class="sbar"><span class="sbar-title">Book a slot</span><div class="pill-d gray">4 of 5</div></div>
+      <div class="body">
+        <div class="card-d green" style="margin-bottom:4px;">
+          <div style="font-size:12px;font-weight:500;color:#5dcaa5;margin-bottom:6px;">ABC Pizza · Friday 21:00–04:00</div>
+          <div class="row-d"><span class="rl-d">Site fee/month</span><span style="font-size:11px;font-weight:500;color:#5dcaa5;">R3,225</span></div>
+          <div class="row-d"><span class="rl-d">Consent status</span><span class="pill-d green">Landlord verified</span></div>
+          <div class="row-d"><span class="rl-d">Site score</span><span class="rv-d">82 / 100</span></div>
+        </div>
+        <div class="card-d">
+          <div style="font-size:10px;color:rgba(255,255,255,.35);margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em;">Your booking request</div>
+          <div class="inp-d filled">Zombie Bao — late-night bao buns</div>
+          <div style="background:#111;border-radius:10px;border:0.5px solid #222;padding:8px 12px;font-size:11px;color:rgba(255,255,255,.45);line-height:1.6;margin-bottom:6px;">"Zombie Bao serves 4 bao varieties. Target delivery via Mr D and UberEats — 4.7 star existing rating. Price R85–140/item. Avg session R11k from 8 prior sessions."</div>
+          <div class="row-d"><span class="rl-d">Slots requested</span><span class="rv-d">Fri + Sat recurring</span></div>
+          <div class="row-d"><span class="rl-d">Starting from</span><span class="rv-d">Friday 4 April</span></div>
+        </div>
+        <div class="btn-d pri" onclick="go(6)">Send booking request →</div>
+        <div style="font-size:9px;color:rgba(255,255,255,.2);text-align:center;margin-top:-4px;">Site owner has 48 hrs to approve.</div>
+      </div>
+    </div>
+
+    <div class="pg" id="pg6">
+      <div class="sbar"><span class="sbar-title">Sign contract</span><div class="pill-d gray">5 of 5</div></div>
+      <div class="body">
+        <div class="alert-d success" style="margin-bottom:8px;">Marco Rossi approved your booking — 6 hours ago</div>
+        <div class="card-d" style="margin-bottom:6px;">
+          <div style="font-size:10px;color:rgba(255,255,255,.35);margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em;">Contract summary</div>
+          <div class="row-d"><span class="rl-d">Site</span><span class="rv-d">ABC Pizza, Bryanston</span></div>
+          <div class="row-d"><span class="rl-d">Slots</span><span class="rv-d">Fri + Sat 21:00–04:00</span></div>
+          <div class="row-d"><span class="rl-d">Site fee/month</span><span style="color:#ef9f27;font-size:11px;font-weight:500;">R3,225</span></div>
+          <div class="row-d"><span class="rl-d">ZombieTech fee</span><span class="rv-d">10% of your revenue</span></div>
+          <div class="row-d"><span class="rl-d">Activation deduction</span><span class="rv-d">R400 × 2 sessions</span></div>
+          <div class="row-d"><span class="rl-d">Notice period</span><span class="rv-d">30 days either party</span></div>
+        </div>
+        <div class="alert-d info" style="margin-bottom:8px;font-size:10px;">By signing you accept the zombie contract terms including the photo evidence protocol, lock-up obligations, and penalty schedule.</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.35);margin-bottom:5px;">Sign with OTP — +27 72 441 0983</div>
+        <div class="otp-row">
+          <div class="otp-box filled">6</div><div class="otp-box filled">1</div><div class="otp-box filled">3</div><div class="otp-box filled">8</div><div class="otp-box filled">4</div><div class="otp-box filled">2</div>
+        </div>
+        <div class="btn-d pri" onclick="go(7)">Sign — zombie business born →</div>
+      </div>
+    </div>
+
+    <div class="pg" id="pg7">
+      <div class="sbar" style="background:#0a2016;"><span class="sbar-title">Zombie Bao</span><span class="sbar-badge" style="background:#1d5a38;color:#5dcaa5;">Active</span></div>
+      <div class="body">
+        <div class="card-d green" style="margin-bottom:6px;">
+          <div style="font-size:11px;color:rgba(93,202,165,.55);margin-bottom:2px;">Tonight</div>
+          <div style="font-size:15px;font-weight:500;color:#fff;margin-bottom:2px;">ABC Pizza · Fri 21:00–04:00</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.4);margin-bottom:8px;">14 Main Rd, Bryanston · Starts in 3h 22m</div>
+          <div class="btn-d pri" style="margin-top:0;padding:10px;" onclick="go(8)">Start session checklist →</div>
+        </div>
+        <div class="g2m">
+          <div class="card-d"><div class="mlb-d">This month</div><div class="mv-d green">R41,200</div></div>
+          <div class="card-d"><div class="mlb-d">Sessions</div><div class="mv-d">8</div></div>
+          <div class="card-d"><div class="mlb-d">Trust score</div><div class="mv-d blue">72</div></div>
+          <div class="card-d"><div class="mlb-d">Next payout</div><div class="mv-d amber">Mon</div></div>
+        </div>
+        <div class="card-d">
+          <div style="font-size:10px;color:rgba(255,255,255,.35);margin-bottom:6px;">Active contracts</div>
+          <div class="row-d"><div class="live-ring"></div><span class="rl-d" style="margin-left:2px;">ABC Pizza — Fri/Sat</span><span class="pill-d green">Active</span></div>
+          <div class="row-d"><div style="width:9px;height:9px;border-radius:50%;background:#222;flex-shrink:0;"></div><span class="rl-d" style="margin-left:2px;">Bella Napoli — Thu</span><span class="pill-d amber">Pending</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pg" id="pg8">
+      <div class="sbar"><span class="sbar-title">Pre-session prep</span><span class="sbar-sub">Starts in 38 min</span></div>
+      <div class="body">
+        <div class="alert-d info" style="margin-bottom:6px;">Complete before arriving. Before-photos begin immediately after digital handover.</div>
+        <div class="card-d">
+          <div style="font-size:10px;color:rgba(255,255,255,.35);margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em;">Before you leave home</div>
+          <div class="check-d done"><div class="ck">✓</div><div class="ck-text">Ingredients purchased and packed</div></div>
+          <div class="check-d done"><div class="ck">✓</div><div class="ck-text">UberEats / Mr D store set to open at 21:00</div></div>
+          <div class="check-d done"><div class="ck">✓</div><div class="ck-text">Packaging materials loaded</div></div>
+          <div class="check-d active"><div class="ck">→</div><div class="ck-text">Confirm Marco's mobile — handover contact</div></div>
+          <div class="check-d locked"><div class="ck"></div><div class="ck-text">Emergency contact confirmed in app</div></div>
+        </div>
+        <div class="card-d">
+          <div style="font-size:10px;color:rgba(255,255,255,.35);margin-bottom:5px;">Site access reminder</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.45);line-height:1.6;">Marco hands over keys at 21:00. Alarm code revealed only after dual sign-off. Back entrance on left side of building.</div>
+        </div>
+        <div class="btn-d pri" onclick="go(9)">I'm at the site →</div>
+      </div>
+    </div>
+
+    <div class="pg" id="pg9">
+      <div class="sbar" style="background:#0a1628;"><span class="sbar-title">Key handover</span><span class="sbar-badge" style="background:#1a3a5c;color:#85b7eb;">21:00</span></div>
+      <div class="body">
+        <div class="h2m" style="font-size:16px;">Both parties sign to start</div>
+        <div class="subm" style="margin-bottom:10px;">This timestamp is your legal session start. Before-photos unlock only after both signatures.</div>
+        <div class="card-d" style="margin-bottom:6px;">
+          <div class="check-d done"><div class="ck">✓</div><div class="ck-text">Site owner present — Marco Rossi confirmed</div></div>
+          <div class="check-d done"><div class="ck">✓</div><div class="ck-text">Keys physically handed over</div></div>
+          <div class="check-d active"><div class="ck">→</div><div class="ck-text">Marco signs on his phone — waiting...</div></div>
+          <div class="check-d locked"><div class="ck"></div><div class="ck-text">You sign with OTP to confirm receipt</div></div>
+        </div>
+        <div class="card-d green">
+          <div style="font-size:10px;color:#5dcaa5;margin-bottom:4px;font-weight:500;">Marco signed — 21:03</div>
+          <div style="font-size:9px;color:rgba(93,202,165,.55);">Your OTP sent to +27 72 441 0983</div>
+          <div class="otp-row" style="margin:8px 0 0;">
+            <div class="otp-box filled">3</div><div class="otp-box filled">8</div><div class="otp-box filled">8</div><div class="otp-box cursor">|</div><div class="otp-box empty"></div><div class="otp-box empty"></div>
+          </div>
+        </div>
+        <div class="btn-d pri" onclick="go(10)">Sign & unlock alarm code →</div>
+      </div>
+    </div>
+
+    <div class="pg" id="pg10">
+      <div class="sbar" style="background:#1e1200;"><span class="sbar-title">Before photos</span><span class="sbar-badge" style="background:#4a3000;color:#ef9f27;">21:06</span></div>
+      <div class="body">
+        <div style="font-size:10px;color:rgba(239,159,39,.65);margin-bottom:2px;">4 of 10 areas captured</div>
+        <div class="progress-d"><div class="prog-fill-d" style="width:40%;background:#ef9f27;"></div></div>
+        <div style="font-size:9px;color:rgba(255,255,255,.25);margin-bottom:8px;">Photos taken in-app only · GPS + timestamp locked automatically</div>
+        <div class="g2m" style="margin-bottom:6px;">
+          <div class="photo-box-d captured"><div class="pb-dot" style="background:#1d9e75;"></div><div class="pb-lbl">Stove tops ✓</div></div>
+          <div class="photo-box-d captured"><div class="pb-dot" style="background:#1d9e75;"></div><div class="pb-lbl">Countertops ✓</div></div>
+          <div class="photo-box-d captured"><div class="pb-dot" style="background:#1d9e75;"></div><div class="pb-lbl">Fridge ✓</div></div>
+          <div class="photo-box-d captured"><div class="pb-dot" style="background:#1d9e75;"></div><div class="pb-lbl">Supply cupboard ✓</div></div>
+          <div class="photo-box-d active-p"><div class="pb-dot" style="background:#1d9e75;border:1.5px solid #fff;"></div><div class="pb-lbl">Floor — take now</div></div>
+          <div class="photo-box-d pending-p"><div class="pb-dot" style="background:#222;"></div><div class="pb-lbl">Equipment</div></div>
+        </div>
+        <div class="alert-d warn" style="margin-bottom:6px;">Camera locked to in-app only. Gallery uploads blocked. Point at the floor and drain area.</div>
+        <div class="btn-d amber" onclick="go(11)">Take photo — floor & drains →</div>
+      </div>
+    </div>
+
+    <div class="pg" id="pg11">
+      <div class="sbar" style="background:#0a2016;"><div class="live-ring"></div><span class="sbar-title" style="margin-left:5px;">Live — Zombie Bao</span><span class="sbar-badge" style="background:#1d5a38;color:#5dcaa5;">01:14</span></div>
+      <div class="body">
+        <div class="g3m">
+          <div class="card-d"><div class="mlb-d">Revenue</div><div class="mv-d green" style="font-size:15px;">R4,820</div></div>
+          <div class="card-d"><div class="mlb-d">Orders</div><div class="mv-d" style="font-size:15px;">27</div></div>
+          <div class="card-d"><div class="mlb-d">Ends in</div><div class="mv-d amber" style="font-size:15px;">2h 46m</div></div>
+        </div>
+        <div class="card-d green">
+          <div style="font-size:10px;color:#5dcaa5;margin-bottom:6px;font-weight:500;">Order pipeline</div>
+          <div class="row-d"><span class="rl-d">In kitchen now</span><span style="font-size:12px;font-weight:500;color:#fff;">4</span></div>
+          <div class="row-d"><span class="rl-d">Out for delivery</span><span style="font-size:12px;font-weight:500;color:#fff;">3</span></div>
+          <div class="row-d"><span class="rl-d">Delivered</span><span style="font-size:12px;font-weight:500;color:#5dcaa5;">20 ✓</span></div>
+        </div>
+        <div class="alert-d info" style="font-size:10px;">After-photos unlock at 03:30. You'll get a reminder 30 min before. Keep trading.</div>
+        <div class="btn-d danger" style="padding:9px;font-size:11px;margin-top:4px;" onclick="go(12)">Emergency — contact ZombieTech support</div>
+      </div>
+    </div>
+
+    <div class="pg" id="pg12">
+      <div class="sbar" style="background:#1e1200;"><span class="sbar-title">After photos</span><span class="sbar-badge" style="background:#4a3000;color:#ef9f27;">03:32</span></div>
+      <div class="body">
+        <div style="font-size:9px;color:rgba(255,255,255,.25);margin-bottom:4px;">Match every before photo — same surface, same angle</div>
+        <div style="font-size:10px;color:rgba(239,159,39,.65);margin-bottom:2px;">5 of 10 areas matched</div>
+        <div class="progress-d"><div class="prog-fill-d" style="width:50%;background:#ef9f27;"></div></div>
+        <div class="g2m" style="margin-top:6px;margin-bottom:6px;">
+          <div class="photo-box-d captured"><div class="pb-dot" style="background:#1d9e75;"></div><div class="pb-lbl">Stove tops ✓</div></div>
+          <div class="photo-box-d captured"><div class="pb-dot" style="background:#1d9e75;"></div><div class="pb-lbl">Countertops ✓</div></div>
+          <div class="photo-box-d captured"><div class="pb-dot" style="background:#1d9e75;"></div><div class="pb-lbl">Fridge ✓</div></div>
+          <div class="photo-box-d captured"><div class="pb-dot" style="background:#1d9e75;"></div><div class="pb-lbl">Cupboard ✓</div></div>
+          <div class="photo-box-d captured"><div class="pb-dot" style="background:#1d9e75;"></div><div class="pb-lbl">Floor ✓</div></div>
+          <div class="photo-box-d active-p"><div class="pb-dot" style="background:#1d9e75;border:1.5px solid #fff;"></div><div class="pb-lbl">Equipment — now</div></div>
+        </div>
+        <div class="alert-d success" style="font-size:10px;">AI pre-check running · no anomalies on 5 surfaces so far</div>
+        <div class="btn-d amber" onclick="go(13)">Continue after photos →</div>
+      </div>
+    </div>
+
+    <div class="pg" id="pg13">
+      <div class="sbar" style="background:#120e20;"><span class="sbar-title">Lock-up sequence</span><span class="sbar-badge" style="background:#2e2456;color:#afa9ec;">03:54</span></div>
+      <div class="body">
+        <div class="subm" style="margin-bottom:8px;">Sequential — cannot skip steps. These photos are your legal exit record.</div>
+        <div class="check-d done"><div class="ck">✓</div><div class="ck-text">Gas off — all burners confirmed cold</div></div>
+        <div class="check-d done"><div class="ck">✓</div><div class="ck-text">All electrical off — photo at 03:47</div></div>
+        <div class="check-d done"><div class="ck">✓</div><div class="ck-text">Waste bagged and cleared — photo 03:50</div></div>
+        <div class="check-d done"><div class="ck">✓</div><div class="ck-text">Back door locked — exterior photo 03:53</div></div>
+        <div class="check-d active"><div class="ck">→</div><div class="ck-text">Alarm panel — photograph armed state now</div></div>
+        <div class="check-d locked"><div class="ck"></div><div class="ck-text">Front entrance secured — photo</div></div>
+        <div class="check-d locked"><div class="ck"></div><div class="ck-text">Keys to lockbox — photo of sealed lockbox</div></div>
+        <div class="alert-d warn" style="margin-top:4px;font-size:10px;">Session cannot close until all 7 lock-up steps are photo-verified. You are 2 steps from done.</div>
+        <div class="btn-d purple" onclick="go(14)">Photograph alarm panel →</div>
+      </div>
+    </div>
+
+    <div class="pg" id="pg14">
+      <div class="sbar" style="background:#0a2016;"><span class="sbar-title">Session closed</span><span class="sbar-badge" style="background:#1d5a38;color:#5dcaa5;">04:02</span></div>
+      <div class="body">
+        <div style="text-align:center;padding:10px 0 6px;">
+          <div style="width:44px;height:44px;border-radius:50%;background:#0d2e1e;border:1.5px solid #1d9e75;margin:0 auto 8px;display:flex;align-items:center;justify-content:center;font-size:18px;color:#5dcaa5;">✓</div>
+          <div style="font-size:15px;font-weight:500;color:#fff;margin-bottom:2px;">All done — great session</div>
+          <div style="font-size:10px;color:rgba(255,255,255,.35);">All 10 before/after pairs captured · Lock-up verified</div>
+        </div>
+        <div class="card-d green">
+          <div style="font-size:10px;color:#5dcaa5;margin-bottom:6px;font-weight:500;">Tonight's numbers</div>
+          <div class="row-d"><span class="rl-d">Gross revenue</span><span style="font-size:12px;font-weight:500;color:#fff;">R6,840</span></div>
+          <div class="row-d"><span class="rl-d">Orders completed</span><span class="rv-d">38</span></div>
+          <div class="row-d"><span class="rl-d">Session duration</span><span class="rv-d">7h 56m</span></div>
+        </div>
+        <div class="card-d amber">
+          <div style="font-size:10px;color:#ef9f27;margin-bottom:5px;">Pending settlement — Monday</div>
+          <div class="row-d"><span class="rl-d">Site fee</span><span style="color:#ef9f27;font-size:11px;font-weight:500;">− R892</span></div>
+          <div class="row-d"><span class="rl-d">ZombieTech fee (10%)</span><span style="color:#ef9f27;font-size:11px;font-weight:500;">− R684</span></div>
+          <div class="row-d"><span class="rl-d">Activation deduction</span><span style="color:#ef9f27;font-size:11px;font-weight:500;">− R400</span></div>
+          <div class="row-d" style="border-top:0.5px solid #4a3000;"><span style="font-size:11px;color:#ef9f27;font-weight:500;">Estimated payout</span><span style="font-size:14px;font-weight:500;color:#ef9f27;">R4,864</span></div>
+        </div>
+        <div style="font-size:9px;color:rgba(255,255,255,.2);text-align:center;">Final amount confirmed Monday after site owner review</div>
+      </div>
+    </div>
+
+    <div class="pg" id="pg15">
+      <div class="sbar" style="background:#120e20;"><span class="sbar-title">Settlement</span><span class="sbar-badge" style="background:#2e2456;color:#afa9ec;">Mon 13:45</span></div>
+      <div class="body">
+        <div style="background:#0d2e1e;border-radius:14px;padding:14px;border:0.5px solid #1d5a38;text-align:center;margin-bottom:8px;">
+          <div style="font-size:10px;color:rgba(93,202,165,.55);margin-bottom:4px;">Weekend payout — deposited</div>
+          <div style="font-size:28px;font-weight:500;color:#5dcaa5;">R10,190</div>
+          <div style="font-size:10px;color:rgba(93,202,165,.45);margin-top:2px;">Nedbank account ending 7823</div>
+        </div>
+        <div class="card-d">
+          <div style="font-size:10px;color:rgba(255,255,255,.35);margin-bottom:6px;">Fri + Sat breakdown</div>
+          <div class="row-d"><span class="rl-d">Fri revenue</span><span class="rv-d">R6,840</span></div>
+          <div class="row-d"><span class="rl-d">Sat revenue</span><span class="rv-d">R6,400</span></div>
+          <div class="row-d"><span class="rl-d">Site fees</span><span style="color:#ef9f27;font-size:11px;">−R1,726</span></div>
+          <div class="row-d"><span class="rl-d">ZombieTech fees</span><span style="color:#afa9ec;font-size:11px;">−R1,324</span></div>
+          <div class="row-d"><span class="rl-d">Activation deduction</span><span style="color:#ef9f27;font-size:11px;">−R400 (last time)</span></div>
+          <div class="row-d" style="border-top:0.5px solid #2a2a2a;"><span style="font-size:11px;color:#5dcaa5;font-weight:500;">Total paid out</span><span style="font-size:14px;font-weight:500;color:#5dcaa5;">R10,190</span></div>
+        </div>
+        <div class="alert-d success" style="font-size:10px;">Activation fee fully collected. Full payout from next weekend onwards.</div>
+      </div>
+    </div>
+
+    <div class="pg" id="pg16">
+      <div class="sbar" style="background:#120e20;"><span class="sbar-title">Trust & profile</span></div>
+      <div class="body">
+        <div class="card-d purple" style="margin-bottom:6px;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+            <div style="width:38px;height:38px;border-radius:50%;background:#1a1030;border:1.5px solid #534ab7;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500;color:#afa9ec;">PN</div>
+            <div><div style="font-size:13px;font-weight:500;color:#fff;">Priya Naidoo</div><div style="font-size:10px;color:rgba(175,169,236,.55);">Zombie Bao · 22 sessions</div></div>
+          </div>
+          <div style="font-size:10px;color:rgba(175,169,236,.55);margin-bottom:3px;">Overall trust score</div>
+          <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:5px;">
+            <div style="font-size:26px;font-weight:500;color:#afa9ec;">87</div>
+            <div style="font-size:11px;color:rgba(175,169,236,.4);">/ 100 · +3 this weekend</div>
+          </div>
+          <div class="bar-d"><div class="bar-fill-d" style="width:87%;background:#7f77dd;"></div></div>
+          <div style="font-size:10px;color:rgba(175,169,236,.45);margin-top:4px;">At 90+ you unlock premium sites and priority booking</div>
+        </div>
+        <div class="card-d">
+          <div style="font-size:10px;color:rgba(255,255,255,.35);margin-bottom:6px;">Score breakdown</div>
+          <div class="row-d"><span class="rl-d">Clean handovers</span><span style="color:#5dcaa5;font-size:11px;font-weight:500;">22/22</span></div>
+          <div class="row-d"><span class="rl-d">On-time access</span><span style="color:#5dcaa5;font-size:11px;font-weight:500;">100%</span></div>
+          <div class="row-d"><span class="rl-d">Penalty claims against</span><span style="color:#5dcaa5;font-size:11px;font-weight:500;">0</span></div>
+          <div class="row-d"><span class="rl-d">Site owner ratings</span><span style="color:#5dcaa5;font-size:11px;font-weight:500;">4.9 avg</span></div>
+          <div class="row-d"><span class="rl-d">Active contracts</span><span class="rv-d">2</span></div>
+        </div>
+        <div class="card-d amber">
+          <div style="font-size:10px;color:#ef9f27;margin-bottom:4px;font-weight:500;">3 points to Premium (90+)</div>
+          <div style="font-size:10px;color:rgba(239,159,39,.6);line-height:1.5;">Complete 2 more clean sessions. Premium unlocks Bella Napoli's Sat 20:00–04:00 slot (currently waitlisted).</div>
+        </div>
+      </div>
+    </div>
+
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+var cur=0;
+var labels=['Browse sites','Site detail','Register','Upload docs','Vetting','Book a slot','Sign contract','Home','Pre-session','Handover sign','Before photos','Trading live','After photos','Lock-up','Session close','Settlement','Trust & profile'];
+var total=17;
+function go(n){
+  if(n<0||n>=total) return;
+  document.getElementById('pg'+cur).classList.remove('on');
+  document.getElementById('ni'+cur).classList.remove('on');
+  cur=n;
+  document.getElementById('pg'+cur).classList.add('on');
+  document.getElementById('ni'+cur).classList.add('on');
+  document.getElementById('sn').textContent=labels[cur];
+  document.getElementById('bp').disabled=cur===0;
+  document.getElementById('bn').disabled=cur===total-1;
+  document.getElementById('bn').textContent=cur===total-1?'Done':'Next →';
+}
+go(0);
+</script>
+</body>
+</html>

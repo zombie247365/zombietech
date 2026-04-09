@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZombieTech — Contract Lifecycle Governance</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f8f8f6;color:#1a1a1a;padding:24px;font-size:13px;}
+h1{font-size:20px;font-weight:500;margin-bottom:4px;color:#1d9e75;}
+.top-meta{font-size:12px;color:#888;margin-bottom:20px;}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;}
+.tab{padding:6px 16px;border-radius:20px;border:0.5px solid #e0e0e0;background:#fff;color:#888;font-size:12px;font-weight:500;cursor:pointer;transition:all .12s;}
+.tab:hover{background:#f5f5f5;}
+.tab.on{background:#1d9e75;border-color:#1d9e75;color:#fff;}
+.pane{display:none;}.pane.on{display:block;}
+.sec{background:#fff;border:0.5px solid #e8e8e8;border-radius:12px;padding:14px 16px;margin-bottom:10px;}
+.sh{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:#bbb;margin-bottom:12px;}
+.g2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:10px;}
+.g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:10px;}
+.g4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:10px;}
+.mc{background:#f8f8f6;border-radius:8px;padding:10px 12px;}
+.mlb{font-size:10px;color:#888;margin-bottom:3px;}
+.mv{font-size:18px;font-weight:500;}
+.mv.green{color:#166534;}.mv.blue{color:#1e40af;}.mv.amber{color:#92400e;}.mv.red{color:#991b1b;}.mv.purple{color:#4c1d95;}
+.lbl{font-size:12px;color:#666;display:block;margin-bottom:4px;}
+.fd{margin-bottom:10px;}
+.irow{display:flex;align-items:center;gap:5px;}
+.px{font-size:13px;color:#888;}
+input[type=number]{padding:5px 8px;border:0.5px solid #e0e0e0;border-radius:8px;background:#f8f8f6;color:#1a1a1a;font-size:13px;width:100%;max-width:100px;}
+input[type=range]{width:100%;}
+.sr{display:flex;align-items:center;gap:8px;}
+.sv{font-size:13px;font-weight:500;min-width:28px;}
+.dvd{border:none;border-top:0.5px solid #f0f0f0;margin:10px 0;}
+.row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:0.5px solid #f5f5f5;}
+.row:last-child{border-bottom:none;}
+.rl{font-size:12px;color:#666;}
+.rv{font-size:12px;font-weight:500;}
+.good{font-size:12px;color:#166534;background:#dcfce7;border-radius:8px;padding:7px 10px;margin-top:8px;border:0.5px solid #86efac;}
+.warn{font-size:12px;color:#854d0e;background:#fef9c3;border-radius:8px;padding:7px 10px;margin-top:8px;border:0.5px solid #fcd34d;}
+.info{font-size:12px;color:#1e40af;background:#dbeafe;border-radius:8px;padding:7px 10px;margin-top:8px;border:0.5px solid #93c5fd;}
+.note{font-size:11px;color:#bbb;margin-top:6px;line-height:1.5;}
+.pill{display:inline-block;font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;}
+.tb{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;margin-bottom:8px;}
+.t{flex:1;min-width:50px;padding:5px 8px;border-radius:8px;border:0.5px solid #e0e0e0;background:#f8f8f6;color:#888;font-size:11px;cursor:pointer;text-align:center;transition:all .12s;}
+.t:hover{background:#f0f0f0;}
+.t.on{background:#dbeafe;color:#1e40af;border-color:#93c5fd;font-weight:500;}
+.slot{border:0.5px solid #e8e8e8;border-radius:8px;padding:8px 10px;margin-bottom:6px;display:flex;align-items:center;gap:8px;background:#f8f8f6;}
+.slot.taken{background:#dcfce7;border-color:#86efac;}
+.slot-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.slot-name{font-size:12px;font-weight:500;flex:1;}
+.slot.taken .slot-name{color:#166534;}
+.term-phase{border-radius:10px;padding:10px 12px;margin-bottom:8px;border:0.5px solid #e8e8e8;background:#fff;}
+.tp-head{display:flex;align-items:center;gap:8px;margin-bottom:5px;}
+.tp-num{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;flex-shrink:0;}
+.tp-title{font-size:13px;font-weight:500;}
+.tp-body{font-size:11px;color:#888;line-height:1.6;padding-left:28px;}
+.ss-bar{height:6px;border-radius:3px;background:#f0f0f0;overflow:hidden;margin-top:4px;}
+.ss-fill{height:100%;border-radius:3px;transition:width .3s;}
+.b2-card{background:#f8f8f6;border-radius:10px;padding:10px 14px;margin-bottom:8px;border:0.5px solid #e8e8e8;}
+.b2-title{font-size:13px;font-weight:500;margin-bottom:4px;}
+.b2-body{font-size:11px;color:#888;line-height:1.6;}
+.b2-row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:0.5px solid #f0f0f0;font-size:12px;}
+.b2-row:last-child{border-bottom:none;}
+</style>
+</head>
+<body>
+<h1>ZombieTech — Contract Lifecycle Governance</h1>
+<div class="top-meta">Multi-party relationships · Fee lifecycle · Termination governance · Site owner scoring · Lifetime value model</div>
+
+<div class="tabs">
+  <div class="tab on" onclick="goTab('relationships')">Multi-party relationships</div>
+  <div class="tab" onclick="goTab('lifecycle')">Fee lifecycle</div>
+  <div class="tab" onclick="goTab('termination')">Termination governance</div>
+  <div class="tab" onclick="goTab('siteScore')">Site owner scoring</div>
+  <div class="tab" onclick="goTab('ltv')">Lifetime value model</div>
+</div>
+
+<!-- RELATIONSHIPS -->
+<div class="pane on" id="pane-relationships">
+  <div class="sec">
+    <p class="sh">A site can have many operators — one per slot</p>
+    <div class="slot taken"><div class="slot-dot" style="background:#1d9e75;"></div><div style="flex:1;"><div class="slot-name">Thursday 20:00–02:00</div><div style="font-size:11px;color:#4ade80;">Zombie Bao — Priya Naidoo · Trust 87</div></div><div class="pill" style="background:#dcfce7;color:#166534;">Contracted</div></div>
+    <div class="slot taken"><div class="slot-dot" style="background:#1d9e75;"></div><div style="flex:1;"><div class="slot-name">Friday 20:00–04:00</div><div style="font-size:11px;color:#4ade80;">Night Burger — Sipho Dlamini · Trust 72</div></div><div class="pill" style="background:#dcfce7;color:#166534;">Contracted</div></div>
+    <div class="slot"><div class="slot-dot" style="background:#d0d0d0;"></div><div style="flex:1;"><div class="slot-name" style="color:#888;">Saturday 20:00–04:00</div><div style="font-size:11px;color:#bbb;">No operator — available for booking</div></div><div class="pill" style="background:#f3f4f6;color:#6b7280;border:0.5px solid #e5e7eb;">Open</div></div>
+    <p class="note">ABC Pizza earns from 2 of 3 available slots. The Saturday slot is listed on the marketplace. Each slot has its own contract, fee calculation, and session history.</p>
+  </div>
+  <div class="sec">
+    <p class="sh">An operator can hold multiple site contracts</p>
+    <div class="slot taken"><div class="slot-dot" style="background:#534ab7;"></div><div style="flex:1;"><div style="font-size:12px;font-weight:500;color:#4c1d95;">Thursday — ABC Pizza, Bryanston</div><div style="font-size:11px;color:#7c3aed;">Zombie Bao · 22 sessions · Trust 87 · R2,200/mth site fee</div></div><div class="pill" style="background:#ede9fe;color:#4c1d95;">Active</div></div>
+    <div class="slot taken"><div class="slot-dot" style="background:#534ab7;"></div><div style="flex:1;"><div style="font-size:12px;font-weight:500;color:#4c1d95;">Friday — Bella Napoli, Sandton</div><div style="font-size:11px;color:#7c3aed;">Zombie Bao · 8 sessions · Trust 72 · R3,100/mth site fee</div></div><div class="pill" style="background:#ede9fe;color:#4c1d95;">Active</div></div>
+    <div class="slot"><div class="slot-dot" style="background:#d0d0d0;"></div><div style="flex:1;"><div style="font-size:12px;font-weight:500;color:#888;">Saturday slot — seeking</div><div style="font-size:11px;color:#bbb;">Browsing marketplace for a Saturday site near Fourways</div></div><div class="pill" style="background:#f3f4f6;color:#6b7280;border:0.5px solid #e5e7eb;">Searching</div></div>
+    <p class="note">Priya's trust score at ABC Pizza (87) is site-specific. Her overall platform score is the weighted average across all contracts. Each contract builds independent goodwill — important for termination fee calculations.</p>
+  </div>
+  <div class="sec">
+    <p class="sh">Contract as the atomic unit</p>
+    <div class="g3">
+      <div class="mc"><div class="mlb">Contract links</div><div class="mv" style="font-size:14px;">Site + Slot + Operator</div></div>
+      <div class="mc"><div class="mlb">Session history</div><div class="mv" style="font-size:14px;">Per contract</div></div>
+      <div class="mc"><div class="mlb">Goodwill score</div><div class="mv" style="font-size:14px;">Per contract</div></div>
+    </div>
+    <div class="info">An operator's goodwill at Site A does not transfer to Site B. It is earned separately at each site — creating a natural incentive to protect existing contracts rather than churn.</div>
+  </div>
+</div>
+
+<!-- FEE LIFECYCLE -->
+<div class="pane" id="pane-lifecycle">
+  <div class="sec">
+    <p class="sh">Operator fee lifecycle — inputs</p>
+    <div class="g2">
+      <div class="fd"><span class="lbl">Monthly session revenue</span><div class="irow"><span class="px">R</span><input type="number" id="lc-rev" value="50000" step="1000" oninput="renderLifecycle()"></div></div>
+      <div class="fd"><span class="lbl">ZombieTech transaction fee</span><div class="irow"><input type="number" id="lc-pct" value="10" style="max-width:60px;" oninput="renderLifecycle()"><span class="px">%</span></div></div>
+      <div class="fd"><span class="lbl">Activation fee (total)</span><div class="irow"><span class="px">R</span><input type="number" id="lc-act" value="800" step="100" oninput="renderLifecycle()"></div></div>
+      <div class="fd"><span class="lbl">Defer activation across</span>
+        <div class="tb">
+          <div class="t on" data-grp="defer" data-val="1" onclick="setT(this)">Session 1</div>
+          <div class="t" data-grp="defer" data-val="2" onclick="setT(this)">Sessions 1–2</div>
+          <div class="t" data-grp="defer" data-val="3" onclick="setT(this)">Sessions 1–3</div>
+        </div>
+      </div>
+    </div>
+    <div id="lc-sessions"></div>
+    <p class="note">Deferring the activation fee removes the upfront cash barrier entirely. The operator pays nothing to start and receives a slightly reduced payout in early sessions.</p>
+  </div>
+  <div class="sec">
+    <p class="sh">Loyalty fee reduction — long-term operators</p>
+    <div class="fd"><span class="lbl">Months of continuous clean sessions</span>
+      <div class="sr"><input type="range" min="1" max="36" value="12" id="lc-months" step="1" oninput="renderLifecycle()"><span class="sv" id="lc-months-out">12</span></div>
+    </div>
+    <div id="lc-loyalty"></div>
+    <p class="note">ZombieTech earns more in absolute terms from a reduced fee on a large sustained revenue base than a full fee on a churning operator. Loyalty reduction creates stickiness without destroying margins.</p>
+  </div>
+  <div class="sec">
+    <p class="sh">Site owner fee lifecycle</p>
+    <div class="g2">
+      <div class="fd"><span class="lbl">Site listing fee (annual)</span><div class="irow"><span class="px">R</span><input type="number" id="so-list" value="500" step="100" oninput="renderLifecycle()"></div></div>
+      <div class="fd"><span class="lbl">Deactivation fee — % of last session earnings</span><div class="irow"><input type="number" id="so-deact" value="15" style="max-width:60px;" oninput="renderLifecycle()"><span class="px">%</span></div></div>
+    </div>
+    <div id="so-fees"></div>
+  </div>
+</div>
+
+<!-- TERMINATION -->
+<div class="pane" id="pane-termination">
+  <div class="sec">
+    <p class="sh">Termination scenarios</p>
+    <div class="tb" style="margin-bottom:14px;">
+      <div class="t on" data-grp="term" data-val="op-leaves" onclick="setT(this)">Operator leaves</div>
+      <div class="t" data-grp="term" data-val="site-leaves" onclick="setT(this)">Site ends contract</div>
+      <div class="t" data-grp="term" data-val="mutual" onclick="setT(this)">Mutual exit</div>
+      <div class="t" data-grp="term" data-val="breach-op" onclick="setT(this)">Operator breach</div>
+      <div class="t" data-grp="term" data-val="breach-site" onclick="setT(this)">Site breach</div>
+    </div>
+    <div id="term-detail"></div>
+  </div>
+  <div class="sec">
+    <p class="sh">Goodwill fee calculator</p>
+    <div class="g2">
+      <div class="fd"><span class="lbl">Sessions completed at this site</span><div class="irow"><input type="number" id="gw-sessions" value="24" step="1" oninput="renderTermination()"></div></div>
+      <div class="fd"><span class="lbl">Avg session revenue</span><div class="irow"><span class="px">R</span><input type="number" id="gw-rev" value="12000" step="500" oninput="renderTermination()"></div></div>
+      <div class="fd"><span class="lbl">Clean handover rate</span><div class="irow"><input type="number" id="gw-clean" value="96" style="max-width:60px;" oninput="renderTermination()"><span class="px">%</span></div></div>
+      <div class="fd"><span class="lbl">Goodwill fee % (site pays)</span><div class="irow"><input type="number" id="gw-pct" value="8" style="max-width:60px;" oninput="renderTermination()"><span class="px">%</span></div></div>
+    </div>
+    <div id="gw-result"></div>
+    <p class="note">Goodwill fee = sessions × avg revenue × clean rate × goodwill %. 50% goes to ZombieTech (forward revenue compensation). 50% goes to the operator (brand equity compensation). Disclosed at contract signing — no surprises.</p>
+  </div>
+  <div class="sec">
+    <p class="sh">Notice period structure</p>
+    <div class="row"><span class="rl">Standard notice (either party, no cause)</span><span class="rv">30 days</span></div>
+    <div class="row"><span class="rl">Operator terminates — deactivation fee</span><span class="rv">None</span></div>
+    <div class="row"><span class="rl">Site owner terminates — deactivation fee</span><span class="rv">15% of last settlement</span></div>
+    <div class="row"><span class="rl">Site owner terminates — goodwill fee</span><span class="rv">Triggered if &gt;6 sessions</span></div>
+    <div class="row"><span class="rl">Operator breach termination</span><span class="rv">Immediate, penalties apply</span></div>
+    <div class="row"><span class="rl">Site breach termination</span><span class="rv">Immediate, operator compensated</span></div>
+    <div class="row"><span class="rl">Mutual exit</span><span class="rv">No fees, goodwill score preserved</span></div>
+  </div>
+</div>
+
+<!-- SITE SCORE -->
+<div class="pane" id="pane-siteScore">
+  <div class="sec">
+    <p class="sh">Site owner score — composite of 4 pillars</p>
+    <div class="g2">
+      <div class="fd"><span class="lbl">Location attractiveness (0–100)</span>
+        <div class="sr"><input type="range" min="0" max="100" value="72" id="ss-loc" step="1" oninput="renderSiteScore()"><span class="sv" id="ss-loc-out">72</span></div>
+      </div>
+      <div class="fd"><span class="lbl">Sessions without dispute</span>
+        <div class="sr"><input type="range" min="0" max="100" value="94" id="ss-disp" step="1" oninput="renderSiteScore()"><span class="sv" id="ss-disp-out">94%</span></div>
+      </div>
+      <div class="fd"><span class="lbl">Response rate</span>
+        <div class="sr"><input type="range" min="0" max="100" value="88" id="ss-resp" step="1" oninput="renderSiteScore()"><span class="sv" id="ss-resp-out">88%</span></div>
+      </div>
+      <div class="fd"><span class="lbl">Operator satisfaction score</span>
+        <div class="sr"><input type="range" min="0" max="100" value="82" id="ss-opsat" step="1" oninput="renderSiteScore()"><span class="sv" id="ss-opsat-out">82</span></div>
+      </div>
+    </div>
+    <div id="ss-result"></div>
+  </div>
+  <div class="sec">
+    <p class="sh">Premium site tiers — what operators see</p>
+    <div class="row"><span class="rl"><span class="pill" style="background:#ede9fe;color:#4c1d95;">Platinum 85+</span></span><span class="rv" style="font-size:12px;color:#888;">Top results · curated operators · priority support</span></div>
+    <div class="row"><span class="rl"><span class="pill" style="background:#fef9c3;color:#854d0e;">Gold 70–84</span></span><span class="rv" style="font-size:12px;color:#888;">Highlighted · high-trust operators · fast settlement</span></div>
+    <div class="row"><span class="rl"><span class="pill" style="background:#dcfce7;color:#166534;">Silver 55–69</span></span><span class="rv" style="font-size:12px;color:#888;">Verified badge · standard queue · normal matching</span></div>
+    <div class="row"><span class="rl"><span class="pill" style="background:#f3f4f6;color:#6b7280;border:0.5px solid #e5e7eb;">Standard &lt;55</span></span><span class="rv" style="font-size:12px;color:#888;">Listed · score improvements unlock benefits</span></div>
+  </div>
+</div>
+
+<!-- LTV -->
+<div class="pane" id="pane-ltv">
+  <div class="sec">
+    <p class="sh">ZombieTech lifetime value — per operator-site contract</p>
+    <div class="g2">
+      <div class="fd"><span class="lbl">Monthly session revenue</span><div class="irow"><span class="px">R</span><input type="number" id="ltv-rev" value="50000" step="2500" oninput="renderLTV()"></div></div>
+      <div class="fd"><span class="lbl">Platform fee %</span><div class="irow"><input type="number" id="ltv-pct" value="10" style="max-width:60px;" oninput="renderLTV()"><span class="px">%</span></div></div>
+    </div>
+    <div class="fd"><span class="lbl">Expected contract duration</span>
+      <div class="tb">
+        <div class="t" data-grp="dur" data-val="6" onclick="setT(this)">6 mths</div>
+        <div class="t on" data-grp="dur" data-val="12" onclick="setT(this)">12 mths</div>
+        <div class="t" data-grp="dur" data-val="24" onclick="setT(this)">24 mths</div>
+        <div class="t" data-grp="dur" data-val="36" onclick="setT(this)">36 mths</div>
+      </div>
+    </div>
+    <div class="fd"><span class="lbl">Active operators on platform</span>
+      <div class="sr"><input type="range" min="10" max="500" value="100" id="ltv-ops" step="10" oninput="renderLTV()"><span class="sv" id="ltv-ops-out">100</span></div>
+    </div>
+    <div class="dvd"></div>
+    <div id="ltv-result"></div>
+    <div class="dvd"></div>
+    <div class="fd"><span class="lbl">Annual churn rate assumption</span>
+      <div class="sr"><input type="range" min="0" max="50" value="20" id="ltv-churn" step="5" oninput="renderLTV()"><span class="sv" id="ltv-churn-out">20%</span></div>
+    </div>
+    <div id="ltv-churn-result"></div>
+  </div>
+</div>
+
+<script>
+var ST={defer:2,term:'op-leaves',dur:12};
+
+function setT(el){
+  var g=el.dataset.grp;
+  document.querySelectorAll('[data-grp="'+g+'"]').forEach(function(e){e.classList.remove('on');});
+  el.classList.add('on');
+  var v=isNaN(el.dataset.val)?el.dataset.val:+el.dataset.val;
+  if(g==='defer') ST.defer=v;
+  else if(g==='term'){ST.term=v;renderTermination();}
+  else if(g==='dur'){ST.dur=v;renderLTV();}
+  if(g==='defer') renderLifecycle();
+}
+
+function goTab(id){
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on');});
+  document.querySelectorAll('.pane').forEach(function(p){p.classList.remove('on');});
+  document.querySelector('.tab[onclick="goTab(\''+id+'\')"]').classList.add('on');
+  document.getElementById('pane-'+id).classList.add('on');
+}
+
+function R(n){return 'R '+Math.round(n).toLocaleString();}
+function v(id){return +(document.getElementById(id)?document.getElementById(id).value:0)||0;}
+
+function renderLifecycle(){
+  var rev=v('lc-rev'),pct=v('lc-pct')/100,act=v('lc-act'),defer=ST.defer;
+  var monthly=rev*pct,perSess=monthly/4.33,actPerSess=act/defer;
+  var html='';
+  for(var i=1;i<=Math.min(6,defer+2);i++){
+    var deduct=i<=defer?actPerSess:0;
+    var net=perSess-deduct;
+    html+='<div class="row"><span class="rl">Session '+i+'</span><span class="rv" style="display:flex;gap:10px;align-items:center;">';
+    if(deduct>0) html+='<span style="font-size:11px;color:#854d0e;">− R'+Math.round(deduct)+' act. fee</span>';
+    html+='<span style="color:'+(net>0?'#166534':'#991b1b')+';">'+R(net)+' net</span></span></div>';
+    if(i===defer) html+='<div class="good" style="margin:6px 0;">Activation fee fully collected by session '+defer+'. Full session net from session '+(defer+1)+' onwards.</div>';
+  }
+  if(document.getElementById('lc-sessions')) document.getElementById('lc-sessions').innerHTML=html;
+
+  var months=v('lc-months'),basePct=pct;
+  if(document.getElementById('lc-months-out')) document.getElementById('lc-months-out').textContent=months;
+  var loyalPct=basePct,loyalLabel='';
+  if(months>=24){loyalPct=basePct*0.8;loyalLabel='Platinum loyalty: 20% fee reduction ('+Math.round(loyalPct*100)+'%)';}
+  else if(months>=12){loyalPct=basePct*0.9;loyalLabel='Gold loyalty: 10% fee reduction ('+Math.round(loyalPct*100)+'%)';}
+  else if(months>=6){loyalPct=basePct*0.95;loyalLabel='Silver loyalty: 5% fee reduction ('+Math.round(loyalPct*100)+'%)';}
+  else{loyalLabel='No loyalty reduction yet — loyalty unlocks at 6 months.';}
+  var loyalMonthly=rev*loyalPct;
+  if(document.getElementById('lc-loyalty')) document.getElementById('lc-loyalty').innerHTML=
+    '<div class="g2"><div class="mc"><div class="mlb">Standard fee/month</div><div class="mv">'+R(rev*basePct)+'</div></div>'+
+    '<div class="mc"><div class="mlb">Loyalty fee/month</div><div class="mv green">'+R(loyalMonthly)+'</div></div></div>'+
+    '<div class="'+(months>=6?'good':'info')+'" style="margin-top:8px;">'+loyalLabel+'</div>';
+
+  var soList=v('so-list'),soDeact=v('so-deact')/100,lastSettle=perSess;
+  if(document.getElementById('so-fees')) document.getElementById('so-fees').innerHTML=
+    '<div class="g2">'+
+    '<div class="mc"><div class="mlb">Annual listing fee</div><div class="mv">'+R(soList)+'</div></div>'+
+    '<div class="mc"><div class="mlb">Deactivation fee if they terminate</div><div class="mv amber">'+R(lastSettle*soDeact)+'</div></div>'+
+    '</div><div class="info" style="margin-top:8px;">Deactivation fee = '+Math.round(soDeact*100)+'% of final session settlement. Low-cost to list, meaningful cost to casually terminate a working contract.</div>';
+}
+
+var TERM_DATA={
+  'op-leaves':{color:'#1e40af',bg:'#dbeafe',title:'Operator-initiated termination',
+    phases:[
+      {n:'1',c:'#1e40af',bg:'#dbeafe',title:'30-day notice lodged in app',body:'Operator notifies platform. Site owner notified immediately. Booking calendar for that slot re-opens to new operators.'},
+      {n:'2',c:'#1e40af',bg:'#dbeafe',title:'Final sessions run normally',body:'All sessions in the notice period run under standard contract terms. No change to fees or obligations.'},
+      {n:'3',c:'#1e40af',bg:'#dbeafe',title:'No deactivation fee',body:'Operator pays no termination fee. Their goodwill score at this site is preserved in their profile as a track record.'},
+      {n:'4',c:'#1e40af',bg:'#dbeafe',title:'Goodwill record retained',body:'Platform history remains visible to future site owners. A clean 24-session track record is valuable evidence of reliability.'},
+    ],summary:'Clean exit. ZombieTech loses forward revenue but retains relationship data. Operator\'s platform trust score is unaffected.'},
+  'site-leaves':{color:'#854d0e',bg:'#fef9c3',title:'Site owner-initiated termination (no cause)',
+    phases:[
+      {n:'1',c:'#854d0e',bg:'#fef9c3',title:'30-day notice lodged',body:'Site owner notifies platform. Operator immediately notified. Platform surfaces nearby alternative sites automatically.'},
+      {n:'2',c:'#854d0e',bg:'#fef9c3',title:'Deactivation fee triggered',body:'15% of the site owner\'s final settlement is withheld. Reflects the forward income loss and disruption cost imposed on the operator.'},
+      {n:'3',c:'#854d0e',bg:'#fef9c3',title:'Goodwill fee assessed',body:'If the operator has completed more than 6 clean sessions, the goodwill fee is calculated and charged to the site owner. 50% to ZombieTech, 50% to operator.'},
+      {n:'4',c:'#854d0e',bg:'#fef9c3',title:'Site re-listed',body:'The slot is immediately re-listed on the marketplace. Fast-track replacement operator given existing site checklist is already configured.'},
+    ],summary:'Site owner bears the cost of the disruption they created. Operator is compensated. ZombieTech retains continuity incentive on the supply side.'},
+  'mutual':{color:'#166534',bg:'#dcfce7',title:'Mutual exit — both parties agree',
+    phases:[
+      {n:'1',c:'#166534',bg:'#dcfce7',title:'Joint notice via platform',body:'Both parties confirm mutual termination in the app. Final session date agreed. No notice period required.'},
+      {n:'2',c:'#166534',bg:'#dcfce7',title:'No fees for either party',body:'No deactivation fee. No goodwill fee. The relationship ended on good terms — neither party should be penalised.'},
+      {n:'3',c:'#166534',bg:'#dcfce7',title:'Positive reference unlocked',body:'Both parties can leave a reference for each other. A mutual exit with positive references is the best possible outcome and increases future booking rates for both.'},
+    ],summary:'Best possible exit. No fees, positive platform reputation for both parties. ZombieTech earns a future re-match fee when either party re-engages.'},
+  'breach-op':{color:'#991b1b',bg:'#fee2e2',title:'Operator breach — immediate termination',
+    phases:[
+      {n:'1',c:'#991b1b',bg:'#fee2e2',title:'Breach trigger confirmed',body:'Evidence submitted via platform. ZombieTech admin reviews within 4 hours. If confirmed — immediate contract suspension.'},
+      {n:'2',c:'#991b1b',bg:'#fee2e2',title:'Penalties applied',body:'Damages, cleaning costs, and security breach penalties deducted from operator\'s held funds before any payout.'},
+      {n:'3',c:'#991b1b',bg:'#fee2e2',title:'Trust score impact',body:'Severe: −40 to −100 pts depending on breach severity. Operator may be suspended from the platform pending review.'},
+      {n:'4',c:'#991b1b',bg:'#fee2e2',title:'No goodwill payment',body:'Operator receives no goodwill compensation. Their session history at this site is flagged with the breach record.'},
+    ],summary:'Operator bears full cost of breach. Platform evidence record is the key defence for the site owner.'},
+  'breach-site':{color:'#4c1d95',bg:'#ede9fe',title:'Site owner breach — immediate exit',
+    phases:[
+      {n:'1',c:'#4c1d95',bg:'#ede9fe',title:'Breach confirmed',body:'Examples: refusing key handover, denying access during contracted hours, making false damage claims. Operator files report with evidence via platform.'},
+      {n:'2',c:'#4c1d95',bg:'#ede9fe',title:'Operator compensated',body:'ZombieTech withholds and compensates the operator for the disrupted session and any provable losses.'},
+      {n:'3',c:'#4c1d95',bg:'#ede9fe',title:'Site owner trust score hit',body:'Significant score reduction. Repeated breaches result in site being unlisted from the marketplace.'},
+      {n:'4',c:'#4c1d95',bg:'#ede9fe',title:'Operator re-matched',body:'Platform fast-tracks a replacement site for the displaced operator, prioritising nearby sites in the same category.'},
+    ],summary:'Site owner bears the cost and reputation impact. Operator is protected and re-matched. ZombieTech retains the operator relationship.'},
+};
+
+function renderTermination(){
+  var d=TERM_DATA[ST.term]||TERM_DATA['op-leaves'];
+  var gws=v('gw-sessions'),gwr=v('gw-rev'),gwc=v('gw-clean')/100,gwp=v('gw-pct')/100;
+  var gw=gws*gwr*gwc*gwp;
+  if(document.getElementById('term-detail')) document.getElementById('term-detail').innerHTML=
+    '<div style="padding:12px 14px;border-radius:10px;background:'+d.bg+';border:0.5px solid '+d.color+';margin-bottom:8px;">'+
+    '<div style="font-size:13px;font-weight:500;color:'+d.color+';margin-bottom:10px;">'+d.title+'</div>'+
+    d.phases.map(function(p){return '<div class="term-phase">'+
+      '<div class="tp-head"><div class="tp-num" style="background:'+p.bg+';color:'+p.c+';">'+p.n+'</div><div class="tp-title">'+p.title+'</div></div>'+
+      '<div class="tp-body">'+p.body+'</div></div>';}).join('')+
+    '<div style="font-size:11px;color:'+d.color+';margin-top:6px;font-style:italic;">'+d.summary+'</div></div>';
+
+  if(document.getElementById('gw-result')) document.getElementById('gw-result').innerHTML=
+    '<div class="g2">'+
+    '<div class="mc"><div class="mlb">Total goodwill value</div><div class="mv">'+R(gws*gwr*gwc)+'</div></div>'+
+    '<div class="mc"><div class="mlb">Goodwill fee ('+Math.round(gwp*100)+'%)</div><div class="mv amber">'+R(gw)+'</div></div>'+
+    '<div class="mc"><div class="mlb">ZombieTech receives (50%)</div><div class="mv purple">'+R(gw*0.5)+'</div></div>'+
+    '<div class="mc"><div class="mlb">Operator receives (50%)</div><div class="mv green">'+R(gw*0.5)+'</div></div>'+
+    '</div>'+
+    '<div class="'+(gws>6?'warn':'info')+'" style="margin-top:8px;">'+
+    (gws>6?'Goodwill fee applies — '+gws+' sessions at '+Math.round(gwc*100)+'% clean rate. Site owner pays '+R(gw)+' if they terminate without cause.':
+    'Goodwill fee does not apply — fewer than 6 sessions completed. Both parties can exit cleanly.')+'</div>';
+}
+
+function renderSiteScore(){
+  var loc=v('ss-loc'),disp=v('ss-disp'),resp=v('ss-resp'),opsat=v('ss-opsat');
+  if(document.getElementById('ss-loc-out')) document.getElementById('ss-loc-out').textContent=loc;
+  if(document.getElementById('ss-disp-out')) document.getElementById('ss-disp-out').textContent=disp+'%';
+  if(document.getElementById('ss-resp-out')) document.getElementById('ss-resp-out').textContent=resp+'%';
+  if(document.getElementById('ss-opsat-out')) document.getElementById('ss-opsat-out').textContent=opsat;
+  var composite=Math.round(loc*0.35+disp*0.3+resp*0.15+opsat*0.2);
+  var tier='',tc='',tb='',tdesc='';
+  if(composite>=85){tier='Platinum';tc='#4c1d95';tb='#ede9fe';tdesc='Featured in top results. Curated operator matching. Priority dispute resolution.';}
+  else if(composite>=70){tier='Gold';tc='#854d0e';tb='#fef9c3';tdesc='Highlighted in search. Access to high-trust operators. Fast-track settlement.';}
+  else if(composite>=55){tier='Silver';tc='#166534';tb='#dcfce7';tdesc='Standard listing with verified badge. Normal matching queue.';}
+  else{tier='Standard';tc='#6b7280';tb='#f3f4f6';tdesc='Listed on marketplace. Score improvements unlock better operator access.';}
+  if(document.getElementById('ss-result')) document.getElementById('ss-result').innerHTML=
+    '<div class="g4">'+
+    '<div class="mc"><div class="mlb">Location (35%)</div><div class="mv blue">'+loc+'</div><div class="ss-bar"><div class="ss-fill" style="width:'+loc+'%;background:#93c5fd;"></div></div></div>'+
+    '<div class="mc"><div class="mlb">Dispute-free (30%)</div><div class="mv green">'+disp+'%</div><div class="ss-bar"><div class="ss-fill" style="width:'+disp+'%;background:#86efac;"></div></div></div>'+
+    '<div class="mc"><div class="mlb">Response rate (15%)</div><div class="mv amber">'+resp+'%</div><div class="ss-bar"><div class="ss-fill" style="width:'+resp+'%;background:#fcd34d;"></div></div></div>'+
+    '<div class="mc"><div class="mlb">Operator sat. (20%)</div><div class="mv purple">'+opsat+'</div><div class="ss-bar"><div class="ss-fill" style="width:'+opsat+'%;background:#c4b5fd;"></div></div></div>'+
+    '</div>'+
+    '<div style="margin-top:10px;padding:12px 14px;border-radius:10px;background:'+tb+';border:0.5px solid '+tc+';">'+
+    '<div style="display:flex;align-items:center;gap:10px;margin-bottom:5px;">'+
+    '<span style="font-size:22px;font-weight:500;color:'+tc+';">'+composite+'</span>'+
+    '<span style="font-size:13px;font-weight:500;color:'+tc+';">'+tier+' site</span></div>'+
+    '<div style="font-size:12px;color:'+tc+';">'+tdesc+'</div></div>';
+}
+
+function renderLTV(){
+  var rev=v('ltv-rev'),pct=v('ltv-pct')/100,dur=ST.dur,ops=v('ltv-ops'),churn=v('ltv-churn')/100;
+  if(document.getElementById('ltv-ops-out')) document.getElementById('ltv-ops-out').textContent=ops;
+  if(document.getElementById('ltv-churn-out')) document.getElementById('ltv-churn-out').textContent=Math.round(churn*100)+'%';
+  var monthly=rev*pct,ltv=monthly*dur;
+  var platMth=monthly*ops,platAnn=platMth*12;
+  if(document.getElementById('ltv-result')) document.getElementById('ltv-result').innerHTML=
+    '<div class="g3">'+
+    '<div class="mc"><div class="mlb">LTV per contract ('+dur+' mths)</div><div class="mv purple">'+R(ltv)+'</div></div>'+
+    '<div class="mc"><div class="mlb">Platform monthly ('+ops+' ops)</div><div class="mv green">'+R(platMth)+'</div></div>'+
+    '<div class="mc"><div class="mlb">Platform annual</div><div class="mv green">'+R(platAnn)+'</div></div>'+
+    '</div>';
+  var retained=Math.round(ops*(1-churn)),lost=ops-retained;
+  var churnLoss=lost*monthly*12;
+  if(document.getElementById('ltv-churn-result')) document.getElementById('ltv-churn-result').innerHTML=
+    '<div class="g3">'+
+    '<div class="mc"><div class="mlb">Retained operators/yr</div><div class="mv green">'+retained+'</div></div>'+
+    '<div class="mc"><div class="mlb">Lost to churn</div><div class="mv red">'+lost+'</div></div>'+
+    '<div class="mc"><div class="mlb">Revenue lost to churn</div><div class="mv red">'+R(churnLoss)+'</div></div>'+
+    '</div>'+
+    '<div class="warn" style="margin-top:8px;">At '+Math.round(churn*100)+'% annual churn, ZombieTech loses '+R(churnLoss)+'/year in recurring fees. Reducing churn by 10 percentage points saves '+R(lost*0.1*monthly*12)+' annually — more than all activation fees combined at this scale.</div>';
+}
+
+document.querySelectorAll('input[type=number],input[type=range]').forEach(function(i){i.addEventListener('input',function(){renderLifecycle();renderTermination();renderSiteScore();renderLTV();});});
+renderLifecycle();
+renderTermination();
+renderSiteScore();
+renderLTV();
+</script>
+</body>
+</html>

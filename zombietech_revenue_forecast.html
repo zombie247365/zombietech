@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZombieTech — Revenue Forecast Engine</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f8f8f6;color:#1a1a1a;padding:24px;font-size:14px;}
+h1{font-size:20px;font-weight:500;margin-bottom:4px;color:#1d9e75;}
+.top-meta{font-size:12px;color:#888;margin-bottom:20px;}
+.sec{background:#fff;border:0.5px solid #e8e8e8;border-radius:12px;padding:1rem 1.25rem;margin-bottom:10px;}
+.sh{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+.sn{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0;}
+.st{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:#bbb;margin:0;}
+.g2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:10px;}
+.g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:10px;}
+.mc{background:#f8f8f6;border-radius:8px;padding:10px 12px;}
+.mc.white{background:#fff;border:0.5px solid #e8e8e8;}
+.mlb{font-size:10px;color:#888;margin-bottom:3px;}
+.mv{font-size:18px;font-weight:500;}
+.mv.green{color:#166534;}.mv.blue{color:#1e40af;}.mv.amber{color:#92400e;}
+.lbl{font-size:12px;color:#666;display:block;margin-bottom:4px;}
+.fd{margin-bottom:10px;}
+.irow{display:flex;align-items:center;gap:5px;}
+.px{font-size:13px;color:#888;}
+input[type=number]{padding:5px 8px;border:0.5px solid #e0e0e0;border-radius:8px;background:#f8f8f6;color:#1a1a1a;font-size:14px;width:100%;max-width:110px;}
+input[type=range]{width:100%;}
+.sr{display:flex;align-items:center;gap:8px;}
+.sv{font-size:13px;font-weight:500;min-width:36px;text-align:right;}
+.dvd{border:none;border-top:0.5px solid #f0f0f0;margin:10px 0;}
+.tb{display:flex;gap:5px;flex-wrap:wrap;margin-top:4px;margin-bottom:8px;}
+.t{flex:1;min-width:48px;padding:5px 8px;border-radius:8px;border:0.5px solid #e0e0e0;background:#f8f8f6;color:#888;font-size:11px;cursor:pointer;text-align:center;transition:all .12s;}
+.t:hover{background:#f0f0f0;}
+.t.on{background:#dbeafe;color:#1e40af;border-color:#93c5fd;font-weight:500;}
+.band{display:flex;border-radius:10px;overflow:hidden;border:0.5px solid #e8e8e8;margin:10px 0;}
+.bc{flex:1;padding:10px 12px;text-align:center;}
+.bcl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;}
+.bca{font-size:17px;font-weight:500;}
+.bcs{font-size:10px;margin-top:2px;opacity:.7;}
+.step-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:0.5px solid #f0f0f0;}
+.step-row:last-child{border-bottom:none;}
+.step-num{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;flex-shrink:0;}
+.step-lbl{font-size:12px;color:#666;flex:1;line-height:1.4;}
+.step-val{font-size:13px;font-weight:500;text-align:right;min-width:80px;}
+.good{font-size:12px;color:#166534;background:#dcfce7;border-radius:8px;padding:7px 10px;margin-top:8px;border:0.5px solid #86efac;}
+.warn{font-size:12px;color:#854d0e;background:#fef9c3;border-radius:8px;padding:7px 10px;margin-top:8px;border:0.5px solid #fcd34d;}
+.info{font-size:12px;color:#1e40af;background:#dbeafe;border-radius:8px;padding:7px 10px;margin-top:8px;border:0.5px solid #93c5fd;}
+.note{font-size:11px;color:#bbb;margin-top:6px;line-height:1.5;}
+.score-bar{height:6px;border-radius:3px;background:#f0f0f0;overflow:hidden;margin-top:4px;}
+.score-fill{height:100%;border-radius:3px;transition:width .3s;}
+.ratecard{display:flex;gap:24px;flex-wrap:wrap;}
+.rateitem{display:flex;flex-direction:column;gap:2px;}
+.rateitem-lbl{font-size:10px;color:#bbb;}
+.rateitem-val{font-size:13px;font-weight:500;color:#1a1a1a;}
+</style>
+</head>
+<body>
+<h1>ZombieTech — Revenue Forecast Engine</h1>
+<div class="top-meta">Data-driven forecast derived from site financials + location intelligence + ramp-up stage. All inputs are live and interactive.</div>
+
+<!-- STEP 1: SITE FINANCIAL BASELINE -->
+<div class="sec">
+  <div class="sh"><div class="sn" style="background:#dbeafe;color:#1e40af;">1</div><p class="st">Site financial baseline — from uploaded bank statements</p></div>
+  <div class="g2">
+    <div class="fd"><span class="lbl">Site monthly revenue (avg)</span><div class="irow"><span class="px">R</span><input type="number" id="siteRev" value="150000" step="5000"></div></div>
+    <div class="fd"><span class="lbl">Site operating hrs/month</span><div class="irow"><input type="number" id="siteHrs" value="330" step="10" style="max-width:80px;"><span class="px">hrs</span></div></div>
+  </div>
+  <div class="fd"><span class="lbl">Evening share of revenue (18:00–22:00 window) — AI inferred from statement patterns</span>
+    <div class="sr"><input type="range" min="20" max="70" value="45" id="eveningShare" step="5"><span class="sv" id="eveningShareOut">45%</span></div>
+  </div>
+  <div class="dvd"></div>
+  <div class="ratecard" id="siteBaseline"></div>
+</div>
+
+<!-- STEP 2: LOCATION INTELLIGENCE -->
+<div class="sec">
+  <div class="sh"><div class="sn" style="background:#dcfce7;color:#166534;">2</div><p class="st">Location intelligence</p></div>
+  <div class="g2">
+    <div class="fd"><span class="lbl">Population within 10km</span>
+      <div class="tb">
+        <div class="t on" data-g="pop" data-v="0.7" onclick="setT(this)">&lt;50k</div>
+        <div class="t" data-g="pop" data-v="0.9" onclick="setT(this)">50–150k</div>
+        <div class="t" data-g="pop" data-v="1.1" onclick="setT(this)">150–300k</div>
+        <div class="t" data-g="pop" data-v="1.3" onclick="setT(this)">300k+</div>
+      </div>
+    </div>
+    <div class="fd"><span class="lbl">Area income band</span>
+      <div class="tb">
+        <div class="t" data-g="inc" data-v="0.85" onclick="setT(this)">LSM 1–4</div>
+        <div class="t on" data-g="inc" data-v="1.0" onclick="setT(this)">LSM 5–7</div>
+        <div class="t" data-g="inc" data-v="1.2" onclick="setT(this)">LSM 8–10</div>
+      </div>
+    </div>
+  </div>
+  <div class="fd"><span class="lbl">Competitor delivery density — other delivery options in the area (5 = clear market)</span>
+    <div class="sr">
+      <span style="font-size:11px;color:#bbb;">saturated</span>
+      <input type="range" min="1" max="5" value="3" id="compScore" step="1">
+      <span style="font-size:11px;color:#bbb;">clear</span>
+      <span class="sv" id="compOut">3/5</span>
+    </div>
+  </div>
+  <div id="locScore"></div>
+</div>
+
+<!-- STEP 3: OPERATING MODEL -->
+<div class="sec">
+  <div class="sh"><div class="sn" style="background:#fef9c3;color:#854d0e;">3</div><p class="st">Operating model</p></div>
+  <div class="tb" style="margin-bottom:8px;">
+    <div class="t on" id="tb-hybrid" onclick="setOpMode('hybrid')">Dine-in + delivery</div>
+    <div class="t" id="tb-delivery" onclick="setOpMode('delivery')">Delivery only</div>
+  </div>
+  <div id="delivery-extra" style="display:none;" class="g2">
+    <div class="fd"><span class="lbl">Delivery platform commission</span><div class="irow"><input type="number" style="max-width:60px;" id="delComm" value="27" min="15" max="35"><span class="px">%</span></div></div>
+    <div class="fd"><span class="lbl">Delivery radius</span>
+      <div class="tb">
+        <div class="t" data-g="rad" data-v="0.8" onclick="setT(this)">3km</div>
+        <div class="t on" data-g="rad" data-v="1.0" onclick="setT(this)">5km</div>
+        <div class="t" data-g="rad" data-v="1.2" onclick="setT(this)">8km</div>
+      </div>
+    </div>
+  </div>
+  <div class="fd"><span class="lbl">Zombie hours/month (from schedule)</span><div class="irow"><input type="number" id="zombieHrs" value="95" step="5" style="max-width:70px;"><span class="px">hrs</span></div></div>
+</div>
+
+<!-- STEP 4: RAMP-UP STAGE -->
+<div class="sec">
+  <div class="sh"><div class="sn" style="background:#ede9fe;color:#4c1d95;">4</div><p class="st">Ramp-up stage</p></div>
+  <div class="tb">
+    <div class="t on" data-g="ramp" data-v="0.45" onclick="setT(this)">Month 1–3<br><span style="font-size:10px;font-weight:400;">Finding feet</span></div>
+    <div class="t" data-g="ramp" data-v="0.65" onclick="setT(this)">Month 4–6<br><span style="font-size:10px;font-weight:400;">Building reviews</span></div>
+    <div class="t" data-g="ramp" data-v="0.82" onclick="setT(this)">Month 7–12<br><span style="font-size:10px;font-weight:400;">Established</span></div>
+    <div class="t" data-g="ramp" data-v="1.0" onclick="setT(this)">12 months+<br><span style="font-size:10px;font-weight:400;">Full potential</span></div>
+  </div>
+  <p class="note">New brands on delivery platforms typically reach 40–50% of their revenue ceiling in the first 90 days, growing as reviews accumulate and the algorithm surfaces them more frequently.</p>
+</div>
+
+<!-- RESULTS -->
+<div class="sec" style="background:#f8f8f6;border-color:#e0e0e0;">
+  <div class="sh"><div class="sn" style="background:#1d9e75;color:#fff;">→</div><p class="st">Revenue forecast — zombie operator</p></div>
+  <div class="band" id="revBand" style="margin-bottom:14px;"></div>
+  <div id="calcSteps" style="margin-bottom:12px;"></div>
+  <div class="dvd"></div>
+  <div class="g3" id="finalMetrics"></div>
+  <div id="deliveryNote" style="display:none;" class="warn" style="margin-top:8px;"></div>
+</div>
+
+<script>
+var S={pop:0.7,inc:1.0,rad:1.0,ramp:0.45,opMode:'hybrid'};
+
+function setT(el){
+  var g=el.dataset.g;
+  document.querySelectorAll('[data-g="'+g+'"]').forEach(function(e){e.classList.remove('on');});
+  el.classList.add('on');
+  S[g]=parseFloat(el.dataset.v);
+  calc();
+}
+
+function setOpMode(m){
+  S.opMode=m;
+  document.getElementById('tb-hybrid').classList.toggle('on',m==='hybrid');
+  document.getElementById('tb-delivery').classList.toggle('on',m==='delivery');
+  document.getElementById('delivery-extra').style.display=m==='delivery'?'grid':'none';
+  calc();
+}
+
+function R(n){return isNaN(n)?'--':'R '+Math.round(n).toLocaleString();}
+function v(id){return +(document.getElementById(id)?document.getElementById(id).value:0)||0;}
+
+function calc(){
+  var siteRev=v('siteRev'),siteHrs=v('siteHrs')||1,eveningShare=v('eveningShare')/100;
+  var compScore=v('compScore'),zombieHrs=v('zombieHrs')||1;
+  var delComm=(v('delComm')||27)/100;
+
+  document.getElementById('eveningShareOut').textContent=Math.round(eveningShare*100)+'%';
+  document.getElementById('compOut').textContent=compScore+'/5';
+
+  var siteHourlyRate=siteRev/siteHrs;
+  var eveningHourlyRate=siteHourlyRate*(1+eveningShare*0.6);
+  var newBrandDiscount=0.42;
+  var rawPotential=eveningHourlyRate*zombieHrs*newBrandDiscount;
+
+  document.getElementById('siteBaseline').innerHTML=
+    '<div class="rateitem"><div class="rateitem-lbl">Site hourly rate (R'+siteRev.toLocaleString()+' ÷ '+siteHrs+'hrs)</div><div class="rateitem-val">'+R(siteHourlyRate)+'/hr</div></div>'+
+    '<div class="rateitem"><div class="rateitem-lbl">Evening-weighted rate (×'+(1+eveningShare*0.6).toFixed(2)+')</div><div class="rateitem-val">'+R(eveningHourlyRate)+'/hr</div></div>'+
+    '<div class="rateitem"><div class="rateitem-lbl">New-brand demand capture</div><div class="rateitem-val">42%</div></div>'+
+    '<div class="rateitem"><div class="rateitem-lbl">Raw zombie potential</div><div class="rateitem-val" style="color:#166534;">'+R(rawPotential)+'/mth</div></div>';
+
+  var locMod=S.pop*S.inc*(0.7+compScore*0.06);
+  var delMod=S.opMode==='delivery'?S.rad*1.15:1.0;
+  var commH=S.opMode==='delivery'?(1-delComm):1.0;
+  var fullPotential=rawPotential*locMod*delMod*commH;
+  var baseRev=fullPotential*S.ramp;
+  var conservative=baseRev*0.75;
+  var optimistic=baseRev*1.35;
+  var locScore=Math.min(100,Math.round(locMod*55));
+
+  document.getElementById('locScore').innerHTML=
+    '<div style="display:flex;align-items:center;gap:12px;margin-top:6px;">'+
+    '<span style="font-size:12px;color:#666;">Location attractiveness score:</span>'+
+    '<span style="font-size:16px;font-weight:500;color:'+(locScore>=70?'#166534':locScore>=45?'#854d0e':'#991b1b')+'">'+locScore+'/100</span>'+
+    '<div style="flex:1;max-width:160px;height:6px;border-radius:3px;background:#f0f0f0;overflow:hidden;">'+
+    '<div style="height:100%;width:'+locScore+'%;background:'+(locScore>=70?'#22c55e':locScore>=45?'#f59e0b':'#ef4444')+';border-radius:3px;transition:width .3s;"></div></div>'+
+    '<span style="font-size:11px;color:#bbb;">'+(locScore>=70?'Strong market':'Moderate market')+'</span></div>';
+
+  document.getElementById('revBand').innerHTML=[
+    {l:'Conservative',a:conservative,bg:'#dbeafe',c:'#1e40af',s:'75th percentile downside'},
+    {l:'Base case',a:baseRev,bg:'#dcfce7',c:'#166534',s:'Expected trajectory'},
+    {l:'Optimistic',a:optimistic,bg:'#fef9c3',c:'#854d0e',s:'Strong execution'}
+  ].map(function(b){return(
+    '<div class="bc" style="background:'+b.bg+';">'+
+    '<div class="bcl" style="color:'+b.c+';">'+b.l+'</div>'+
+    '<div class="bca" style="color:'+b.c+';">'+R(b.a)+'</div>'+
+    '<div class="bcs" style="color:'+b.c+';">'+b.s+'</div>'+
+    '</div>'
+  );}).join('');
+
+  var steps=[
+    {num:'1',label:'Site evening demand ('+Math.round(eveningShare*100)+'% of site revenue, weighted to peak hrs)',val:R(eveningHourlyRate)+'/hr',bg:'#dbeafe',tc:'#1e40af'},
+    {num:'2',label:'New brand demand capture (42% — new listing without review history)',val:'×0.42',bg:'#fee2e2',tc:'#991b1b'},
+    {num:'3',label:'Raw zombie monthly potential (×'+zombieHrs+' hrs)',val:R(rawPotential),bg:'#dbeafe',tc:'#1e40af'},
+    {num:'4',label:'Location modifier (population ×'+S.pop+' · income ×'+S.inc+' · competition ×'+(0.7+compScore*0.06).toFixed(2)+')',val:'×'+locMod.toFixed(2),bg:'#dcfce7',tc:'#166534'},
+    {num:'5',label:S.opMode==='delivery'?'Delivery model modifier (wider radius, late-night demand premium)':'Dine-in + delivery (no radius expansion)',val:S.opMode==='delivery'?'×'+delMod.toFixed(2):'×1.00',bg:'#fef9c3',tc:'#854d0e'},
+    S.opMode==='delivery'?{num:'6',label:'Delivery platform commission deduction ('+Math.round(delComm*100)+'%)',val:'×'+(1-delComm).toFixed(2),bg:'#fee2e2',tc:'#991b1b'}:null,
+    {num:S.opMode==='delivery'?'7':'6',label:'Ramp-up factor ('+Math.round(S.ramp*100)+'% of ceiling — current stage)',val:'×'+S.ramp,bg:'#ede9fe',tc:'#4c1d95'},
+  ].filter(Boolean);
+
+  document.getElementById('calcSteps').innerHTML=steps.map(function(s){return(
+    '<div class="step-row">'+
+    '<div class="step-num" style="background:'+s.bg+';color:'+s.tc+';">'+s.num+'</div>'+
+    '<div class="step-lbl">'+s.label+'</div>'+
+    '<div class="step-val">'+s.val+'</div>'+
+    '</div>'
+  );}).join('');
+
+  var perNight=baseRev/(S.ramp>0.6?18:14);
+  var perHr=baseRev/zombieHrs;
+  document.getElementById('finalMetrics').innerHTML=
+    '<div class="mc white"><div class="mlb">Base case/month</div><div class="mv green">'+R(baseRev)+'</div></div>'+
+    '<div class="mc white"><div class="mlb">Est. per zombie night</div><div class="mv blue">'+R(perNight)+'</div></div>'+
+    '<div class="mc white"><div class="mlb">Revenue per zombie hour</div><div class="mv amber">'+R(perHr)+'</div></div>';
+
+  var dn=document.getElementById('deliveryNote');
+  if(S.opMode==='delivery'){
+    dn.style.display='';
+    dn.textContent='Delivery-only mode: no front-of-house staff needed, but delivery platform commission ('+Math.round(delComm*100)+'%) applies to gross revenue. Effective net revenue shown above already reflects this deduction. Consider registering on multiple platforms (UberEats + Mr D) to maximise reach.';
+  } else {
+    dn.style.display='none';
+  }
+}
+
+document.querySelectorAll('input[type=number],input[type=range]').forEach(function(i){i.addEventListener('input',calc);});
+calc();
+</script>
+</body>
+</html>

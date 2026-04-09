@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZombieTech — Session App Flow</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f8f8f6;color:#1a1a1a;padding:24px;font-size:13px;}
+h1{font-size:20px;font-weight:500;margin-bottom:4px;color:#1d9e75;}
+.top-meta{font-size:12px;color:#888;margin-bottom:20px;}
+.wrap{display:flex;gap:24px;align-items:flex-start;}
+.flow-col{display:flex;flex-direction:column;gap:0;width:180px;flex-shrink:0;}
+.step-pip{display:flex;align-items:flex-start;gap:10px;cursor:pointer;padding:6px 0;}
+.pip-col{display:flex;flex-direction:column;align-items:center;}
+.pip{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;border:1.5px solid #e0e0e0;background:#f8f8f6;color:#888;flex-shrink:0;transition:all .15s;}
+.pip.done{background:#dcfce7;border-color:#86efac;color:#166534;}
+.pip.active{background:#1d9e75;border-color:#1d9e75;color:#fff;}
+.pip-line{width:1.5px;flex:1;min-height:14px;background:#e0e0e0;}
+.pip-line.done{background:#86efac;}
+.step-label{font-size:12px;color:#888;padding-top:6px;line-height:1.4;transition:color .15s;}
+.step-label.active{color:#1a1a1a;font-weight:500;}
+.phone-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:12px;}
+.nav-strip{display:flex;gap:8px;align-items:center;}
+.nav-btn{padding:5px 14px;border-radius:20px;border:0.5px solid #e0e0e0;background:#fff;color:#666;font-size:11px;cursor:pointer;transition:all .1s;}
+.nav-btn:hover{background:#f5f5f5;}
+.nav-btn.pri{background:#1d9e75;border-color:#1d9e75;color:#fff;}
+.nav-btn:disabled{opacity:.35;cursor:default;}
+.screen-name{font-size:11px;color:#aaa;text-align:center;min-width:140px;}
+.phone{background:#111;border-radius:40px;width:290px;padding:8px;border:5px solid #1a1a1a;box-shadow:0 20px 60px rgba(0,0,0,.25);}
+.notch{width:90px;height:22px;background:#111;border-radius:0 0 14px 14px;margin:0 auto 6px;}
+.screen{background:#111;border-radius:30px;overflow:hidden;min-height:520px;display:flex;flex-direction:column;}
+.pg{display:none;flex-direction:column;min-height:520px;}.pg.on{display:flex;}
+.sbar{padding:12px 14px 8px;display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.sbar-title{font-size:13px;font-weight:500;color:#fff;flex:1;}
+.sbar-time{font-size:11px;color:rgba(255,255,255,.4);}
+.sbar-badge{font-size:9px;font-weight:600;padding:2px 7px;border-radius:20px;}
+.body{flex:1;padding:0 14px 14px;display:flex;flex-direction:column;gap:8px;overflow:hidden;}
+.phase-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:500;padding:3px 10px;border-radius:20px;margin-bottom:2px;}
+.card-d{background:#1a1a1a;border-radius:14px;padding:12px 14px;border:0.5px solid #2a2a2a;}
+.card-d.green{background:#0a2016;border-color:#1d5a38;}
+.card-d.blue{background:#0a1628;border-color:#1a3a5c;}
+.card-d.amber{background:#1e1200;border-color:#4a3000;}
+.card-d.purple{background:#120e20;border-color:#2e2456;}
+.card-title-d{font-size:12px;font-weight:500;color:#fff;margin-bottom:5px;}
+.card-sub-d{font-size:11px;color:rgba(255,255,255,.4);line-height:1.5;}
+.checklist{display:flex;flex-direction:column;gap:4px;}
+.ci{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;border:0.5px solid #2a2a2a;background:#1a1a1a;}
+.ci.done{background:#0a2016;border-color:#1d5a38;}
+.ci.active-item{border-color:#1d9e75;background:#0d2e1e;}
+.ci.pending{background:#111;border-color:#1a1a1a;opacity:.5;}
+.ci-dot{width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;flex-shrink:0;}
+.ci.done .ci-dot{background:#1d9e75;color:#fff;}
+.ci.active-item .ci-dot{border:1.5px solid #1d9e75;color:#1d9e75;}
+.ci:not(.done):not(.active-item):not(.pending) .ci-dot{background:#222;border:0.5px solid #333;}
+.ci-text{font-size:11px;flex:1;color:rgba(255,255,255,.6);}
+.ci.done .ci-text{color:#5dcaa5;}
+.ci.active-item .ci-text{color:#fff;font-weight:500;}
+.ci-tag{font-size:9px;font-weight:500;padding:1px 5px;border-radius:4px;}
+.photo-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.photo-box{border-radius:10px;height:62px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;}
+.photo-box.captured{background:#0a2016;border:0.5px solid #1d5a38;}
+.photo-box.active-p{border:1.5px solid #1d9e75;background:#0d2e1e;}
+.photo-box.pending-p{background:#1a1a1a;border:0.5px solid #222;}
+.pb-dot{width:14px;height:14px;border-radius:3px;}
+.pb-lbl{font-size:8px;font-weight:500;}
+.photo-box.captured .pb-lbl{color:#5dcaa5;}
+.photo-box.active-p .pb-lbl{color:#fff;}
+.photo-box.pending-p .pb-lbl{color:rgba(255,255,255,.2);}
+.stat-row{display:flex;gap:6px;}
+.stat{flex:1;background:#1a1a1a;border-radius:8px;padding:8px;text-align:center;border:0.5px solid #2a2a2a;}
+.stat-val{font-size:16px;font-weight:500;color:#fff;}
+.stat-val.green{color:#5dcaa5;}.stat-val.blue{color:#85b7eb;}.stat-val.amber{color:#ef9f27;}
+.stat-lbl{font-size:10px;color:rgba(255,255,255,.35);margin-top:2px;}
+.prog-bar{height:5px;border-radius:3px;background:#222;overflow:hidden;margin:4px 0;}
+.prog-fill{height:100%;border-radius:3px;}
+.btn-d{border-radius:12px;padding:13px 16px;text-align:center;font-size:13px;font-weight:500;cursor:pointer;margin-top:auto;}
+.btn-d.pri{background:#1d9e75;color:#fff;}
+.btn-d.sec{background:#1a1a1a;color:rgba(255,255,255,.6);border:0.5px solid #2a2a2a;}
+.btn-d.danger{background:#2a0a0a;color:#f09595;border:0.5px solid #4a1a1a;}
+.btn-d.purple{background:#7f77dd;color:#fff;}
+.btn-d.amber{background:#ef9f27;color:#111;}
+.alert-d{border-radius:10px;padding:9px 12px;font-size:11px;line-height:1.5;}
+.alert-d.info{background:#0a1628;color:#85b7eb;border:0.5px solid #1a3a5c;}
+.alert-d.warn{background:#1e1200;color:#ef9f27;border:0.5px solid #4a3000;}
+.alert-d.success{background:#0a2016;color:#5dcaa5;border:0.5px solid #1d5a38;}
+.row-d{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:0.5px solid #222;}
+.row-d:last-child{border-bottom:none;}
+.rl-d{font-size:11px;color:rgba(255,255,255,.4);}
+.rv-d{font-size:11px;font-weight:500;color:#fff;}
+.otp-row{display:flex;gap:5px;justify-content:center;margin:8px 0;}
+.otp-box{width:36px;height:42px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:500;}
+.otp-box.filled{background:#1a2e1a;border:0.5px solid #1d5a38;color:#5dcaa5;}
+.otp-box.cursor{background:#0d2e1e;border:1.5px solid #1d9e75;color:#1d9e75;}
+.otp-box.empty{background:#1a1a1a;border:0.5px solid #2a2a2a;}
+.live-ring{width:9px;height:9px;border-radius:50%;background:#1d9e75;flex-shrink:0;}
+.settle-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:0.5px solid #222;}
+.settle-row:last-child{border-bottom:none;}
+.settle-lbl{font-size:12px;color:rgba(255,255,255,.4);}
+.settle-val{font-size:13px;font-weight:500;color:#fff;}
+.settle-val.green{color:#5dcaa5;}.settle-val.purple{color:#afa9ec;}.settle-val.red{color:#f09595;}
+.nav-dots{display:flex;justify-content:center;gap:5px;margin-top:8px;}
+.dot{width:6px;height:6px;border-radius:50%;background:#d0d0d0;transition:all .15s;}
+.dot.active{background:#1d9e75;width:18px;border-radius:3px;}
+</style>
+</head>
+<body>
+<h1>ZombieTech — Session App Flow</h1>
+<div class="top-meta">Full operator session journey: from key handover through settlement. 7 phases — click through the complete Friday night experience.</div>
+
+<div class="wrap">
+<div class="flow-col" id="flowCol"></div>
+<div class="phone-col">
+  <div class="nav-strip">
+    <button class="nav-btn" id="btn-prev" onclick="go(cur-1)">← Prev</button>
+    <div class="screen-name" id="screen-name">Key handover</div>
+    <button class="nav-btn pri" id="btn-next" onclick="go(cur+1)">Next →</button>
+  </div>
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="screen" id="screen"></div>
+  </div>
+  <div class="nav-dots" id="navDots"></div>
+</div>
+</div>
+
+<script>
+var STEPS=[
+  {label:'Key handover',phase:'HANDOVER',time:'20:00',
+   render:function(){return(
+    '<div class="sbar" style="background:#0a1628;">'+
+    '<span class="sbar-title">Session start</span>'+
+    '<span class="sbar-time">Fri 20:00</span>'+
+    '<span class="sbar-badge" style="background:#1a3a5c;color:#85b7eb;">HANDOVER</span></div>'+
+    '<div class="body">'+
+    '<div class="phase-badge" style="background:#0a1628;color:#85b7eb;">Key handover</div>'+
+    '<div class="card-d blue"><div class="card-title-d">ABC Pizza — 14 Main Rd, Bryanston</div>'+
+    '<div class="card-sub-d">Site owner: Marco Rossi · +27 82 555 0101<br>Your session: Fri 20:00 – Sat 04:00</div></div>'+
+    '<div class="checklist">'+
+    '<div class="ci done"><div class="ci-dot">✓</div><span class="ci-text">Site owner present &amp; ID confirmed</span></div>'+
+    '<div class="ci done"><div class="ci-dot">✓</div><span class="ci-text">Keys physically handed over</span></div>'+
+    '<div class="ci active-item"><div class="ci-dot">→</div><span class="ci-text">Both parties sign digital handover</span>'+
+    '<span class="ci-tag" style="background:#0a1628;color:#85b7eb;">now</span></div>'+
+    '<div class="ci pending"><div class="ci-dot"></div><span class="ci-text">Site owner confirms departure</span></div>'+
+    '</div>'+
+    '<div class="alert-d info">Both parties must sign before before-photos unlock. This timestamp is your legal session start.</div>'+
+    '<div class="btn-d pri" onclick="go(1)">Sign &amp; start session →</div>'+
+    '</div>'
+   );}
+  },
+  {label:'Before photos',phase:'BEFORE',time:'20:08',
+   render:function(){return(
+    '<div class="sbar" style="background:#1e1200;">'+
+    '<span class="sbar-title">Before photos</span>'+
+    '<span class="sbar-time">Fri 20:08</span>'+
+    '<span class="sbar-badge" style="background:#4a3000;color:#ef9f27;">BEFORE</span></div>'+
+    '<div class="body">'+
+    '<div class="phase-badge" style="background:#1e1200;color:#ef9f27;">Document site condition</div>'+
+    '<div class="prog-bar"><div class="prog-fill" style="background:#ef9f27;width:50%;"></div></div>'+
+    '<div style="font-size:11px;color:rgba(255,255,255,.35);margin-bottom:4px;">3 of 6 areas captured</div>'+
+    '<div class="checklist">'+
+    '<div class="ci done"><div class="ci-dot">✓</div><span class="ci-text">Stove tops &amp; burners</span>'+
+    '<span class="ci-tag" style="background:#0a2016;color:#5dcaa5;">captured</span></div>'+
+    '<div class="ci done"><div class="ci-dot">✓</div><span class="ci-text">Prep countertops</span>'+
+    '<span class="ci-tag" style="background:#0a2016;color:#5dcaa5;">captured</span></div>'+
+    '<div class="ci done"><div class="ci-dot">✓</div><span class="ci-text">Fridge &amp; cold storage</span>'+
+    '<span class="ci-tag" style="background:#0a2016;color:#5dcaa5;">captured</span></div>'+
+    '<div class="ci active-item"><div class="ci-dot">→</div><span class="ci-text">Supply cupboard</span>'+
+    '<span class="ci-tag" style="background:#0a1628;color:#85b7eb;">take photo</span></div>'+
+    '<div class="ci pending"><div class="ci-dot"></div><span class="ci-text">Floor &amp; drains</span></div>'+
+    '<div class="ci pending"><div class="ci-dot"></div><span class="ci-text">Equipment &amp; appliances</span></div>'+
+    '</div>'+
+    '<div class="alert-d warn">Photos must be taken in-app. GPS + timestamp locked automatically. Gallery uploads are blocked.</div>'+
+    '<div class="btn-d amber" onclick="go(2)">Take next photo →</div>'+
+    '</div>'
+   );}
+  },
+  {label:'Session live',phase:'TRADING',time:'20:41',
+   render:function(){return(
+    '<div class="sbar" style="background:#0a2016;">'+
+    '<div class="live-ring"></div>'+
+    '<span class="sbar-title" style="margin-left:5px;">Session live</span>'+
+    '<span class="sbar-time">Fri 21:33</span>'+
+    '<span class="sbar-badge" style="background:#04342c;color:#5dcaa5;">TRADING</span></div>'+
+    '<div class="body">'+
+    '<div class="phase-badge" style="background:#0a2016;color:#5dcaa5;">Zombie Bao — active</div>'+
+    '<div class="stat-row">'+
+    '<div class="stat"><div class="stat-val green">R 3,240</div><div class="stat-lbl">revenue tonight</div></div>'+
+    '<div class="stat"><div class="stat-val">18</div><div class="stat-lbl">orders</div></div>'+
+    '<div class="stat"><div class="stat-val blue">2h 27m</div><div class="stat-lbl">remaining</div></div>'+
+    '</div>'+
+    '<div class="card-d green">'+
+    '<div class="card-title-d">Order pipeline</div>'+
+    '<div style="display:flex;flex-direction:column;gap:4px;margin-top:4px;">'+
+    '<div style="display:flex;justify-content:space-between;font-size:11px;"><span style="color:rgba(255,255,255,.4);">In kitchen</span><span style="font-weight:500;color:#fff;">4 orders</span></div>'+
+    '<div style="display:flex;justify-content:space-between;font-size:11px;"><span style="color:rgba(255,255,255,.4);">Out for delivery</span><span style="font-weight:500;color:#fff;">3 orders</span></div>'+
+    '<div style="display:flex;justify-content:space-between;font-size:11px;"><span style="color:rgba(255,255,255,.4);">Delivered</span><span style="font-weight:500;color:#5dcaa5;">11 ✓</span></div>'+
+    '</div></div>'+
+    '<div class="alert-d info">After-photos checklist unlocks at 03:30. Reminder sent 30 min before session end.</div>'+
+    '<div class="btn-d danger" style="padding:9px;font-size:11px;margin-top:4px;" onclick="go(3)">Emergency — contact support</div>'+
+    '</div>'
+   );}
+  },
+  {label:'After photos',phase:'AFTER',time:'03:31',
+   render:function(){return(
+    '<div class="sbar" style="background:#1e1200;">'+
+    '<span class="sbar-title">After photos</span>'+
+    '<span class="sbar-time">Sat 03:31</span>'+
+    '<span class="sbar-badge" style="background:#4a3000;color:#ef9f27;">AFTER</span></div>'+
+    '<div class="body">'+
+    '<div class="phase-badge" style="background:#1e1200;color:#ef9f27;">Match every before photo</div>'+
+    '<div class="photo-grid">'+
+    '<div class="photo-box captured"><div class="pb-dot" style="background:#1d9e75;"></div><div class="pb-lbl">Stove tops ✓</div></div>'+
+    '<div class="photo-box captured"><div class="pb-dot" style="background:#1d9e75;"></div><div class="pb-lbl">Countertops ✓</div></div>'+
+    '<div class="photo-box captured"><div class="pb-dot" style="background:#1d9e75;"></div><div class="pb-lbl">Fridge ✓</div></div>'+
+    '<div class="photo-box captured"><div class="pb-dot" style="background:#1d9e75;"></div><div class="pb-lbl">Supply cupboard ✓</div></div>'+
+    '<div class="photo-box active-p"><div class="pb-dot" style="background:#1d9e75;border:1.5px solid #fff;"></div><div class="pb-lbl">Floor — take now</div></div>'+
+    '<div class="photo-box pending-p"><div class="pb-dot" style="background:#222;"></div><div class="pb-lbl">Equipment</div></div>'+
+    '</div>'+
+    '<div class="prog-bar"><div class="prog-fill" style="background:#ef9f27;width:67%;"></div></div>'+
+    '<div style="font-size:11px;color:rgba(255,255,255,.35);">4 of 6 areas documented</div>'+
+    '<div class="alert-d success">AI pre-check running on captured photos. No anomalies flagged on 4 surfaces so far.</div>'+
+    '<div class="btn-d amber" onclick="go(4)">Continue after photos →</div>'+
+    '</div>'
+   );}
+  },
+  {label:'Lock & secure',phase:'LOCKUP',time:'03:57',
+   render:function(){return(
+    '<div class="sbar" style="background:#120e20;">'+
+    '<span class="sbar-title">Lock &amp; secure</span>'+
+    '<span class="sbar-time">Sat 03:57</span>'+
+    '<span class="sbar-badge" style="background:#26215c;color:#afa9ec;">LOCKUP</span></div>'+
+    '<div class="body">'+
+    '<div class="phase-badge" style="background:#120e20;color:#afa9ec;">Sequential — cannot skip</div>'+
+    '<div class="checklist">'+
+    '<div class="ci done"><div class="ci-dot">✓</div><span class="ci-text">All gas &amp; electrical off — photo captured</span></div>'+
+    '<div class="ci done"><div class="ci-dot">✓</div><span class="ci-text">Waste cleared — photo captured</span></div>'+
+    '<div class="ci done"><div class="ci-dot">✓</div><span class="ci-text">All windows &amp; back door locked — photo</span></div>'+
+    '<div class="ci active-item"><div class="ci-dot">→</div><span class="ci-text">Alarm panel — photograph armed state</span>'+
+    '<span class="ci-tag" style="background:#1a1030;color:#afa9ec;">required</span></div>'+
+    '<div class="ci pending"><div class="ci-dot"></div><span class="ci-text">Front entrance secured — photo</span></div>'+
+    '<div class="ci pending"><div class="ci-dot"></div><span class="ci-text">Keys to lockbox — photo of sealed lockbox</span></div>'+
+    '</div>'+
+    '<div class="alert-d info">Session cannot close until all 6 lock-up steps are photo-verified. These photos form your legal handover record.</div>'+
+    '<div class="btn-d purple" onclick="go(5)">Photograph alarm panel →</div>'+
+    '</div>'
+   );}
+  },
+  {label:'Session close',phase:'CLOSE',time:'04:03',
+   render:function(){return(
+    '<div class="sbar" style="background:#085041;">'+
+    '<span class="sbar-title">Session closed</span>'+
+    '<span class="sbar-time">Sat 04:03</span>'+
+    '<span class="sbar-badge" style="background:#04342c;color:#5dcaa5;">CLOSED</span></div>'+
+    '<div class="body">'+
+    '<div style="text-align:center;padding:8px 0 4px;">'+
+    '<div style="width:44px;height:44px;border-radius:50%;background:#0d2e1e;border:1.5px solid #1d9e75;margin:0 auto 8px;display:flex;align-items:center;justify-content:center;font-size:18px;color:#5dcaa5;">✓</div>'+
+    '<div style="font-size:15px;font-weight:500;color:#fff;margin-bottom:2px;">All done — great session</div>'+
+    '<div style="font-size:10px;color:rgba(255,255,255,.35);">All 6 before/after pairs · Lock-up verified</div>'+
+    '</div>'+
+    '<div class="alert-d success">AI comparison complete — no anomalies flagged. Full report sent to Marco Rossi.</div>'+
+    '<div class="card-d">'+
+    '<div class="card-title-d" style="margin-bottom:6px;">Tonight\'s summary</div>'+
+    '<div class="settle-row"><span class="settle-lbl">Gross revenue</span><span class="settle-val">R 6,840</span></div>'+
+    '<div class="settle-row"><span class="settle-lbl">Orders completed</span><span class="settle-val">38</span></div>'+
+    '<div class="settle-row"><span class="settle-lbl">Session duration</span><span class="settle-val">7h 58m</span></div>'+
+    '<div class="settle-row"><span class="settle-lbl">Avg order value</span><span class="settle-val">R 180</span></div>'+
+    '</div>'+
+    '<div class="card-d amber">'+
+    '<div class="card-title-d" style="margin-bottom:6px;">Pending settlement</div>'+
+    '<div class="settle-row"><span class="settle-lbl">Site owner fee</span><span class="settle-val red">− R 892</span></div>'+
+    '<div class="settle-row"><span class="settle-lbl">ZombieTech fee (10%)</span><span class="settle-val purple">− R 684</span></div>'+
+    '<div class="settle-row"><span class="settle-lbl">Your net (before COGS)</span><span class="settle-val green">R 5,264</span></div>'+
+    '</div>'+
+    '<div class="btn-d pri" onclick="go(6)">View full session report →</div>'+
+    '</div>'
+   );}
+  },
+  {label:'Settlement',phase:'SETTLE',time:'Mon 11:45',
+   render:function(){return(
+    '<div class="sbar" style="background:#1d9e75;">'+
+    '<span class="sbar-title">Settlement</span>'+
+    '<span class="sbar-time">Mon 11:45</span>'+
+    '<span class="sbar-badge" style="background:#04342c;color:#5dcaa5;">SETTLED</span></div>'+
+    '<div class="body">'+
+    '<div class="phase-badge" style="background:#0a2016;color:#5dcaa5;">Site owner confirmed — no claims</div>'+
+    '<div class="alert-d success">Marco Rossi confirmed site in good order at 09:12 Sunday. No penalty claims lodged. Settlement released.</div>'+
+    '<div class="card-d green">'+
+    '<div class="card-title-d" style="margin-bottom:8px;">Weekend settlement — Fri + Sat</div>'+
+    '<div class="settle-row"><span class="settle-lbl">Total weekend revenue</span><span class="settle-val">R 13,240</span></div>'+
+    '<div class="settle-row"><span class="settle-lbl">Site owner fees</span><span class="settle-val red">− R 1,726</span></div>'+
+    '<div class="settle-row"><span class="settle-lbl">ZombieTech fees</span><span class="settle-val purple">− R 1,324</span></div>'+
+    '<div class="settle-row" style="border-top:0.5px solid #1d5a38;"><span style="font-size:12px;color:#5dcaa5;font-weight:500;">Paid out to you</span><span style="font-size:16px;font-weight:500;color:#5dcaa5;">R 10,190</span></div>'+
+    '</div>'+
+    '<div class="card-d purple">'+
+    '<div class="card-title-d" style="margin-bottom:5px;color:#afa9ec;">Trust score update</div>'+
+    '<div class="prog-bar"><div class="prog-fill" style="background:#7f77dd;width:82%;"></div></div>'+
+    '<div style="display:flex;justify-content:space-between;font-size:11px;color:rgba(175,169,236,.6);margin-top:3px;"><span>82 / 100</span><span style="color:#afa9ec;">+3 pts this weekend</span></div>'+
+    '<div style="font-size:11px;color:rgba(175,169,236,.5);margin-top:4px;">At 90+ you unlock premium sites and priority booking.</div>'+
+    '</div>'+
+    '</div>'
+   );}
+  }
+];
+
+var cur=0;
+
+function go(n){
+  cur=Math.max(0,Math.min(n,STEPS.length-1));
+  render();
+}
+
+function render(){
+  var flowHtml=STEPS.map(function(s,i){
+    return '<div class="step-pip" onclick="go('+i+')">'+
+      '<div class="pip-col">'+
+      '<div class="pip '+(i<cur?'done':i===cur?'active':'')+'">'+(i<cur?'✓':i+1)+'</div>'+
+      (i<STEPS.length-1?'<div class="pip-line '+(i<cur?'done':'')+'"></div>':'')+
+      '</div>'+
+      '<div class="step-label '+(i===cur?'active':'')+'">'+s.label+'<br>'+
+      '<span style="font-size:10px;color:#bbb;">'+s.time+'</span></div>'+
+      '</div>';
+  }).join('');
+  document.getElementById('flowCol').innerHTML=flowHtml;
+  document.getElementById('screen').innerHTML=STEPS[cur].render();
+  document.getElementById('screen-name').textContent=STEPS[cur].label+' · '+STEPS[cur].time;
+  document.getElementById('btn-prev').disabled=cur===0;
+  document.getElementById('btn-next').disabled=cur===STEPS.length-1;
+  document.getElementById('btn-next').textContent=cur===STEPS.length-1?'Done':'Next →';
+  document.getElementById('navDots').innerHTML=STEPS.map(function(_,i){
+    return '<div class="dot'+(i===cur?' active':'')+'" onclick="go('+i+')"></div>';
+  }).join('');
+}
+
+render();
+</script>
+</body>
+</html>

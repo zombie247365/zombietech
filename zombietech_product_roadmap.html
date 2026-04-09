@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZombieTech — Product Roadmap</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f8f8f6;color:#1a1a1a;padding:24px;font-size:13px;}
+h1{font-size:20px;font-weight:500;margin-bottom:4px;color:#1d9e75;}
+.top-meta{font-size:12px;color:#888;margin-bottom:20px;}
+.timeline{display:flex;gap:0;border-radius:12px;overflow:hidden;border:0.5px solid #e0e0e0;margin-bottom:16px;}
+.tph{flex:1;padding:12px 14px;}
+.tph-title{font-size:11px;font-weight:600;margin-bottom:4px;}
+.tph-sub{font-size:10px;color:#888;line-height:1.5;}
+.progress-track{height:4px;border-radius:2px;background:rgba(255,255,255,.3);margin-top:8px;overflow:hidden;}
+.progress-fill{height:100%;border-radius:2px;background:rgba(255,255,255,.8);}
+.det-panel{background:#fff;border:0.5px solid #e0e0e0;border-radius:12px;padding:14px 16px;margin-bottom:16px;min-height:80px;}
+.det-badge{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:600;padding:3px 10px;border-radius:20px;margin-bottom:8px;}
+.det-title{font-size:14px;font-weight:500;color:#1a1a1a;margin-bottom:6px;}
+.det-body{font-size:12px;color:#666;line-height:1.65;margin-bottom:10px;}
+.dvd{border:none;border-top:0.5px solid #f0f0f0;margin:8px 0;}
+.det-items{display:flex;flex-direction:column;gap:4px;margin-bottom:8px;}
+.det-item{display:flex;gap:7px;align-items:flex-start;}
+.di-dot{width:4px;height:4px;border-radius:50%;flex-shrink:0;margin-top:6px;}
+.di-text{font-size:11px;color:#666;line-height:1.5;}
+.deps-row{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px;}
+.dep{font-size:10px;font-weight:500;padding:2px 7px;border-radius:20px;background:#f0f0f0;color:#666;border:0.5px solid #e0e0e0;}
+.r-head{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+.r-badge{font-size:11px;font-weight:600;padding:4px 12px;border-radius:20px;}
+.r-title{font-size:16px;font-weight:500;}
+.r-sub{font-size:12px;color:#888;margin-top:2px;}
+.pillars{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:10px;}
+.r2-pillars{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:10px;}
+.pillar{border-radius:12px;border:0.5px solid #e0e0e0;overflow:hidden;}
+.p-head{padding:10px 12px;display:flex;align-items:center;gap:8px;}
+.p-icon{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:11px;font-weight:600;color:#fff;}
+.p-title{font-size:12px;font-weight:600;}
+.p-sub{font-size:10px;margin-top:1px;}
+.features{padding:0 8px 8px;}
+.feat{display:flex;align-items:flex-start;gap:7px;padding:6px;border-radius:6px;cursor:pointer;transition:background .1s;margin-bottom:2px;}
+.feat:hover{background:#f5f5f5;}
+.feat.sel{background:#f0f0f0;}
+.f-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:5px;}
+.f-text{font-size:11px;color:#555;flex:1;line-height:1.4;}
+.f-badge{font-size:9px;font-weight:600;padding:1px 5px;border-radius:10px;flex-shrink:0;white-space:nowrap;}
+.dvd2{border:none;border-top:0.5px solid #e0e0e0;margin:16px 0;}
+.note{font-size:11px;color:#aaa;line-height:1.6;margin-top:8px;}
+.placeholder{color:#bbb;font-size:12px;}
+</style>
+</head>
+<body>
+<h1>ZombieTech — Product Roadmap</h1>
+<div class="top-meta">Release 1 · Release 2 · Click any feature to explore its detail, dependencies and integrations</div>
+
+<div class="timeline">
+  <div class="tph" style="background:#1d9e75;border-right:0.5px solid #0f6e56;">
+    <div class="tph-title" style="color:#fff;">Release 1 — zombie platform core</div>
+    <div class="tph-sub" style="color:rgba(255,255,255,.75);">Months 1–9 · Place + Premises + Browse & forecast · Prove the core loop · 20–30 active contracts</div>
+    <div class="progress-track"><div class="progress-fill" style="width:100%;"></div></div>
+  </div>
+  <div class="tph" style="background:#534ab7;">
+    <div class="tph-title" style="color:#fff;">Release 2 — zombie business in a box</div>
+    <div class="tph-sub" style="color:rgba(255,255,255,.75);">Months 10–24 · Product + Identity + Suppliers + Full ecosystem · Funded by R1 revenue</div>
+    <div class="progress-track"><div class="progress-fill" style="width:100%;"></div></div>
+  </div>
+</div>
+
+<div class="det-panel" id="det-panel"><div class="placeholder">Click any feature below to see its full specification, dependencies and integrations.</div></div>
+
+<div class="r-head">
+  <div class="r-badge" style="background:#e8f7f0;color:#166534;">Release 1</div>
+  <div><div class="r-title">Zombie platform core</div><div class="r-sub">Everything needed to get from zero to first contracted zombie sessions — nothing more</div></div>
+</div>
+
+<div class="pillars" id="r1-pillars"></div>
+
+<div class="dvd2"></div>
+
+<div class="r-head">
+  <div class="r-badge" style="background:#ede9fe;color:#4c1d95;">Release 2</div>
+  <div><div class="r-title">Zombie business in a box</div><div class="r-sub">Transform the platform into a full entrepreneurship engine — built on validated R1 foundations</div></div>
+</div>
+
+<div class="r2-pillars" id="r2-pillars"></div>
+
+<div class="dvd2"></div>
+<div class="note">The rule: every feature in Release 2 requires either a third-party integration, a commercial partnership, or a regulatory relationship that takes time to establish. None of those can be rushed. Release 1 generates the revenue and proof points that make those partnerships easy to sign.</div>
+
+<script>
+var sel=null;
+
+var R1=[
+  {id:'r1-supply',title:'Supply side',color:'#1d9e75',bg:'#e8f7f0',icon:'S',sub:'Get sites onboarded and verified',
+   features:[
+    {id:'f1',text:'Site owner registration & document upload',badge:'Core',bc:'#166534',bb:'#dcfce7',
+     title:'Site owner registration & document upload',meta:'Release 1 · Supply side · Weeks 1–6',
+     body:'The foundation of the entire supply side. Site owners register, upload their lease, bank statements, and utility bill. AI parses each document to extract the fee calculation inputs. Landlord consent is mandatory before the site can be listed.',
+     items:['Business registration and contact details','Lease upload — AI extracts monthly rent','3 months bank statements — AI extracts avg monthly revenue and evening pattern','Utility bill — AI extracts monthly cost and operating hours','Landlord consent letter or portfolio partnership verification'],
+     deps:['AI document parsing','Cloud document store','Lease scanning engine']},
+    {id:'f2',text:'AI fee calculation & upside model selection',badge:'Core',bc:'#166534',bb:'#dcfce7',
+     title:'AI fee calculation & upside model',meta:'Release 1 · Supply side · Weeks 4–8',
+     body:'Platform calculates the blended zombie session fee from the site owner\'s own documents. Site owner reviews and approves, then selects their upside model — fixed markup or variable profit share. This number is locked into the contract.',
+     items:['Hourly rent: monthly rent ÷ 720','Hourly utility: monthly utility ÷ operating hours','Blended hourly rate displayed for approval','Fixed upside: guaranteed % markup on base rate','Variable upside: base fee + % share of zombie net profit'],
+     deps:['Document parsing engine','Commercial model calculator']},
+    {id:'f3',text:'Zombie slot scheduler — any out-of-hours window',badge:'Core',bc:'#166534',bb:'#dcfce7',
+     title:'Zombie slot scheduler',meta:'Release 1 · Supply side · Weeks 6–10',
+     body:'Site owner defines their operating hours and the platform automatically generates all available zombie windows. Any hour outside normal operating hours is bookable. Mon–Sun coverage. Closed days create full-window zombie availability.',
+     items:['Site open/close times set per day','Zombie end time configured per slot','Closed days flagged — full window opens','Weekly availability calendar generated','Slot economics calculated per window'],
+     deps:['Scheduling engine','Availability calendar']},
+    {id:'f4',text:'Site checklist definition — before/after photo areas',badge:'Core',bc:'#166534',bb:'#dcfce7',
+     title:'Site checklist builder',meta:'Release 1 · Supply side · Weeks 6–10',
+     body:'Site owner defines the specific surfaces and areas that must be photographed at handover and session close. This checklist is locked into the contract and loaded into the operator app for every session. Cannot be skipped or reordered.',
+     items:['Stove tops, prep surfaces, fridges defined','Supply cupboards and equipment areas','Alarm panel and all entry/exit points','Any site-specific areas of concern','Checklist immutable once contract is signed'],
+     deps:['Contract engine','Operator app photo module']},
+  ]},
+  {id:'r1-demand',title:'Demand side',color:'#534ab7',bg:'#ede9fe',icon:'D',sub:'Get operators discovered, vetted, and contracted',
+   features:[
+    {id:'f5',text:'Browse sites — map view with revenue forecasts',badge:'Core',bc:'#4c1d95',bb:'#ede9fe',
+     title:'Site browse & revenue forecast',meta:'Release 1 · Demand side · Weeks 4–10 — pull into R1 immediately',
+     body:'The acquisition moment. A potential operator browses available sites, sees the zombie fee, and sees a data-driven revenue forecast based on the site\'s own financials plus location intelligence. This is what converts interest into intent. Must ship early.',
+     items:['Map view of available sites with filters','Category, suburb, nights available, fee range','Revenue forecast: conservative / base / optimistic bands','Forecast derived from site bank statements + location data','Consent status badge: Landlord Verified / Consent Uploaded / Pending'],
+     deps:['Revenue forecast engine','Location intelligence API','Maps integration']},
+    {id:'f6',text:'Operator registration, document upload & vetting',badge:'Core',bc:'#4c1d95',bb:'#ede9fe',
+     title:'Operator onboarding & vetting',meta:'Release 1 · Demand side · Weeks 6–12',
+     body:'Full KYC, AML, and criminal record check pipeline. Documents verified digitally. Vetting runs in background — 24–48 hours. Activation fee deferred across first two sessions to remove upfront friction.',
+     items:['SA ID with biometric liveness check','Proof of address under 3 months','Food handler certificate (food operators)','Public liability insurance certificate','CIPC check, criminal record, AML/PEP screening','R800 activation fee split across sessions 1 and 2'],
+     deps:['Smile Identity or Onfido (ID verification)','MIE or LexisNexis (criminal/CIPC)','FICA-compliant AML screening']},
+    {id:'f7',text:'Contract generation & digital signing',badge:'Core',bc:'#4c1d95',bb:'#ede9fe',
+     title:'Contract engine & digital signing',meta:'Release 1 · Demand side · Weeks 8–14',
+     body:'Platform generates the standard zombie contract with the calculated commercials, upside model, checklist obligations, risk clauses, penalties, and termination terms — specific to this site, this operator, and these numbers. Both parties sign via OTP.',
+     items:['Contract auto-generated from onboarding data','Commercials: fee, upside model, termination terms locked in','Risk clauses: damages, cleaning, insurance, security','Digital signature via OTP — legally binding','Immutable contract stored in document store'],
+     deps:['Contract template engine','Digital signature provider','Document store']},
+    {id:'f8',text:'Booking request, approval & scheduling',badge:'Core',bc:'#4c1d95',bb:'#ede9fe',
+     title:'Booking & scheduling',meta:'Release 1 · Demand side · Weeks 10–14',
+     body:'Operator sends a booking request with their trading concept summary. Site owner has 48 hours to approve or decline. Recurring bookings enabled for operators who want to lock in a regular slot. Conflict management for multi-operator sites.',
+     items:['Booking request with concept summary','Site owner 48hr approval window','Push notifications for requests and approvals','Recurring booking with committed slot discount','Conflict management for multi-operator sites'],
+     deps:['Notification service','Calendar engine']},
+  ]},
+  {id:'r1-session',title:'Session & settlement',color:'#b45309',bg:'#fdf6e3',icon:'N',sub:'Govern the night and settle by Monday',
+   features:[
+    {id:'f9',text:'Digital handover — dual OTP sign-off',badge:'Core',bc:'#92400e',bb:'#fef9c3',
+     title:'Digital handover',meta:'Release 1 · Session · Weeks 10–16',
+     body:'Both parties sign digitally at the moment of key handover. The timestamp generated here is the legal session start — it anchors all before photos, trading activity, and after photos. Neither party can retrospectively claim a different start time.',
+     items:['Operator confirms site owner present and ID checked','Keys physically handed over','Dual OTP sign-off — both parties','Timestamp and GPS locked — legal session start','Session checklist unlocks only after dual sign-off'],
+     deps:['OTP provider','GPS/location service','Session state machine']},
+    {id:'f10',text:'In-app photo protocol — before, after, lock-up',badge:'Core',bc:'#92400e',bb:'#fef9c3',
+     title:'In-app photo evidence protocol',meta:'Release 1 · Session · Weeks 10–18',
+     body:'Photos must be taken in-app — no gallery uploads. Timestamp and GPS generated by the platform, not the phone. Sequential checklist per site — cannot be skipped or reordered. AI comparison runs automatically between before and after pairs.',
+     items:['In-app camera only — gallery uploads blocked','Platform-generated timestamp and GPS on every photo','Sequential checklist loaded per site contract','Before, after, and lock-up sequences separate','AI pre-scores before/after pairs before site owner review'],
+     deps:['Mobile camera API','AI vision comparison model','Photo store with metadata']},
+    {id:'f11',text:'Settlement engine — card only, Monday noon',badge:'Core',bc:'#92400e',bb:'#fef9c3',
+     title:'Settlement & payments',meta:'Release 1 · Session · Weeks 12–18',
+     body:'All revenue collected via card only — no cash. Weekend revenue held in escrow. Site owner reviews AI-scored handover report Sunday morning and confirms or claims by Monday noon. Settlement processes Monday afternoon. Penalties deducted before payout.',
+     items:['Card-only payment collection via Peach Payments or PayFast','Weekend revenue held in platform escrow','AI handover report delivered to site owner Sunday morning','Claims window: Sunday to Monday 12:00','Settlement releases Monday afternoon — fee splits applied','Penalties deducted automatically from held funds'],
+     deps:['Peach Payments or PayFast','Escrow account','Dispute workflow']},
+    {id:'f12',text:'Trust score engine — operator and site owner',badge:'Core',bc:'#92400e',bb:'#fef9c3',
+     title:'Trust score engine',meta:'Release 1 · Session · Weeks 14–20',
+     body:'Bilateral trust scoring. Operators accumulate score through clean sessions, anomaly-free photo checks, timely access, and no claims. Site owners accumulate score through dispute-free history, response rate, and operator satisfaction. Scores visible on both sides of the marketplace.',
+     items:['Operator: clean session +3, claim against −10, breach −40','Site owner: dispute-free rate, response rate, operator satisfaction','Scores visible on every listing and booking request','90+ operator unlocks premium sites and priority booking','85+ site owner achieves Gold/Platinum tier'],
+     deps:['Event logging','Score computation engine']},
+  ]},
+];
+
+var R2=[
+  {id:'r2-identity',title:'Business identity',color:'#534ab7',bg:'#ede9fe',icon:'I',sub:'Legal entity + brand in minutes',
+   features:[
+    {id:'g1',text:'Shelf company registration wizard',badge:'R2',bc:'#4c1d95',bb:'#ede9fe',
+     title:'Shelf company registration wizard',meta:'Release 2 · Business identity · Requires CIPC API or accredited partner',
+     body:'AI-guided wizard walks the operator through registering a legal entity. Asks 5 questions, generates the CIPC application, handles submission and tracks registration. Operator ends up with a registered company, CK number, and directors certificate — all without touching CIPC directly.',
+     items:['5-question AI wizard — name, structure, directors','CIPC application auto-generated and submitted','Registration tracked — notifications on approval','CK number and certificates stored in document store','Compliance flags set: PAYE registration, annual returns calendar'],
+     deps:['CIPC API integration or accredited agent partnership','Legal compliance partner']},
+    {id:'g2',text:'Bank account wizard with FIC compliance',badge:'R2',bc:'#4c1d95',bb:'#ede9fe',
+     title:'Bank account wizard',meta:'Release 2 · Business identity · Requires banking partner agreement',
+     body:'Integrated account opening flow with a banking partner. ZombieTech pre-populates the KYC data already collected during operator vetting — the operator doesn\'t re-submit identity documents. Account opened and verified for settlement payouts.',
+     items:['Pre-populated from existing KYC data — no re-submission','Banking partner agreement required (TymeBank, Discovery, Capitec Business)','FIC compliance built into the flow','Account verified for ZombieTech settlement payouts','Business debit card issued for supplier purchases'],
+     deps:['Banking partner API','FIC compliance module','Existing KYC data pipeline']},
+    {id:'g3',text:'SARS registration wizard',badge:'R2',bc:'#4c1d95',bb:'#ede9fe',
+     title:'SARS registration wizard',meta:'Release 2 · Business identity · Requires SARS eFiling API or tax practitioner network',
+     body:'Guided income tax and VAT registration for new zombie businesses. Explains thresholds clearly. Registers for provisional tax where applicable. Links to the operator\'s bank account and ZombieTech revenue data to pre-populate returns.',
+     items:['Income tax registration via SARS eFiling','VAT threshold explained — registration triggered at R1M','Provisional tax registration and bi-annual reminder','Revenue data from ZombieTech pre-populates returns','Tax calendar built into operator dashboard'],
+     deps:['SARS eFiling API or registered tax practitioner network','Revenue data feed from settlement engine']},
+    {id:'g4',text:'Brand wizard — name, identity, visual style',badge:'R2',bc:'#4c1d95',bb:'#ede9fe',
+     title:'AI brand wizard',meta:'Release 2 · Business identity · High viral potential — prioritise within R2',
+     body:'10-question AI wizard that produces a brand name, a visual identity direction, a colour palette, and a tone of voice in under 20 minutes. The output feeds directly into the menu wizard and delivery platform profile setup.',
+     items:['10 questions: cuisine, inspiration, target customer, price point','AI generates 3 brand name options with rationale','Colour palette and visual direction produced','Tone of voice defined — feeds into menu descriptions','Brand brief exported to menu wizard and delivery platform setup'],
+     deps:['AI generation model','Brand brief template engine']},
+  ]},
+  {id:'r2-product',title:'Product & supply',color:'#b45309',bg:'#fdf6e3',icon:'P',sub:'Menu, suppliers, and inventory',
+   features:[
+    {id:'g5',text:'Menu development wizard',badge:'R2',bc:'#92400e',bb:'#fef9c3',
+     title:'Menu development wizard',meta:'Release 2 · Product & supply · Builds on brand wizard output',
+     body:'AI wizard that builds a 5–8 item menu based on the brand brief, the site\'s kitchen equipment, the operator\'s stated cooking skills, and the target price point. Produces dish names, descriptions, suggested pricing, and a full ingredient list per dish.',
+     items:['Inputs: brand brief, kitchen equipment, cooking skill level, price point','AI produces 5–8 dish options with names and descriptions','Suggested pricing based on location and competitive data','Full ingredient list per dish — feeds directly into supplier wizard','Menu formatted for delivery platform upload (UberEats, Mr D)'],
+     deps:['Brand wizard output','Site equipment data from onboarding','Pricing intelligence engine']},
+    {id:'g6',text:'Supplier marketplace — transparent pricing',badge:'R2',bc:'#92400e',bb:'#fef9c3',
+     title:'Supplier marketplace',meta:'Release 2 · Product & supply · Separate B2B revenue stream',
+     body:'Suppliers register on the platform with transparent pricing. ZombieTech knows exactly what each operator is selling — intelligent supplier recommendations are made automatically. Operators order through the app. Suppliers pay a transaction fee on fulfilled orders.',
+     items:['Suppliers register with product catalogue and pricing','ZombieTech matches operators to relevant suppliers by menu','Orders placed and tracked through the app','Supplier transaction fee: 3–5% on fulfilled orders','Delivery scheduling aligned to zombie session start times','Pricing history visible — operators can compare and switch'],
+     deps:['Supplier onboarding portal','Procurement matching engine','Order management system','Supplier payment integration']},
+    {id:'g7',text:'Inventory management — session-level tracking',badge:'R2',bc:'#92400e',bb:'#fef9c3',
+     title:'Inventory & order management',meta:'Release 2 · Product & supply · Completes the operational loop',
+     body:'Session-level inventory tracking. Operator sets starting stock at session open. App tracks orders placed and ingredients consumed. End-of-session stock count produces a variance report. Automatic reorder suggestions sent to supplier marketplace.',
+     items:['Starting stock set from supplier order at session open','Orders tracked in real time — ingredients consumed per dish','End-of-session stock count and variance report','Wastage flagged — suggests menu or portion adjustments','Automatic reorder triggered when stock falls below threshold'],
+     deps:['Order management system','Supplier marketplace integration','Menu ingredient mappings']},
+    {id:'g8',text:'Delivery platform integration — UberEats, Mr D',badge:'R2',bc:'#92400e',bb:'#fef9c3',
+     title:'Delivery platform integration',meta:'Release 2 · Product & supply · Unlocks the delivery-only model at scale',
+     body:'ZombieTech integrates with UberEats and Mr D APIs to enable operators to manage their delivery listings from within the ZombieTech app. Menu synced from menu wizard. Revenue from delivery platforms flows into the settlement engine.',
+     items:['Menu auto-synced from menu wizard to delivery platforms','Session hours set automatically from booking calendar','Orders received in ZombieTech app — no separate device needed','Revenue from delivery platforms flows into settlement engine','Platform commissions tracked and deducted in P&L view'],
+     deps:['UberEats Partner API','Mr D integration','Settlement engine update']},
+  ]},
+];
+
+function showDet(id){
+  sel=id;
+  var all=[];
+  R1.forEach(function(p){p.features.forEach(function(f){all.push({f:f,color:p.color,bg:p.bg});});});
+  R2.forEach(function(p){p.features.forEach(function(f){all.push({f:f,color:p.color,bg:p.bg});});});
+  var found=all.find(function(x){return x.f.id===id;});
+  if(!found){document.getElementById('det-panel').innerHTML='<div class="placeholder">Click any feature below to see its full specification.</div>';return;}
+  var f=found.f,c=found.color,bg=found.bg;
+  var html='<div class="det-badge" style="background:'+bg+';color:'+c+';">'+f.meta+'</div>';
+  html+='<div class="det-title">'+f.title+'</div>';
+  html+='<div class="det-body">'+f.body+'</div>';
+  html+='<div class="det-items">'+f.items.map(function(it){
+    return '<div class="det-item"><div class="di-dot" style="background:'+c+';"></div><div class="di-text">'+it+'</div></div>';
+  }).join('')+'</div>';
+  if(f.deps&&f.deps.length){
+    html+='<div class="dvd"></div>';
+    html+='<div style="font-size:10px;font-weight:600;color:#bbb;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em;">Dependencies & integrations</div>';
+    html+='<div class="deps-row">'+f.deps.map(function(d){return '<div class="dep">'+d+'</div>';}).join('')+'</div>';
+  }
+  document.getElementById('det-panel').innerHTML=html;
+  renderAll();
+}
+
+function renderPillars(data,containerId){
+  var html='';
+  data.forEach(function(pillar){
+    html+='<div class="pillar">';
+    html+='<div class="p-head" style="background:'+pillar.bg+';border-bottom:0.5px solid #e0e0e0;">';
+    html+='<div class="p-icon" style="background:'+pillar.color+';">'+pillar.icon+'</div>';
+    html+='<div><div class="p-title" style="color:'+pillar.color+';">'+pillar.title+'</div>';
+    html+='<div class="p-sub" style="color:'+pillar.color+';opacity:.7;">'+pillar.sub+'</div></div>';
+    html+='</div>';
+    html+='<div class="features">';
+    pillar.features.forEach(function(f){
+      html+='<div class="feat'+(sel===f.id?' sel':'')+'" onclick="showDet(\''+f.id+'\')">';
+      html+='<div class="f-dot" style="background:'+pillar.color+';"></div>';
+      html+='<div class="f-text">'+f.text+'</div>';
+      html+='<div class="f-badge" style="background:'+f.bb+';color:'+f.bc+';">'+f.badge+'</div>';
+      html+='</div>';
+    });
+    html+='</div></div>';
+  });
+  document.getElementById(containerId).innerHTML=html;
+}
+
+function renderAll(){
+  renderPillars(R1,'r1-pillars');
+  renderPillars(R2,'r2-pillars');
+}
+
+renderAll();
+</script>
+</body>
+</html>

@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZombieTech — Commercial Model</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f8f8f6;color:#1a1a1a;padding:24px;font-size:14px;}
+h1{font-size:20px;font-weight:500;margin-bottom:4px;color:#1d9e75;}
+.top-meta{font-size:12px;color:#888;margin-bottom:20px;}
+.sec{background:#fff;border:0.5px solid #e8e8e8;border-radius:12px;padding:1rem 1.25rem;margin-bottom:10px;}
+.sec.alt{background:#f8f8f6;border-color:#e0e0e0;}
+.sec-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:#bbb;margin:0 0 12px;}
+.g2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:12px;}
+.g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:12px;}
+.g4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:12px;}
+.fd{display:flex;flex-direction:column;gap:4px;margin-bottom:10px;}
+.lbl{font-size:12px;color:#666;}
+.irow{display:flex;align-items:center;gap:5px;}
+.px{font-size:13px;color:#888;}
+input[type=number]{padding:5px 8px;border:0.5px solid #e0e0e0;border-radius:8px;background:#f8f8f6;color:#1a1a1a;font-size:14px;width:100%;max-width:110px;}
+.p60{max-width:60px;}
+.p70{max-width:70px;}
+.tog-row{display:flex;gap:8px;margin-bottom:10px;}
+.tog{flex:1;padding:6px 8px;border-radius:8px;border:0.5px solid #e0e0e0;background:#f8f8f6;color:#888;font-size:12px;cursor:pointer;text-align:center;transition:all .15s;}
+.tog.on{background:#1d9e75;border-color:#1d9e75;color:#fff;font-weight:500;}
+.day{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;border:0.5px solid #e8e8e8;cursor:pointer;user-select:none;margin-bottom:6px;transition:all .12s;background:#f8f8f6;}
+.day.on{background:#dcfce7;border-color:#86efac;}
+.dck{width:14px;height:14px;border-radius:3px;border:1.5px solid #e0e0e0;display:flex;align-items:center;justify-content:center;font-size:10px;color:transparent;transition:all .12s;}
+.day.on .dck{background:#1d9e75;border-color:#1d9e75;color:#fff;}
+.dn{font-size:13px;font-weight:500;flex:1;}
+.day.on .dn{color:#166534;}
+.dt{font-size:11px;color:#bbb;}
+.dh{font-size:11px;font-weight:500;color:#bbb;}
+.day.on .dt,.day.on .dh{color:#4ade80;}
+.dvd{border:none;border-top:0.5px solid #f0f0f0;margin:10px 0;}
+.strip{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:#888;}
+.strip strong{color:#1a1a1a;}
+.upside-box{padding:10px 12px;border-radius:8px;border:0.5px solid #f0f0f0;background:#f8f8f6;margin-top:8px;}
+.mc{background:#f8f8f6;border-radius:8px;padding:10px 12px;}
+.mc.white{background:#fff;border:0.5px solid #e8e8e8;}
+.mlb{font-size:11px;color:#888;margin-bottom:3px;}
+.mv{font-size:20px;font-weight:500;}
+.mv.green{color:#166534;}.mv.blue{color:#1e40af;}.mv.amber{color:#92400e;}.mv.red{color:#991b1b;}
+.br{display:flex;align-items:center;gap:8px;margin-bottom:5px;}
+.brl{font-size:11px;color:#888;width:180px;flex-shrink:0;text-align:right;}
+.brt{flex:1;background:#f8f8f6;border-radius:3px;height:20px;overflow:hidden;border:0.5px solid #f0f0f0;}
+.brf{height:100%;border-radius:3px;display:flex;align-items:center;padding-left:6px;transition:width .3s;}
+.bra{font-size:10px;font-weight:500;color:#fff;white-space:nowrap;}
+.warn{font-size:12px;color:#854d0e;background:#fef9c3;border-radius:8px;padding:7px 10px;margin-top:8px;border:0.5px solid #fcd34d;}
+.note{font-size:11px;color:#bbb;margin-top:6px;line-height:1.5;}
+.ratecard{display:flex;gap:20px;flex-wrap:wrap;}
+.ri{display:flex;flex-direction:column;gap:2px;}
+.ri-lbl{font-size:10px;color:#bbb;}
+.ri-val{font-size:13px;font-weight:500;color:#1a1a1a;}
+</style>
+</head>
+<body>
+<h1>ZombieTech — Commercial Model Calculator</h1>
+<div class="top-meta">Site costs → fee calculation → zombie schedule → upside model → operator P&L → ZombieTech at scale. All inputs are live.</div>
+
+<!-- SITE COSTS -->
+<div class="sec">
+  <p class="sec-title">Site costs</p>
+  <div class="g2">
+    <div class="fd"><span class="lbl">Monthly rent</span><div class="irow"><span class="px">R</span><input type="number" id="rent" value="15000" step="500"></div></div>
+    <div class="fd"><span class="lbl">Monthly utilities</span><div class="irow"><span class="px">R</span><input type="number" id="util" value="3000" step="100"></div></div>
+    <div class="fd"><span class="lbl">Site operating hrs/month</span><div class="irow"><input type="number" id="siteHrs" value="330" step="10" class="p70"><span class="px">hrs</span></div></div>
+    <div class="fd"><span class="lbl">Calculated hourly rate</span>
+      <div class="irow" style="padding-top:5px;"><span style="font-size:16px;font-weight:500;color:#1a1a1a;">R <span id="hourlyRate">--</span>/hr</span></div>
+    </div>
+  </div>
+  <div id="rateBreakdown" class="ratecard"></div>
+</div>
+
+<!-- ZOMBIE SCHEDULE -->
+<div class="sec">
+  <p class="sec-title">Zombie schedule</p>
+  <div class="day on" data-hrs="6" onclick="toggleDay(this)"><div class="dck">✓</div><span class="dn">Thursday</span><span class="dt">20:00–02:00</span><span class="dh" style="margin-left:auto;">6 hrs</span></div>
+  <div class="day on" data-hrs="8" onclick="toggleDay(this)"><div class="dck">✓</div><span class="dn">Friday</span><span class="dt">20:00–04:00</span><span class="dh" style="margin-left:auto;">8 hrs</span></div>
+  <div class="day on" data-hrs="8" onclick="toggleDay(this)"><div class="dck">✓</div><span class="dn">Saturday</span><span class="dt">20:00–04:00</span><span class="dh" style="margin-left:auto;">8 hrs</span></div>
+  <div class="dvd"></div>
+  <div class="strip" id="schedStrip"></div>
+</div>
+
+<!-- UPSIDE MODEL -->
+<div class="sec">
+  <p class="sec-title">Site owner upside model</p>
+  <div class="tog-row">
+    <div class="tog on" id="tog-fixed" onclick="setModel('fixed')">Fixed %</div>
+    <div class="tog" id="tog-variable" onclick="setModel('variable')">Variable % of net profit</div>
+  </div>
+  <div class="upside-box">
+    <div id="fixed-panel">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span class="lbl" style="flex:1;">Guaranteed upside on base fee</span>
+        <input type="number" class="p60" id="fixedPct" value="30" min="0" max="200" step="5">
+        <span class="px">%</span>
+      </div>
+      <p class="note" style="margin-top:6px;">Site owner receives base cost recovery + this fixed markup, regardless of zombie performance.</p>
+    </div>
+    <div id="variable-panel" style="display:none;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span class="lbl" style="flex:1;">Share of zombie net profit (after all costs)</span>
+        <input type="number" class="p60" id="varPct" value="20" min="0" max="80" step="5">
+        <span class="px">%</span>
+      </div>
+      <p class="note" style="margin-top:6px;">Site owner receives base fee + this % of net profit. In loss periods, only the base fee is paid.</p>
+    </div>
+  </div>
+</div>
+
+<!-- OPERATOR ECONOMICS -->
+<div class="sec">
+  <p class="sec-title">Zombie operator economics</p>
+  <div class="g2">
+    <div class="fd"><span class="lbl">Monthly revenue</span><div class="irow"><span class="px">R</span><input type="number" id="revenue" value="50000" step="1000"></div></div>
+    <div class="fd"><span class="lbl">COGS %</span><div class="irow"><input type="number" class="p60" id="cogsPct" value="40" min="0" max="90"><span class="px">%</span></div></div>
+    <div class="fd"><span class="lbl">Labour cost</span><div class="irow"><span class="px">R</span><input type="number" id="labour" value="8000" step="500"></div></div>
+    <div class="fd"><span class="lbl">Packaging / other</span><div class="irow"><span class="px">R</span><input type="number" id="other" value="2000" step="200"></div></div>
+  </div>
+</div>
+
+<!-- ZOMBIETECH FEES -->
+<div class="sec">
+  <p class="sec-title">ZombieTech fees</p>
+  <div class="g2">
+    <div class="fd"><span class="lbl">Platform transaction fee</span><div class="irow"><input type="number" class="p60" id="platformPct" value="10" min="0" max="30"><span class="px">%</span></div></div>
+    <div class="fd"><span class="lbl">Starter pack / activation (once-off)</span><div class="irow"><span class="px">R</span><input type="number" id="starterPack" value="800" step="100"></div></div>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div class="sec alt">
+  <p class="sec-title">Monthly P&L — all parties</p>
+  <div class="g4" id="plMetrics" style="margin-bottom:12px;"></div>
+  <div id="barChart" style="margin-bottom:14px;"></div>
+  <div id="res-warning" style="display:none;" class="warn"></div>
+  <p class="note">* ZombieTech activation fee (R <span id="spAmt">800</span>) collected once at operator sign-on — not included in monthly figures above.</p>
+</div>
+
+<script>
+var model='fixed';
+
+function setModel(m){
+  model=m;
+  document.getElementById('tog-fixed').className='tog'+(m==='fixed'?' on':'');
+  document.getElementById('tog-variable').className='tog'+(m==='variable'?' on':'');
+  document.getElementById('fixed-panel').style.display=m==='fixed'?'':'none';
+  document.getElementById('variable-panel').style.display=m==='variable'?'':'none';
+  calc();
+}
+
+function toggleDay(el){
+  el.classList.toggle('on');
+  el.querySelector('.dck').textContent=el.classList.contains('on')?'✓':'';
+  calc();
+}
+
+function fmt(n){
+  if(isNaN(n)) return '--';
+  var abs=Math.abs(Math.round(n));
+  return (n<0?'-R ':' R ')+abs.toLocaleString();
+}
+
+function calc(){
+  var rent=+document.getElementById('rent').value||0;
+  var util=+document.getElementById('util').value||0;
+  var siteHrs=+document.getElementById('siteHrs').value||1;
+  var fixedPct=+document.getElementById('fixedPct').value||0;
+  var varPct=+document.getElementById('varPct').value||0;
+  var revenue=+document.getElementById('revenue').value||0;
+  var cogsPct=+document.getElementById('cogsPct').value||0;
+  var labour=+document.getElementById('labour').value||0;
+  var other=+document.getElementById('other').value||0;
+  var platformPct=+document.getElementById('platformPct').value||0;
+  var sp=+document.getElementById('starterPack').value||0;
+
+  var hourlyRent=rent/720;
+  var hourlyUtil=util/siteHrs;
+  var hourlyRate=hourlyRent+hourlyUtil;
+
+  document.getElementById('hourlyRate').textContent=hourlyRate.toFixed(2);
+  document.getElementById('rateBreakdown').innerHTML=
+    '<div class="ri"><div class="ri-lbl">Rent/hr (R'+rent.toLocaleString()+' ÷ 720)</div><div class="ri-val">R '+hourlyRent.toFixed(2)+'</div></div>'+
+    '<div class="ri"><div class="ri-lbl">Utilities/hr (R'+util.toLocaleString()+' ÷ '+siteHrs+'hrs)</div><div class="ri-val">R '+hourlyUtil.toFixed(2)+'</div></div>';
+
+  var days=document.querySelectorAll('.day.on');
+  var hrsWeek=0;
+  days.forEach(function(d){hrsWeek+=(+d.dataset.hrs||0);});
+  var hrsMth=hrsWeek*52/12;
+  var baseFee=hourlyRate*hrsMth;
+  document.getElementById('schedStrip').innerHTML=
+    '<span>Hrs/week: <strong>'+hrsWeek+'</strong></span>'+
+    '<span>Hrs/month (×4.33): <strong>'+hrsMth.toFixed(1)+'</strong></span>'+
+    '<span>Base site fee: <strong>R '+Math.round(baseFee).toLocaleString()+'/mth</strong></span>';
+
+  var cogs=revenue*cogsPct/100;
+  var ztFee=revenue*platformPct/100;
+  var siteOwnerAmt,zombieNet,siteOwnerLabel;
+
+  if(model==='fixed'){
+    siteOwnerAmt=baseFee*(1+fixedPct/100);
+    zombieNet=revenue-cogs-labour-other-ztFee-siteOwnerAmt;
+    siteOwnerLabel='Site owner (base + '+fixedPct+'% markup)';
+  } else {
+    var baseNetBeforeShare=revenue-cogs-labour-other-ztFee-baseFee;
+    var variableShare=Math.max(0,baseNetBeforeShare)*varPct/100;
+    siteOwnerAmt=baseFee+variableShare;
+    zombieNet=baseNetBeforeShare-variableShare;
+    siteOwnerLabel='Site owner (base + '+varPct+'% of net)';
+  }
+  var zombieMargin=revenue>0?(zombieNet/revenue*100):0;
+
+  document.getElementById('spAmt').textContent=sp.toLocaleString();
+  document.getElementById('plMetrics').innerHTML=[
+    {l:'Site owner earns',v:fmt(siteOwnerAmt),c:'#166534'},
+    {l:'ZombieTech earns',v:fmt(ztFee),c:'#1e40af'},
+    {l:'Zombie operator net',v:fmt(zombieNet),c:zombieNet>=0?'#166534':'#991b1b'},
+    {l:'Operator margin',v:Math.round(zombieMargin)+'%',c:'#888'},
+  ].map(function(m){return '<div class="mc white"><div class="mlb">'+m.l+'</div><div class="mv" style="font-size:18px;color:'+m.c+';">'+m.v+'</div></div>';}).join('');
+
+  var bars=[
+    {label:'Revenue',amt:revenue,color:'#3266ad'},
+    {label:'COGS',amt:cogs,color:'#ef4444'},
+    {label:'Labour',amt:labour,color:'#f59e0b'},
+    {label:'Packaging / other',amt:other,color:'#9ca3af'},
+    {label:'ZombieTech fee',amt:ztFee,color:'#7c3aed'},
+    {label:siteOwnerLabel,amt:siteOwnerAmt,color:'#0f766e'},
+    {label:'Zombie net profit',amt:zombieNet,color:zombieNet>=0?'#16a34a':'#dc2626'},
+  ];
+  document.getElementById('barChart').innerHTML=bars.map(function(b){
+    var pct=Math.min(100,Math.max(0,(Math.abs(b.amt)/(Math.max(revenue,1)))*100));
+    return '<div class="br">'+
+      '<div class="brl">'+b.label+'</div>'+
+      '<div class="brt"><div class="brf" style="width:'+pct.toFixed(1)+'%;background:'+b.color+';">'+
+      '<span class="bra">'+fmt(b.amt)+'</span></div></div></div>';
+  }).join('');
+
+  var warn=document.getElementById('res-warning');
+  if(zombieNet<0){warn.style.display='';warn.textContent='Zombie operator is loss-making at these inputs. Consider reducing COGS, site fee, or platform fee — or growing revenue.';}
+  else warn.style.display='none';
+}
+
+document.querySelectorAll('input').forEach(function(inp){inp.addEventListener('input',calc);});
+calc();
+</script>
+</body>
+</html>

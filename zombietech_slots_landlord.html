@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZombieTech — Slots & Landlord Partnership</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f8f8f6;color:#1a1a1a;padding:24px;font-size:14px;}
+h1{font-size:20px;font-weight:500;margin-bottom:4px;color:#1d9e75;}
+.top-meta{font-size:12px;color:#888;margin-bottom:20px;}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;}
+.tab{padding:7px 16px;border-radius:20px;border:0.5px solid #e0e0e0;background:#fff;color:#888;font-size:12px;font-weight:500;cursor:pointer;transition:all .12s;}
+.tab:hover{background:#f0f0f0;}
+.tab.on{background:#1d9e75;border-color:#1d9e75;color:#fff;}
+.pane{display:none;}.pane.on{display:block;}
+.sec{background:#fff;border:0.5px solid #e8e8e8;border-radius:12px;padding:1rem 1.25rem;margin-bottom:10px;}
+.sh{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:#bbb;margin:0 0 12px;}
+.g2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:10px;}
+.g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:10px;}
+.g4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:10px;}
+.mc{background:#f4f4f2;border-radius:8px;padding:10px 12px;}
+.mlb{font-size:11px;color:#888;margin-bottom:3px;}
+.mv{font-size:18px;font-weight:500;}
+.lbl{font-size:12px;color:#666;display:block;margin-bottom:4px;}
+.irow{display:flex;align-items:center;gap:5px;}
+.px{font-size:13px;color:#888;}
+input[type=number]{padding:5px 8px;border:0.5px solid #d0d0d0;border-radius:8px;background:#f8f8f6;color:#1a1a1a;font-size:14px;width:100%;max-width:90px;}
+input[type=range]{width:100%;}
+.sr{display:flex;align-items:center;gap:8px;}
+.sv{font-size:13px;font-weight:500;min-width:36px;text-align:right;}
+.dvd{border:none;border-top:0.5px solid #f0f0f0;margin:10px 0;}
+.tb{display:flex;gap:5px;flex-wrap:wrap;margin-top:4px;margin-bottom:8px;}
+.t{flex:1;min-width:44px;padding:5px 7px;border-radius:8px;border:0.5px solid #d0d0d0;background:#f8f8f6;color:#888;font-size:11px;cursor:pointer;text-align:center;transition:all .12s;}
+.t:hover{background:#efefef;}
+.t.on{background:#dbeafe;color:#1e40af;border-color:#93c5fd;font-weight:500;}
+.good{font-size:12px;color:#166534;background:#dcfce7;border-radius:8px;padding:7px 10px;margin-top:8px;border:0.5px solid #86efac;}
+.warn{font-size:12px;color:#854d0e;background:#fef9c3;border-radius:8px;padding:7px 10px;margin-top:8px;border:0.5px solid #fcd34d;}
+.info{font-size:12px;color:#1e40af;background:#dbeafe;border-radius:8px;padding:7px 10px;margin-top:8px;border:0.5px solid #93c5fd;}
+.note{font-size:11px;color:#bbb;margin-top:6px;line-height:1.5;}
+.row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:0.5px solid #f0f0f0;}
+.row:last-child{border-bottom:none;}
+.rl{font-size:12px;color:#666;}
+.rv{font-size:12px;font-weight:500;}
+.pill{display:inline-block;font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;}
+.pill.green{background:#dcfce7;color:#166534;}
+.pill.amber{background:#fef9c3;color:#854d0e;}
+.pill.red{background:#fee2e2;color:#991b1b;}
+.pill.blue{background:#dbeafe;color:#1e40af;}
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px;margin:10px 0;}
+.dh{text-align:center;font-size:10px;font-weight:600;padding:4px 2px;border-radius:4px;color:#888;}
+.dh.wk{background:#dcfce7;color:#166534;}
+.hb{height:13px;border-radius:2px;margin-bottom:2px;}
+.hb.open{background:#e8e6de;}
+.hb.zombie{background:#1d9e75;}
+.hb.deep{background:#bfdbfe;}
+.hb.off{background:#f0f0f0;}
+.leg{display:flex;gap:12px;flex-wrap:wrap;font-size:11px;color:#888;margin-top:6px;}
+.ld{width:10px;height:10px;border-radius:2px;display:inline-block;margin-right:3px;vertical-align:middle;}
+.sc-card{border-radius:10px;padding:10px 14px;margin-bottom:7px;border:0.5px solid #e0e0e0;cursor:pointer;background:#f8f8f6;transition:all .12s;}
+.sc-card:hover{border-color:#d0d0d0;background:#f0f0f0;}
+.sc-card.on{border-color:#1d9e75;background:#dcfce7;}
+.sc-head{display:flex;align-items:center;justify-content:space-between;}
+.sc-title{font-size:13px;font-weight:500;}
+.sc-badge{font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;}
+.sc-body{font-size:11px;color:#666;line-height:1.6;margin-top:7px;}
+.sc-items{margin-top:6px;display:flex;flex-direction:column;gap:3px;}
+.sc-item{display:flex;gap:6px;align-items:flex-start;font-size:11px;}
+.sc-dot{width:4px;height:4px;border-radius:50%;flex-shrink:0;margin-top:5px;}
+.lp-card{background:#f4f4f2;border-radius:10px;padding:12px 14px;margin-bottom:8px;border:0.5px solid #e0e0e0;}
+.lp-name{font-size:13px;font-weight:500;margin-bottom:4px;}
+.lp-meta{font-size:11px;color:#888;margin-bottom:8px;}
+.prog-track{height:6px;border-radius:3px;background:#e0e0e0;overflow:hidden;margin-top:3px;}
+.prog-fill{height:100%;border-radius:3px;}
+.badge-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;}
+.b-card{flex:1;min-width:130px;border-radius:10px;padding:10px;text-align:center;border:0.5px solid #e0e0e0;background:#f8f8f6;}
+.fd{margin-bottom:10px;}
+</style>
+</head>
+<body>
+<h1>ZombieTech — Slots & Landlord Partnership</h1>
+<div class="top-meta">Three tabs: slot scheduler · legal structure options · landlord portfolio partnership model</div>
+
+<div class="tabs">
+  <div class="tab on" onclick="goTab('sched')">Slot scheduler</div>
+  <div class="tab" onclick="goTab('legal')">Legal structure</div>
+  <div class="tab" onclick="goTab('landlord')">Landlord partnership</div>
+</div>
+
+<div class="pane on" id="pane-sched">
+  <div class="sec">
+    <p class="sh">Site operating hours — defined by site owner at onboarding</p>
+    <div class="g2">
+      <div class="fd"><span class="lbl">Site opens daily</span>
+        <div class="tb">
+          <div class="t" data-g="op" data-v="7" onclick="setT(this)">07:00</div>
+          <div class="t on" data-g="op" data-v="10" onclick="setT(this)">10:00</div>
+          <div class="t" data-g="op" data-v="11" onclick="setT(this)">11:00</div>
+          <div class="t" data-g="op" data-v="12" onclick="setT(this)">12:00</div>
+        </div>
+      </div>
+      <div class="fd"><span class="lbl">Site closes daily</span>
+        <div class="tb">
+          <div class="t" data-g="cl" data-v="18" onclick="setT(this)">18:00</div>
+          <div class="t on" data-g="cl" data-v="20" onclick="setT(this)">20:00</div>
+          <div class="t" data-g="cl" data-v="21" onclick="setT(this)">21:00</div>
+          <div class="t" data-g="cl" data-v="22" onclick="setT(this)">22:00</div>
+        </div>
+      </div>
+    </div>
+    <div class="fd"><span class="lbl">Zombie session end time</span>
+      <div class="tb">
+        <div class="t" data-g="ze" data-v="23" onclick="setT(this)">23:00</div>
+        <div class="t" data-g="ze" data-v="24" onclick="setT(this)">00:00</div>
+        <div class="t" data-g="ze" data-v="2" onclick="setT(this)">02:00</div>
+        <div class="t on" data-g="ze" data-v="4" onclick="setT(this)">04:00</div>
+      </div>
+    </div>
+    <div class="fd"><span class="lbl">Mark fully closed days — entire zombie window opens</span>
+      <div class="tb" id="cd-row">
+        <div class="t" data-g="cd" data-d="0" onclick="togDay(this)">Mon</div>
+        <div class="t" data-g="cd" data-d="1" onclick="togDay(this)">Tue</div>
+        <div class="t" data-g="cd" data-d="2" onclick="togDay(this)">Wed</div>
+        <div class="t" data-g="cd" data-d="3" onclick="togDay(this)">Thu</div>
+        <div class="t" data-g="cd" data-d="4" onclick="togDay(this)">Fri</div>
+        <div class="t" data-g="cd" data-d="5" onclick="togDay(this)">Sat</div>
+        <div class="t" data-g="cd" data-d="6" onclick="togDay(this)">Sun</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <p class="sh">Weekly availability map — every green cell is a bookable zombie hour</p>
+    <div id="cal" style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px;margin:10px 0;"></div>
+    <div class="leg">
+      <span><span class="ld" style="background:#e8e6de;border:0.5px solid #ccc;"></span>Site open</span>
+      <span><span class="ld" style="background:#1d9e75;"></span>Zombie slot</span>
+      <span><span class="ld" style="background:#bfdbfe;"></span>Deep night Fri/Sat/Sun</span>
+      <span><span class="ld" style="background:#f0f0f0;border:0.5px solid #e0e0e0;"></span>Unavailable</span>
+    </div>
+  </div>
+
+  <div class="sec">
+    <p class="sh">Slot economics</p>
+    <div class="g2">
+      <div class="fd"><span class="lbl">Monthly rent</span>
+        <div class="irow"><span class="px">R</span><input type="number" id="s-rent" value="15000" step="500" oninput="renderSched()"></div>
+      </div>
+      <div class="fd"><span class="lbl">Urban density</span>
+        <div class="tb">
+          <div class="t" data-g="dn" data-v="0.7" onclick="setT(this)">Suburban</div>
+          <div class="t on" data-g="dn" data-v="1.0" onclick="setT(this)">Mixed-use</div>
+          <div class="t" data-g="dn" data-v="1.3" onclick="setT(this)">Dense CBD</div>
+        </div>
+      </div>
+    </div>
+    <div class="g4" id="slot-metrics"></div>
+    <div id="slot-msg"></div>
+    <p class="note">On fully closed days, the zombie window opens from the site's normal opening time all the way to the zombie end time. A Mon–Wed closure at a dense urban site creates a full-time operator opportunity: 4+ zombie hours every weekday on top of the weekend slots.</p>
+  </div>
+</div>
+
+<div class="pane" id="pane-legal">
+  <div class="sec">
+    <p class="sh">The subletting risk — why it matters</p>
+    <div style="background:#fee2e2;border:0.5px solid #fca5a5;border-radius:10px;padding:10px 14px;margin-bottom:10px;">
+      <div style="font-size:12px;font-weight:600;color:#991b1b;margin-bottom:4px;">The deal-breaker risk</div>
+      <div style="font-size:11px;color:#991b1b;line-height:1.65;">Most SA commercial leases prohibit the lessee from subletting, allowing third-party occupation, or parting with possession without the landlord's written consent. A zombie operator using the kitchen could be characterised as exactly this. If discovered: breach notice → potential lease cancellation → site owner loses their entire business. ZombieTech could also be named in the litigation.</div>
+    </div>
+    <div class="info">SA common law key test: did <strong>possession</strong> transfer? A sublease transfers possession and requires consent. A limited license to use does not transfer possession and may not. ZombieTech's contract must be structured as a license — never a sublease.</div>
+  </div>
+
+  <div class="sec">
+    <p class="sh">Four legal structure options — click each to compare</p>
+    <div id="structs"></div>
+  </div>
+
+  <div class="sec">
+    <p class="sh">Non-negotiable platform safeguards</p>
+    <div class="row"><span class="rl">Landlord consent document</span><span class="rv"><span class="pill red">Mandatory upload</span></span></div>
+    <div class="row"><span class="rl">AI lease scan for anti-alienation clauses</span><span class="rv"><span class="pill amber">Auto-flagged</span></span></div>
+    <div class="row"><span class="rl">Contract language: services agreement, not sublease</span><span class="rv"><span class="pill green">Template-enforced</span></span></div>
+    <div class="row"><span class="rl">Site owner retains possession and alarm codes at all times</span><span class="rv"><span class="pill green">Contractual</span></span></div>
+    <div class="row"><span class="rl">Landlord partnership enrolled sites</span><span class="rv"><span class="pill blue">Blanket consent</span></span></div>
+  </div>
+</div>
+
+<div class="pane" id="pane-landlord">
+  <div class="sec">
+    <p class="sh">From deal-breaker to competitive moat</p>
+    <div class="good">ZombieTech negotiates blanket zombie consent with major SA commercial property groups — Redefine, Growthpoint, Resilient REIT, Attacq, Liberty Two Degrees. One agreement per landlord covers their entire portfolio. Every tenant site owner at enrolled properties onboards as "Landlord Verified" — zero subletting risk, fast-track listing, premium placement.</div>
+  </div>
+
+  <div class="sec">
+    <p class="sh">Landlord economics — what makes them sign</p>
+    <div class="g2">
+      <div class="fd"><span class="lbl">Landlord share of zombie site fee</span>
+        <div class="tb">
+          <div class="t" data-g="ls" data-v="5" onclick="setT(this)">5%</div>
+          <div class="t on" data-g="ls" data-v="10" onclick="setT(this)">10%</div>
+          <div class="t" data-g="ls" data-v="15" onclick="setT(this)">15%</div>
+          <div class="t" data-g="ls" data-v="20" onclick="setT(this)">20%</div>
+        </div>
+      </div>
+      <div class="fd"><span class="lbl">Avg zombie site fee / month</span>
+        <div class="irow"><span class="px">R</span><input type="number" id="lp-fee" value="3500" step="100" oninput="renderLandlord()"></div>
+      </div>
+    </div>
+    <div class="fd"><span class="lbl">Properties in landlord portfolio</span>
+      <div class="sr"><input type="range" min="10" max="500" value="80" id="lp-sites" step="10" oninput="renderLandlord()"><span class="sv" id="lp-sv">80</span></div>
+    </div>
+    <div class="fd"><span class="lbl">Uptake — % with active zombie contracts</span>
+      <div class="sr"><input type="range" min="5" max="80" value="35" id="lp-uptake" step="5" oninput="renderLandlord()"><span class="sv" id="lp-uv">35%</span></div>
+    </div>
+    <div class="g3" id="lp-metrics" style="margin-top:10px;margin-bottom:8px;"></div>
+    <div id="lp-msg"></div>
+    <p class="note">The landlord signs once. After that, every new zombie contract at one of their properties generates passive income with zero management overhead. For a REIT running hundreds of F&B tenancies, this is a meaningful new revenue line from assets that currently earn nothing after hours.</p>
+  </div>
+
+  <div class="sec">
+    <p class="sh">Value exchange — what each party gets</p>
+    <div class="row"><span class="rl">Landlord — passive monthly income</span><span class="rv" style="color:#166534;">Share of every zombie session in portfolio</span></div>
+    <div class="row"><span class="rl">Landlord — tenant retention</span><span class="rv">Tenants who earn more stay longer and pay reliably</span></div>
+    <div class="row"><span class="rl">Landlord — zero management overhead</span><span class="rv">ZombieTech handles all vetting, contracts, insurance</span></div>
+    <div class="row"><span class="rl">Landlord — single blanket agreement</span><span class="rv">One signature covers all properties</span></div>
+    <div class="dvd"></div>
+    <div class="row"><span class="rl">ZombieTech — subletting risk eliminated</span><span class="rv" style="color:#166534;">Entire portfolio legally cleared instantly</span></div>
+    <div class="row"><span class="rl">ZombieTech — B2B supply channel</span><span class="rv">Landlord promotes platform directly to all tenants</span></div>
+    <div class="row"><span class="rl">ZombieTech — competitive moat</span><span class="rv" style="color:#4c1d95;">3–4 REIT agreements = years to replicate</span></div>
+  </div>
+
+  <div class="sec">
+    <p class="sh">Consent status — what operators see on every listing</p>
+    <div class="badge-row">
+      <div class="b-card" style="border-color:#86efac;background:#dcfce7;">
+        <div style="width:10px;height:10px;border-radius:50%;background:#1d9e75;margin:0 auto 5px;"></div>
+        <div style="font-size:11px;font-weight:600;color:#166534;">Landlord verified</div>
+        <div style="font-size:10px;color:#4ade80;margin-top:3px;">Blanket consent · zero risk · premium listing</div>
+      </div>
+      <div class="b-card" style="border-color:#fcd34d;">
+        <div style="width:10px;height:10px;border-radius:50%;background:#f59e0b;margin:0 auto 5px;"></div>
+        <div style="font-size:11px;font-weight:600;color:#854d0e;">Consent uploaded</div>
+        <div style="font-size:10px;color:#92400e;margin-top:3px;">Individual letter on file · verified by ZT</div>
+      </div>
+      <div class="b-card" style="border-color:#fca5a5;">
+        <div style="width:10px;height:10px;border-radius:50%;background:#ef4444;margin:0 auto 5px;"></div>
+        <div style="font-size:11px;font-weight:600;color:#991b1b;">Consent pending</div>
+        <div style="font-size:10px;color:#b91c1c;margin-top:3px;">Cannot be booked until consent confirmed</div>
+      </div>
+    </div>
+    <p class="note">Operators naturally prefer Landlord Verified sites — no risk of the arrangement being challenged mid-contract. That preference creates a pull that incentivises more site owners to obtain consent or push their landlord to join the partnership programme.</p>
+  </div>
+</div>
+
+<script>
+var S={op:10,cl:20,ze:4,dn:1.0,ls:10};
+var cd=new Set();
+var selSt=0;
+
+var STRUCTS=[
+  {title:'After-hours services agreement',badge:'Recommended',bc:'#166534',bb:'#dcfce7',
+   body:'The zombie operator is a contracted after-hours kitchen operator — not a sublessee. The site owner retains full possession at all times and can access the premises during zombie hours. The operator receives only a revocable, personal license to use specific listed equipment. No transfer of "use or enjoyment of the premises." This mirrors hotel management agreements and franchise concessions in SA — well-established structures that do not constitute subletting.',
+   items:['Possession stays with site owner — not a sublease','Operator access is personal, revocable, and non-transferable','Site owner retains alarm codes and physical access at all times','ZombieTech contract template enforces this language automatically','Legally equivalent to existing SA concession and management structures']},
+  {title:'ZombieTech as commercial intermediary',badge:'Medium risk',bc:'#854d0e',bb:'#fef9c3',
+   body:'ZombieTech enters the kitchen services agreement with the site owner directly, then sub-licenses to the operator. ZombieTech becomes the known commercial counterparty in both directions. This gives cleaner characterisation but increases ZombieTech\'s liability exposure and requires proper capitalisation and insurance.',
+   items:['ZombieTech is the known counterparty — operator never faces landlord risk directly','Cleaner legal characterisation — platform sits in the commercial chain','Increases ZombieTech\'s liability — requires substantial insurance cover','Best applied to high-value or flagship sites where extra protection is warranted']},
+  {title:'Individual landlord consent per site',badge:'Safest · most friction',bc:'#1e40af',bb:'#dbeafe',
+   body:'Each site owner obtains explicit written consent from their individual landlord before onboarding. ZombieTech provides a standard consent letter template and a lease addendum option for landlords who want more protection. Legally bulletproof but creates friction. Best used as the fallback for sites not covered by a portfolio partnership.',
+   items:['Explicit consent removes all legal risk completely','ZombieTech standard consent letter template provided at onboarding','Landlord revenue share can be built into the fee calculation','Best for complex, high-value, or one-off sites outside partnership portfolios']},
+  {title:'Landlord portfolio partnership',badge:'Strategic moat',bc:'#4c1d95',bb:'#ede9fe',
+   body:'ZombieTech negotiates blanket zombie consent with major SA commercial property groups. One agreement covers the whole portfolio. Tenant site owners at enrolled properties onboard as Landlord Verified automatically — no individual consent required. This solves the subletting risk at scale, creates a B2B supply channel, and builds a competitive moat that takes years to replicate.',
+   items:['Blanket consent across entire portfolio — scales without per-site friction','B2B channel: landlord promotes ZombieTech directly to all their tenants','Enrolled sites fast-tracked as premium Landlord Verified listings','Landlord revenue share incentivises participation and ongoing promotion','Three to four signed REIT agreements = a near-unassailable market position']},
+];
+
+function setT(el){
+  var g=el.dataset.g;
+  document.querySelectorAll('[data-g="'+g+'"]').forEach(function(e){e.classList.remove('on');});
+  el.classList.add('on');
+  var v=parseFloat(el.dataset.v);
+  if(g==='op') S.op=v;
+  else if(g==='cl') S.cl=v;
+  else if(g==='ze') S.ze=v;
+  else if(g==='dn') S.dn=v;
+  else if(g==='ls'){S.ls=v;renderLandlord();}
+  if(g!=='ls') renderSched();
+}
+
+function togDay(el){
+  var d=+el.dataset.d;
+  if(cd.has(d)){cd.delete(d);el.classList.remove('on');}
+  else{cd.add(d);el.classList.add('on');}
+  renderSched();
+}
+
+function goTab(id){
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on');});
+  document.querySelectorAll('.pane').forEach(function(p){p.classList.remove('on');});
+  var tabs=document.querySelectorAll('.tab');
+  var map={'sched':0,'legal':1,'landlord':2};
+  tabs[map[id]].classList.add('on');
+  document.getElementById('pane-'+id).classList.add('on');
+}
+
+function renderSched(){
+  var DAYS=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  var isWeekend=[false,false,false,false,false,true,true];
+  var open=S.op,close=S.cl,zend=S.ze;
+  var html='';
+  DAYS.forEach(function(d,di){
+    var wk=isWeekend[di];
+    html+='<div class="dh'+(wk?' wk':'')+'">'+d+'</div>';
+  });
+  for(var h=0;h<24;h++){
+    DAYS.forEach(function(d,di){
+      var wk=isWeekend[di];
+      var isClosed=cd.has(di);
+      var cls;
+      if(isClosed){
+        if(h>=0&&h<6){cls=wk?'deep':'zombie';}
+        else if(h>=6&&h<open){cls='zombie';}
+        else if(h>=open&&h<close){cls='zombie';}
+        else if(h>=close&&h<zend){cls='zombie';}
+        else{cls='off';}
+      } else {
+        if(h>=0&&h<6){cls=wk?'deep':'off';}
+        else if(h>=open&&h<close){cls='open';}
+        else if(h>=close&&h<zend){cls='zombie';}
+        else{cls='off';}
+      }
+      html+='<div class="hb '+cls+'"></div>';
+    });
+  }
+  document.getElementById('cal').innerHTML=html;
+
+  var zwk=0;
+  DAYS.forEach(function(d,di){
+    var wk=isWeekend[di];
+    var isClosed=cd.has(di);
+    if(isClosed){
+      zwk+=Math.max(0,zend-open);
+      if(wk) zwk+=6;
+    } else {
+      zwk+=Math.max(0,zend-close);
+      if(wk) zwk+=6;
+    }
+  });
+  var zmth=Math.round(zwk*52/12);
+  var rent=+(document.getElementById('s-rent').value)||15000;
+  var hrly=rent/720;
+  var fee=Math.round(hrly*zmth*S.dn);
+  var slots=Math.max(1,Math.floor(zwk/8));
+  document.getElementById('slot-metrics').innerHTML=
+    '<div class="mc"><div class="mlb">Zombie hrs/week</div><div class="mv">'+Math.round(zwk)+'</div></div>'+
+    '<div class="mc"><div class="mlb">Zombie hrs/month</div><div class="mv">'+zmth+'</div></div>'+
+    '<div class="mc"><div class="mlb">Max bookable slots/wk</div><div class="mv">'+slots+'</div></div>'+
+    '<div class="mc"><div class="mlb">Base site fee/month</div><div class="mv" style="color:#166534;">R '+fee.toLocaleString()+'</div></div>';
+  var msg=zwk>56?'<div class="good">Full-time zombie potential — a Mon–Sun operator could run this site as their primary income. '+Math.round(zwk)+' zombie hours per week rivals a standard work week.</div>':
+    zwk>28?'<div class="info">Strong part-time potential — weekend + selected weekday slots. Ideal for an operator growing towards full-time.</div>':
+    zwk>14?'<div class="info">Classic weekend hustle model — Thu/Fri/Sat after-hours. The core ZombieTech proposition.</div>':
+    '<div class="warn">Limited zombie capacity at these hours. Extend the zombie end time or mark additional closed days to open up more slots.</div>';
+  document.getElementById('slot-msg').innerHTML=msg;
+}
+
+function renderStructs(){
+  document.getElementById('structs').innerHTML=STRUCTS.map(function(s,i){
+    var isSel=selSt===i;
+    return '<div class="sc-card'+(isSel?' on':'')+'" onclick="selSt='+i+';renderStructs();" style="background:'+(isSel?s.bb:'#f8f8f6')+';">'+
+      '<div class="sc-head">'+
+        '<div class="sc-title" style="color:'+(isSel?s.bc:'#1a1a1a')+'">'+s.title+'</div>'+
+        '<div class="sc-badge" style="background:'+s.bb+';color:'+s.bc+';">'+s.badge+'</div>'+
+      '</div>'+
+      (isSel?
+        '<div class="sc-body" style="color:'+s.bc+';">'+s.body+'</div>'+
+        '<div class="sc-items">'+s.items.map(function(it){
+          return '<div class="sc-item"><div class="sc-dot" style="background:'+s.bc+';"></div><div style="font-size:11px;color:'+s.bc+';">'+it+'</div></div>';
+        }).join('')+'</div>'
+      :'')+
+    '</div>';
+  }).join('');
+}
+
+function renderLandlord(){
+  var sites=+(document.getElementById('lp-sites').value)||80;
+  var uptake=+(document.getElementById('lp-uptake').value)||35;
+  var fee=+(document.getElementById('lp-fee').value)||3500;
+  var share=S.ls/100;
+  document.getElementById('lp-sv').textContent=sites;
+  document.getElementById('lp-uv').textContent=Math.round(uptake)+'%';
+  var active=Math.round(sites*uptake/100);
+  var mth=Math.round(active*fee*share);
+  var ann=mth*12;
+  var zt=Math.round(active*fee*(1-share));
+  document.getElementById('lp-metrics').innerHTML=
+    '<div class="mc"><div class="mlb">Active zombie sites</div><div class="mv">'+active+'</div></div>'+
+    '<div class="mc"><div class="mlb">Landlord earns/month</div><div class="mv" style="color:#166534;">R '+mth.toLocaleString()+'</div></div>'+
+    '<div class="mc"><div class="mlb">Landlord earns/year</div><div class="mv" style="color:#166534;">R '+ann.toLocaleString()+'</div></div>';
+  document.getElementById('lp-msg').innerHTML=
+    '<div class="good">At '+Math.round(uptake)+'% uptake across a '+sites+'-property portfolio, the landlord earns R '+ann.toLocaleString()+'/year from a single blanket agreement. ZombieTech retains R '+zt.toLocaleString()+'/month from this portfolio after the landlord share. A Growthpoint or Redefine partnership at this scale pays for itself in legal protection and supply velocity alone.</div>';
+}
+
+renderSched();
+renderStructs();
+renderLandlord();
+</script>
+</body>
+</html>
