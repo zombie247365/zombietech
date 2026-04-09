@@ -5,6 +5,7 @@
  */
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
+import { COOKIE_NAME } from './constants';
 export { COOKIE_NAME } from './constants';
 
 /** Get the JWT token from cookies (server components only). */

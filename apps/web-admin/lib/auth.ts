@@ -4,6 +4,7 @@
  */
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
+import { COOKIE_NAME } from './constants';
 export { COOKIE_NAME } from './constants';
 
 export function getToken(): string | undefined {
