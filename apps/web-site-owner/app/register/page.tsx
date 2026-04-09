@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { ArrowRight, Phone, User, Mail } from 'lucide-react';
@@ -9,7 +9,7 @@ import { Spinner } from '../../components/ui/Spinner';
 
 type Step = 'details' | 'otp';
 
-export default function RegisterPage() {
+function RegisterForm() {
   const router = useRouter();
   const params = useSearchParams();
   const nextPath = params.get('next') ?? '/dashboard';
@@ -247,5 +247,13 @@ export default function RegisterPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center" style={{ background: '#f8f8f6' }}><div className="text-sm text-[#aaa]">Loading...</div></div>}>
+      <RegisterForm />
+    </Suspense>
   );
 }
