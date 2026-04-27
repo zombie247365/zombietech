@@ -21,6 +21,7 @@ function RegisterForm() {
 
   // Form fields
   const [fullName, setFullName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [mobile, setMobile] = useState('+27');
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
@@ -65,7 +66,7 @@ function RegisterForm() {
         body: JSON.stringify({
           mobile,
           otp: code,
-          full_name: fullName,
+          full_name: `${fullName} ${lastName}`.trim(),
           email,
           role: 'site_owner',
         }),
@@ -144,7 +145,12 @@ function RegisterForm() {
               </div>
               <div>
                 <label className="label">Last name</label>
-                <input className="input" placeholder="Rossi" disabled />
+                <input
+                  className="input"
+                  placeholder="Rossi"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                />
               </div>
             </div>
 
