@@ -36,6 +36,7 @@ const verifyOtpSchema = z.object({
 async function handleSendOtp(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const { mobile } = req.body as { mobile: string };
+    console.log('[OTP] entered');
     console.error('[OTP] step 1 — handler entered, mobile:', mobile);
 
     const otp = config.isDev && config.otp.bypassInDev
