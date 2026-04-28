@@ -34,8 +34,17 @@ app.use(cors({
   credentials: true,
 }));
 app.use((req, res, next) => { console.log('[mw-2] after cors', req.method, req.url); next(); });
-app.use(express.json({ limit: '10mb' }));
-app.use((req, res, next) => { console.log('[mw-3] after json', req.method, req.url); next(); });
+app.use((req, res, next) => {
+  express.json({ limit: '10mb' })(req, res, (err) => {
+    if (err) {
+      console.error('[mw-3] express.json FAILED:', err.message, err.stack);
+      res.status(400).json({ success: false, error: 'JSON parse error', detail: err.message });
+      return;
+    }
+    console.log('[mw-3] after json (with parse check)', req.method, req.url);
+    next();
+  });
+});
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use((req, res, next) => { console.log('[mw-4] after urlencoded', req.method, req.url); next(); });
 
