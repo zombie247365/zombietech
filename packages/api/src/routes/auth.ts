@@ -36,27 +36,33 @@ const verifyOtpSchema = z.object({
 async function handleSendOtp(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const { mobile } = req.body as { mobile: string };
+    console.error('[OTP] step 1 — handler entered, mobile:', mobile);
 
     const otp = config.isDev && config.otp.bypassInDev
       ? config.otp.devOtp
       : String(Math.floor(100000 + Math.random() * 900000));
+    console.error('[OTP] step 2 — OTP generated, isDev:', config.isDev, 'bypassInDev:', config.otp.bypassInDev);
 
     const expiresAt = new Date(Date.now() + OTP_EXPIRES_MINUTES * 60 * 1000);
     const hash = await bcrypt.hash(otp, 10);
+    console.error('[OTP] step 3 — bcrypt.hash complete');
 
     const existingUser = await prisma.user.findFirst({ where: { mobile } });
+    console.error('[OTP] step 4 — prisma.findFirst complete, existingUser:', !!existingUser);
 
     if (existingUser) {
       await prisma.user.update({
         where: { id: existingUser.id },
         data: { otp_hash: hash, otp_expires_at: expiresAt },
       });
+      console.error('[OTP] step 5 — prisma.update complete');
     }
     // If user doesn't exist yet, we store the OTP only after they provide registration
     // fields in verify-otp. Nothing to store here for new users.
 
     // Send OTP via Twilio SMS (dev mode logs to console, prod sends live SMS)
-    await sendOtpSms(mobile, otp);
+    const smsResult = await sendOtpSms(mobile, otp);
+    console.error('[OTP] step 6 — sendOtpSms returned:', JSON.stringify(smsResult));
 
     res.json({
       success: true,
@@ -67,6 +73,7 @@ async function handleSendOtp(req: Request, res: Response, next: NextFunction): P
       },
     });
   } catch (err) {
+    console.error('[OTP] error caught:', err);
     next(err);
   }
 }
