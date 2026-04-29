@@ -1,7 +1,7 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { z } from 'zod';
 import bcrypt from 'bcryptjs';
-import { prisma } from '@zombietech/database';
+import { prisma, Prisma } from '@zombietech/database';
 import { validate } from '../middleware/validate';
 import { issueToken, authenticate, AuthRequest, PlatformRole } from '../middleware/auth';
 import { auditLog } from '../middleware/auditLogger';
@@ -16,15 +16,14 @@ const router = Router();
 
 const sendOtpSchema = z.object({
   mobile: z.string().regex(/^\+27[0-9]{9}$/, 'Must be a valid SA mobile number (+27XXXXXXXXX)'),
+  full_name: z.string().min(2).max(255).optional(),
+  email: z.string().email().optional(),
+  role: z.enum(['site_owner', 'operator']).optional(),
 });
 
 const verifyOtpSchema = z.object({
   mobile: z.string().regex(/^\+27[0-9]{9}$/),
   otp: z.string().length(6, 'OTP must be 6 digits'),
-  // Registration fields — required only for new users
-  full_name: z.string().min(2).max(255).optional(),
-  email: z.string().email().optional(),
-  role: z.enum(['site_owner', 'operator']).optional(),
 });
 
 // ── POST /auth/send-otp ────────────────────────────────────────────────────
@@ -35,7 +34,12 @@ const verifyOtpSchema = z.object({
  */
 async function handleSendOtp(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    const { mobile } = req.body as { mobile: string };
+    const { mobile, full_name, email, role } = req.body as {
+      mobile: string;
+      full_name?: string;
+      email?: string;
+      role?: 'site_owner' | 'operator';
+    };
     console.log('[OTP] entered');
     console.error('[OTP] step 1 — handler entered, mobile:', mobile);
 
@@ -57,9 +61,21 @@ async function handleSendOtp(req: Request, res: Response, next: NextFunction): P
         data: { otp_hash: hash, otp_expires_at: expiresAt },
       });
       console.error('[OTP] step 5 — prisma.update complete');
+    } else {
+      if (!full_name || !email || !role) {
+        throw new AppError(422, 'New user registration requires full_name, email, and role', 'REGISTRATION_FIELDS_REQUIRED');
+      }
+      const emailExists = await prisma.user.findUnique({ where: { email } });
+      if (emailExists) {
+        throw new AppError(409, 'An account with this email already exists', 'EMAIL_TAKEN');
+      }
+      await prisma.pendingVerification.upsert({
+        where: { mobile },
+        create: { mobile, full_name, email, role, otp_hash: hash, otp_expires_at: expiresAt, attempts: 0 },
+        update: { full_name, email, role, otp_hash: hash, otp_expires_at: expiresAt, attempts: 0 },
+      });
+      console.error('[OTP] step 5 — pendingVerification upsert complete');
     }
-    // If user doesn't exist yet, we store the OTP only after they provide registration
-    // fields in verify-otp. Nothing to store here for new users.
 
     // Send OTP via Twilio SMS (dev mode logs to console, prod sends live SMS)
     const smsResult = await sendOtpSms(mobile, otp);
@@ -89,78 +105,107 @@ router.post(
   validate(verifyOtpSchema),
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { mobile, otp, full_name, email, role } = req.body as {
+      const { mobile, otp } = req.body as {
         mobile: string;
         otp: string;
-        full_name?: string;
-        email?: string;
-        role?: 'site_owner' | 'operator';
       };
 
       let user = await prisma.user.findFirst({ where: { mobile } });
+      const wasNewUser = !user;
 
       if (!user) {
-        // New user — registration fields required
-        if (!full_name || !email || !role) {
-          throw new AppError(
-            422,
-            'New user registration requires full_name, email, and role',
-            'REGISTRATION_REQUIRED',
-          );
+        const pending = await prisma.pendingVerification.findUnique({ where: { mobile } });
+        if (!pending) {
+          await auditLog(req as AuthRequest, 'auth.otp.no_pending', 'mobile', mobile, { mobile });
+          throw new AppError(400, 'No registration request found for this number — call send-otp first', 'NO_PENDING_REGISTRATION');
         }
-        // Check email uniqueness
-        const emailExists = await prisma.user.findUnique({ where: { email } });
-        if (emailExists) {
-          throw new AppError(409, 'An account with this email already exists', 'EMAIL_TAKEN');
+        if (pending.attempts >= 3) {
+          await auditLog(req as AuthRequest, 'auth.otp.lockout', 'mobile', mobile, { mobile, source: 'pending' });
+          throw new AppError(423, 'Too many failed attempts — request a new OTP to try again', 'ACCOUNT_LOCKED');
         }
-
-        const hash = await bcrypt.hash(otp, 10);
-        const expiresAt = new Date(Date.now() + OTP_EXPIRES_MINUTES * 60 * 1000);
-
-        user = await prisma.user.create({
-          data: { mobile, full_name, email, role, otp_hash: hash, otp_expires_at: expiresAt },
-        });
-
-        if (role === 'site_owner') {
-          await prisma.siteOwner.create({
-            data: { user_id: user.id, trading_name: full_name, business_category: 'Other' },
-          });
-        } else {
-          await prisma.operator.create({
-            data: {
-              user_id: user.id,
-              trading_concept: '',
-              food_category: '',
-              emergency_contact_name: '',
-              emergency_contact_mobile: mobile,
-              activation_fee_balance: 0,
-            },
-          });
-        }
-      }
-
-      // OTP verification
-      const isDevBypass = config.isDev && otp === config.otp.devOtp;
-
-      if (!isDevBypass) {
-        if (!user.otp_hash || !user.otp_expires_at) {
-          throw new AppError(400, 'No OTP was requested for this number', 'NO_OTP');
-        }
-        if (new Date() > user.otp_expires_at) {
+        if (new Date() > pending.otp_expires_at) {
+          await auditLog(req as AuthRequest, 'auth.otp.expired', 'mobile', mobile, { mobile, source: 'pending' });
           throw new AppError(400, 'OTP has expired — request a new one', 'OTP_EXPIRED');
         }
-        const valid = await bcrypt.compare(otp, user.otp_hash);
-        if (!valid) throw new AppError(400, 'Invalid OTP', 'INVALID_OTP');
-      }
+        const pendingValid = await bcrypt.compare(otp, pending.otp_hash);
+        if (!pendingValid) {
+          await prisma.pendingVerification.update({
+            where: { mobile },
+            data: { attempts: { increment: 1 } },
+          });
+          await auditLog(req as AuthRequest, 'auth.otp.invalid', 'mobile', mobile, { mobile, source: 'pending', attempts_after: pending.attempts + 1 });
+          throw new AppError(400, 'Invalid OTP', 'INVALID_OTP');
+        }
 
-      await prisma.user.update({
-        where: { id: user.id },
-        data: {
-          otp_hash: null,
-          otp_expires_at: null,
-          mobile_verified_at: user.mobile_verified_at ?? new Date(),
-        },
-      });
+        user = await prisma.$transaction(async (tx) => {
+          const created = await tx.user.create({
+            data: {
+              mobile: pending.mobile,
+              full_name: pending.full_name,
+              email: pending.email,
+              role: pending.role,
+              mobile_verified_at: new Date(),
+            },
+          });
+          await tx.pendingVerification.delete({ where: { mobile } });
+          return created;
+        });
+      } else {
+        // === EXISTING USER: verify via otp_hash on user row ===
+        if (user.locked_until && new Date() < user.locked_until) {
+          const secondsRemaining = Math.ceil((user.locked_until.getTime() - Date.now()) / 1000);
+          await auditLog(req as AuthRequest, 'auth.otp.lockout_attempt', 'user', user.id, { mobile, locked_until: user.locked_until.toISOString() });
+          throw new AppError(423, `Account is locked. Try again in ${secondsRemaining} seconds.`, 'ACCOUNT_LOCKED');
+        }
+
+        const isDevBypass = config.isDev && otp === config.otp.devOtp;
+        if (!isDevBypass) {
+          if (!user.otp_hash || !user.otp_expires_at) {
+            await auditLog(req as AuthRequest, 'auth.otp.no_request', 'user', user.id, { mobile });
+            throw new AppError(400, 'No OTP was requested for this number', 'NO_OTP');
+          }
+          if (new Date() > user.otp_expires_at) {
+            await auditLog(req as AuthRequest, 'auth.otp.expired', 'user', user.id, { mobile, source: 'user' });
+            throw new AppError(400, 'OTP has expired — request a new one', 'OTP_EXPIRED');
+          }
+          const valid = await bcrypt.compare(otp, user.otp_hash);
+          if (!valid) {
+            const newCount = user.failed_otp_attempts + 1;
+            const lockedUntil = newCount >= 3 ? new Date(Date.now() + 15 * 60 * 1000) : null;
+            await prisma.user.update({
+              where: { id: user.id },
+              data: {
+                failed_otp_attempts: { increment: 1 },
+                ...(lockedUntil ? { locked_until: lockedUntil } : {}),
+              },
+            });
+            if (lockedUntil) {
+              await auditLog(req as AuthRequest, 'auth.otp.lockout', 'user', user.id, { mobile, source: 'user', locked_until: lockedUntil.toISOString() });
+              throw new AppError(423, 'Too many failed attempts — account locked for 15 minutes', 'ACCOUNT_LOCKED');
+            }
+            await auditLog(req as AuthRequest, 'auth.otp.invalid', 'user', user.id, { mobile, source: 'user', attempts_after: newCount });
+            throw new AppError(400, 'Invalid OTP', 'INVALID_OTP');
+          }
+        }
+
+        try {
+          await prisma.user.update({
+            where: { id: user.id, otp_hash: user.otp_hash },
+            data: {
+              otp_hash: null,
+              otp_expires_at: null,
+              mobile_verified_at: user.mobile_verified_at ?? new Date(),
+              failed_otp_attempts: 0,
+              locked_until: null,
+            },
+          });
+        } catch (err) {
+          if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2025') {
+            throw new AppError(400, 'OTP already used — request a new one', 'OTP_ALREADY_USED');
+          }
+          throw err;
+        }
+      }
 
       const token = issueToken({ sub: user.id, role: user.role as PlatformRole, email: user.email });
       const refreshToken = issueToken({ sub: user.id, role: user.role as PlatformRole, email: user.email });
@@ -170,7 +215,7 @@ router.post(
       await auditLog(req as AuthRequest, 'auth.login', 'user', user.id, {
         mobile,
         role: user.role,
-        is_new_user: !user.mobile_verified_at,
+        is_new_user: wasNewUser,
       });
 
       res.json({

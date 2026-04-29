@@ -237,6 +237,8 @@ model User {
   role                UserRole
   otp_hash            String?   @db.VarChar(255)
   otp_expires_at      DateTime? @db.Timestamptz()
+  failed_otp_attempts Int       @default(0)
+  locked_until        DateTime? @db.Timestamptz()
   email_verified_at   DateTime? @db.Timestamptz()
   mobile_verified_at  DateTime? @db.Timestamptz()
   created_at          DateTime  @default(now()) @db.Timestamptz()
@@ -303,6 +305,22 @@ model Operator {
   vetting_records          VettingRecord[]
 
   @@map("operators")
+}
+
+model PendingVerification {
+  id             String    @id @default(uuid())
+  mobile         String    @unique @db.VarChar(20)
+  full_name      String    @db.VarChar(255)
+  email          String    @db.VarChar(255)
+  role           UserRole
+  otp_hash       String    @db.VarChar(255)
+  otp_expires_at DateTime  @db.Timestamptz()
+  attempts       Int       @default(0)
+  created_at     DateTime  @default(now()) @db.Timestamptz()
+  updated_at     DateTime  @updatedAt @db.Timestamptz()
+
+  @@index([mobile])
+  @@map("pending_verifications")
 }
 
 // ─────────────────────────────────────────────────
