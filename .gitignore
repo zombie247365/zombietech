@@ -41,3 +41,16 @@ packages/database/generated
 
 # Sensitive files
 twillio account details.jpg
+
+# Credentials and secrets — never commit
+*password*.txt
+*password*.md
+*.pem
+*.key
+*secret*.txt
+*.env.local
+*.env.*.local
+credentials.json
+service-account*.json
+*credentials*.txt
+*credentials*.md
