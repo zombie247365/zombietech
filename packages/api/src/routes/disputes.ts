@@ -269,8 +269,8 @@ router.get('/:id', authenticate, async (req: AuthRequest, res: Response, next: N
             },
           },
         },
-        raised_by: { select: { full_name: true, role: true } },
-        decided_by: { select: { full_name: true } },
+        raised_by: { select: { first_name: true, last_name: true, role: true } },
+        decided_by: { select: { first_name: true, last_name: true } },
       },
     });
     if (!dispute) throw new AppError(404, 'Dispute not found', 'NOT_FOUND');

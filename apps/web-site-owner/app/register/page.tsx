@@ -20,7 +20,7 @@ function RegisterForm() {
   const [devOtp, setDevOtp] = useState('');
 
   // Form fields
-  const [fullName, setFullName] = useState('');
+  const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [mobile, setMobile] = useState('+27');
@@ -30,7 +30,7 @@ function RegisterForm() {
   // Step 1 — request OTP
   const handleRequestOtp = async () => {
     setError('');
-    if (!fullName.trim()) { setError('Full name is required'); return; }
+    if (!firstName.trim()) { setError('First name is required'); return; }
     if (!email.trim() || !email.includes('@')) { setError('Valid email is required'); return; }
     if (!mobile.match(/^\+27\d{9}$/)) { setError('Enter a valid South African mobile: +27 followed by 9 digits'); return; }
 
@@ -39,7 +39,13 @@ function RegisterForm() {
       const res = await fetch('/api/auth/request-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ mobile }),
+        body: JSON.stringify({
+          mobile,
+          first_name: firstName,
+          last_name: lastName,
+          email,
+          role: 'site_owner',
+        }),
       });
       const data = await res.json();
       if (!res.ok) { setError(data.error || 'Failed to send OTP'); return; }
@@ -66,9 +72,6 @@ function RegisterForm() {
         body: JSON.stringify({
           mobile,
           otp: code,
-          full_name: `${fullName} ${lastName}`.trim(),
-          email,
-          role: 'site_owner',
         }),
       });
       const data = await res.json();
@@ -137,8 +140,8 @@ function RegisterForm() {
                   <User className="absolute left-3 top-3 w-3.5 h-3.5 text-[#aaa]" />
                   <input
                     className="input pl-8"
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
                     placeholder="Marco"
                   />
                 </div>
@@ -190,7 +193,7 @@ function RegisterForm() {
 
             <p className="text-xs text-center text-[#aaa] mt-4">
               Already have an account?{' '}
-              <button onClick={() => { setFullName('_'); setEmail('_@_._'); setStep('otp'); }}
+              <button onClick={() => { setFirstName('_'); setEmail('_@_._'); setStep('otp'); }}
                 className="underline">Sign in</button>
             </p>
           </>

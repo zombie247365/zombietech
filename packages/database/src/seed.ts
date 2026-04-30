@@ -48,7 +48,8 @@ async function main() {
     data: {
       email: 'admin@zombietech.co.za',
       mobile: '+27821234567',
-      full_name: 'ZombieTech Admin',
+      first_name: 'Zombie',
+      last_name: 'Admin',
       role: 'admin',
       mobile_verified_at: new Date('2025-01-01T00:00:00Z'),
       email_verified_at: new Date('2025-01-01T00:00:00Z'),
@@ -60,7 +61,8 @@ async function main() {
     data: {
       email: 'thabo.mokoena@thaboskitchen.co.za',
       mobile: '+27833456789',
-      full_name: 'Thabo Mokoena',
+      first_name: 'Thabo',
+      last_name: 'Mokoena',
       role: 'site_owner',
       mobile_verified_at: new Date('2025-03-15T08:00:00+02:00'),
       email_verified_at: new Date('2025-03-15T08:05:00+02:00'),
@@ -86,7 +88,8 @@ async function main() {
     data: {
       email: 'priya.naidoo@spicejarsa.co.za',
       mobile: '+27844567890',
-      full_name: 'Priya Naidoo',
+      first_name: 'Priya',
+      last_name: 'Naidoo',
       role: 'site_owner',
       mobile_verified_at: new Date('2025-04-10T09:00:00+02:00'),
       email_verified_at: new Date('2025-04-10T09:10:00+02:00'),
@@ -113,7 +116,8 @@ async function main() {
     data: {
       email: 'kefilwe.sithole@gmail.com',
       mobile: '+27855678901',
-      full_name: 'Kefilwe Sithole',
+      first_name: 'Kefilwe',
+      last_name: 'Sithole',
       role: 'operator',
       mobile_verified_at: new Date('2025-05-01T10:00:00+02:00'),
       email_verified_at: new Date('2025-05-01T10:15:00+02:00'),
@@ -141,7 +145,8 @@ async function main() {
     data: {
       email: 'marco.vdberg@firewoodpizza.co.za',
       mobile: '+27877890123',
-      full_name: 'Marco van der Berg',
+      first_name: 'Marco',
+      last_name: 'van der Berg',
       role: 'operator',
       mobile_verified_at: new Date('2025-05-15T11:00:00+02:00'),
       email_verified_at: new Date('2025-05-15T11:20:00+02:00'),
@@ -169,7 +174,8 @@ async function main() {
     data: {
       email: 'ayesha.cassim@sugarandspice.co.za',
       mobile: '+27899012345',
-      full_name: 'Ayesha Cassim',
+      first_name: 'Ayesha',
+      last_name: 'Cassim',
       role: 'operator',
       mobile_verified_at: new Date('2026-03-20T14:00:00+02:00'),
       email_verified_at: new Date('2026-03-20T14:10:00+02:00'),

@@ -16,7 +16,8 @@ const router = Router();
 
 const sendOtpSchema = z.object({
   mobile: z.string().regex(/^\+27[0-9]{9}$/, 'Must be a valid SA mobile number (+27XXXXXXXXX)'),
-  full_name: z.string().min(2).max(255).optional(),
+  first_name: z.string().min(1).max(255).optional(),
+  last_name: z.string().min(1).max(255).optional(),
   email: z.string().email().optional(),
   role: z.enum(['site_owner', 'operator']).optional(),
 });
@@ -34,9 +35,10 @@ const verifyOtpSchema = z.object({
  */
 async function handleSendOtp(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    const { mobile, full_name, email, role } = req.body as {
+    const { mobile, first_name, last_name, email, role } = req.body as {
       mobile: string;
-      full_name?: string;
+      first_name?: string;
+      last_name?: string;
       email?: string;
       role?: 'site_owner' | 'operator';
     };
@@ -62,8 +64,8 @@ async function handleSendOtp(req: Request, res: Response, next: NextFunction): P
       });
       console.error('[OTP] step 5 — prisma.update complete');
     } else {
-      if (!full_name || !email || !role) {
-        throw new AppError(422, 'New user registration requires full_name, email, and role', 'REGISTRATION_FIELDS_REQUIRED');
+      if (!first_name || !last_name || !email || !role) {
+        throw new AppError(422, 'New user registration requires first_name, last_name, email, and role', 'REGISTRATION_FIELDS_REQUIRED');
       }
       const emailExists = await prisma.user.findUnique({ where: { email } });
       if (emailExists) {
@@ -71,8 +73,8 @@ async function handleSendOtp(req: Request, res: Response, next: NextFunction): P
       }
       await prisma.pendingVerification.upsert({
         where: { mobile },
-        create: { mobile, full_name, email, role, otp_hash: hash, otp_expires_at: expiresAt, attempts: 0 },
-        update: { full_name, email, role, otp_hash: hash, otp_expires_at: expiresAt, attempts: 0 },
+        create: { mobile, first_name, last_name, email, role, otp_hash: hash, otp_expires_at: expiresAt, attempts: 0 },
+        update: { first_name, last_name, email, role, otp_hash: hash, otp_expires_at: expiresAt, attempts: 0 },
       });
       console.error('[OTP] step 5 — pendingVerification upsert complete');
     }
@@ -141,7 +143,8 @@ router.post(
           const created = await tx.user.create({
             data: {
               mobile: pending.mobile,
-              full_name: pending.full_name,
+              first_name: pending.first_name,
+              last_name: pending.last_name,
               email: pending.email,
               role: pending.role,
               mobile_verified_at: new Date(),
@@ -227,7 +230,8 @@ router.post(
             id: user.id,
             email: user.email,
             mobile: user.mobile,
-            full_name: user.full_name,
+            first_name: user.first_name,
+            last_name: user.last_name,
             role: user.role,
           },
         },
@@ -266,7 +270,7 @@ router.get('/me', authenticate, async (req: AuthRequest, res: Response, next: Ne
     const user = await prisma.user.findUnique({
       where: { id: req.user!.id },
       select: {
-        id: true, email: true, mobile: true, full_name: true, role: true,
+        id: true, email: true, mobile: true, first_name: true, last_name: true, role: true,
         email_verified_at: true, mobile_verified_at: true, created_at: true,
         site_owner: { select: { id: true, trading_name: true, site_score: true, score_tier: true } },
         operator: { select: { id: true, trading_concept: true, trust_score: true, vetting_status: true, activation_fee_balance: true } },

@@ -186,7 +186,7 @@ router.get('/', authenticate, async (req: AuthRequest, res: Response, next: Next
         contract: {
           include: {
             site_slot: { include: { site: { select: { trading_name: true, address_line1: true, suburb: true, city: true } } } },
-            operator: { include: { user: { select: { full_name: true } } } },
+            operator: { include: { user: { select: { first_name: true, last_name: true } } } },
           },
         },
         _count: { select: { session_photos: true, disputes: true } },
@@ -217,7 +217,7 @@ router.get('/:id', authenticate, async (req: AuthRequest, res: Response, next: N
         contract: {
           include: {
             site_slot: { include: { site: { include: { site_checklist_items: { orderBy: { sort_order: 'asc' } } } } } },
-            operator: { include: { user: { select: { full_name: true, mobile: true } } } },
+            operator: { include: { user: { select: { first_name: true, last_name: true, mobile: true } } } },
           },
         },
         session_photos: { orderBy: { created_at: 'asc' } },

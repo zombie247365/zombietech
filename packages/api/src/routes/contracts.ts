@@ -144,7 +144,7 @@ router.get('/', authenticate, async (req: AuthRequest, res: Response, next: Next
       where,
       include: {
         site_slot: { include: { site: { select: { trading_name: true, address_line1: true, suburb: true, city: true } } } },
-        operator: { include: { user: { select: { full_name: true, email: true } } } },
+        operator: { include: { user: { select: { first_name: true, last_name: true, email: true } } } },
         _count: { select: { sessions: true } },
       },
       orderBy: { created_at: 'desc' },
@@ -163,8 +163,8 @@ router.get('/:id', authenticate, async (req: AuthRequest, res: Response, next: N
     const contract = await prisma.contract.findUnique({
       where: { id: req.params.id },
       include: {
-        site_slot: { include: { site: { include: { site_owner: { include: { user: { select: { full_name: true, email: true } } } }, site_checklist_items: { orderBy: { sort_order: 'asc' } } } } } },
-        operator: { include: { user: { select: { full_name: true, email: true, mobile: true } } } },
+        site_slot: { include: { site: { include: { site_owner: { include: { user: { select: { first_name: true, last_name: true, email: true } } } }, site_checklist_items: { orderBy: { sort_order: 'asc' } } } } } },
+        operator: { include: { user: { select: { first_name: true, last_name: true, email: true, mobile: true } } } },
         booking_request: true,
         sessions: { orderBy: { session_date: 'desc' }, take: 10 },
         _count: { select: { sessions: true } },

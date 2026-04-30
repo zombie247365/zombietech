@@ -59,7 +59,7 @@ router.post(
       // Check operator exists
       const operator = await prisma.operator.findUnique({
         where: { id: operator_id },
-        select: { id: true, user: { select: { full_name: true } } },
+        select: { id: true, user: { select: { first_name: true, last_name: true } } },
       });
       if (!operator) throw new AppError(404, 'Operator not found', 'NOT_FOUND');
 
@@ -135,7 +135,7 @@ router.get('/', authenticate, async (req: AuthRequest, res: Response, next: Next
         skip,
         take: limitNum,
         include: {
-          operator: { select: { user: { select: { full_name: true } } } },
+          operator: { select: { user: { select: { first_name: true, last_name: true } } } },
         },
       }),
       prisma.settlement.count({ where }),
@@ -158,7 +158,7 @@ router.get('/:id', authenticate, async (req: AuthRequest, res: Response, next: N
     const settlement = await prisma.settlement.findUnique({
       where: { id: req.params.id },
       include: {
-        operator: { select: { id: true, user: { select: { full_name: true, mobile: true } } } },
+        operator: { select: { id: true, user: { select: { first_name: true, last_name: true, mobile: true } } } },
         line_items: { orderBy: [{ line_type: 'asc' }, { created_at: 'asc' }] },
       },
     });
@@ -206,7 +206,7 @@ router.post(
       // Fetch operator bank account ref for payout
       const operatorFull = await prisma.operator.findUnique({
         where: { id: settlement.operator_id },
-        include: { user: { select: { id: true, full_name: true, mobile: true } } },
+        include: { user: { select: { id: true, first_name: true, last_name: true, mobile: true } } },
       });
 
       // Initiate Peach Payments payout (non-blocking in dev, awaited in prod)

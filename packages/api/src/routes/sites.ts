@@ -155,7 +155,7 @@ router.get('/:id', async (req: AuthRequest, res: Response, next: NextFunction) =
     const site = await prisma.site.findUnique({
       where: { id: req.params.id },
       include: {
-        site_owner: { include: { user: { select: { full_name: true, email: true } } } },
+        site_owner: { include: { user: { select: { first_name: true, last_name: true, email: true } } } },
         site_slots: { where: { status: { not: 'suspended' } }, orderBy: { day_of_week: 'asc' } },
         site_checklist_items: { orderBy: { sort_order: 'asc' } },
       },

@@ -44,7 +44,7 @@ export async function runDocumentExpiryAlerts(): Promise<{
       expires_at: true,
       owner_user_id: true,
       owner: {
-        select: { id: true, full_name: true, mobile: true, email: true },
+        select: { id: true, first_name: true, last_name: true, mobile: true, email: true },
       },
     },
   });
@@ -92,7 +92,7 @@ export async function runDocumentExpiryAlerts(): Promise<{
 
       alertedIds.push(doc.id);
       console.log(
-        `[doc-expiry] Alerted ${doc.owner.full_name} — ${docLabel} expires in ${daysUntilExpiry} days`,
+        `[doc-expiry] Alerted ${doc.owner.first_name} ${doc.owner.last_name} — ${docLabel} expires in ${daysUntilExpiry} days`,
       );
     } catch (err) {
       console.error(`[doc-expiry] Failed to alert for document ${doc.id}:`, err);

@@ -58,7 +58,7 @@ router.get('/profile', authenticate, requireRole('operator'), async (req: AuthRe
     const operator = await prisma.operator.findUnique({
       where: { user_id: req.user!.id },
       include: {
-        user: { select: { id: true, full_name: true, email: true, mobile: true, mobile_verified_at: true } },
+        user: { select: { id: true, first_name: true, last_name: true, email: true, mobile: true, mobile_verified_at: true } },
         vetting_records: { orderBy: { created_at: 'asc' } },
         contracts: {
           where: { status: { in: ['active', 'in_notice'] } },
@@ -210,7 +210,7 @@ router.get('/:operatorId/status', authenticate, requireRole('admin'), async (req
     const operator = await prisma.operator.findUnique({
       where: { id: req.params.operatorId },
       include: {
-        user: { select: { id: true, full_name: true, email: true, mobile: true } },
+        user: { select: { id: true, first_name: true, last_name: true, email: true, mobile: true } },
         vetting_records: { orderBy: { created_at: 'asc' } },
       },
     });
