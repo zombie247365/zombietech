@@ -20,11 +20,9 @@ import { runDocumentExpiryAlerts } from './jobs/documentExpiry';
 
 const app = express();
 app.set('trust proxy', 1);
-app.use((req, res, next) => { console.log('[mw-0] entered express', req.method, req.url); next(); });
 
 // ── Security & parsing middleware ────────────────────────────────────────────
 app.use(helmet());
-app.use((req, res, next) => { console.log('[mw-1] after helmet', req.method, req.url); next(); });
 app.use(cors({
   origin: [
     'http://localhost:3000',  // site owner portal
@@ -33,20 +31,16 @@ app.use(cors({
   ],
   credentials: true,
 }));
-app.use((req, res, next) => { console.log('[mw-2] after cors', req.method, req.url); next(); });
 app.use((req, res, next) => {
   express.json({ limit: '10mb' })(req, res, (err) => {
     if (err) {
-      console.error('[mw-3] express.json FAILED:', err.message, err.stack);
       res.status(400).json({ success: false, error: 'JSON parse error', detail: err.message });
       return;
     }
-    console.log('[mw-3] after json (with parse check)', req.method, req.url);
     next();
   });
 });
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-app.use((req, res, next) => { console.log('[mw-4] after urlencoded', req.method, req.url); next(); });
 
 // ── Logging ──────────────────────────────────────────────────────────────────
 if (config.isDev) {
@@ -54,7 +48,6 @@ if (config.isDev) {
 } else {
   app.use(morgan('combined'));
 }
-app.use((req, res, next) => { console.log('[mw-5] after morgan', req.method, req.url); next(); });
 
 // ── Rate limiting ─────────────────────────────────────────────────────────────
 const limiter = rateLimit({
@@ -66,7 +59,6 @@ const limiter = rateLimit({
 });
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 app.use(limiter as any);
-app.use((req, res, next) => { console.log('[mw-6] after limiter', req.method, req.url); next(); });
 
 // OTP endpoint gets stricter limiting
 const otpLimiter = rateLimit({
@@ -76,7 +68,6 @@ const otpLimiter = rateLimit({
 });
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 app.use('/api/auth/request-otp', otpLimiter as any);
-app.use('/api/auth/request-otp', (req, res, next) => { console.log('[mw-7] after otpLimiter', req.method, req.url); next(); });
 
 // ── Routes ────────────────────────────────────────────────────────────────────
 app.use('/api', routes);
@@ -87,7 +78,7 @@ app.use(errorHandler);
 
 // ── Start server ──────────────────────────────────────────────────────────────
 const server = app.listen(config.port, () => {
-  console.log(`\n🧟 ZombieTech API DIAG-7 running on port ${config.port}`);
+  console.log(`\n🧟 ZombieTech API running on port ${config.port}`);
   console.log(`   Environment: ${config.nodeEnv}`);
   console.log(`   Health check: http://localhost:${config.port}/api/health\n`);
 });
