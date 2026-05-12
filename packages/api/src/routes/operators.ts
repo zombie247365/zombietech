@@ -5,7 +5,7 @@ import { authenticate, requireRole, AuthRequest } from '../middleware/auth';
 import { validate } from '../middleware/validate';
 import { auditLog } from '../middleware/auditLogger';
 import { AppError } from '../middleware/errorHandler';
-import { ACTIVATION_FEE_CENTS } from '@zombietech/shared';
+
 
 const router = Router();
 

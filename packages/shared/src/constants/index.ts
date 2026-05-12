@@ -1,7 +1,7 @@
 // Platform constants
 export const PLATFORM_FEE_PCT = 10.00;
-export const ACTIVATION_FEE_CENTS = 80000; // R800
-export const ACTIVATION_FEE_PER_SESSION_CENTS = 40000; // R400 per session deduction
+export const ACTIVATION_FEE_CENTS = 0; // R0 — activation fee killed per v4 spec
+export const ACTIVATION_FEE_PER_SESSION_CENTS = 0; // R0 — activation fee killed per v4 spec
 export const DEFAULT_NOTICE_PERIOD_DAYS = 30;
 export const GOODWILL_THRESHOLD_SESSIONS = 6;
 export const GOODWILL_FEE_PCT = 8.00;

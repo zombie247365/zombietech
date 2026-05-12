@@ -9,7 +9,7 @@ import { AppError } from '../middleware/errorHandler';
 import { config } from '../config';
 import {
   PLATFORM_FEE_PCT, DEFAULT_NOTICE_PERIOD_DAYS, GOODWILL_THRESHOLD_SESSIONS,
-  GOODWILL_FEE_PCT, DEACTIVATION_FEE_PCT, ACTIVATION_FEE_CENTS, OTP_EXPIRES_MINUTES,
+  GOODWILL_FEE_PCT, DEACTIVATION_FEE_PCT, OTP_EXPIRES_MINUTES,
 } from '@zombietech/shared';
 
 const router = Router();
@@ -282,16 +282,6 @@ router.post('/:id/sign', authenticate, validate(signContractSchema), async (req:
     if (isSiteOwner) updateData.site_owner_signed_at = now;
     if (isOperator) {
       updateData.operator_signed_at = now;
-      // Enforce activation fee on first ever contract
-      const existingContracts = await prisma.contract.count({
-        where: { operator_id: contract.operator_id, operator_signed_at: { not: null } },
-      });
-      if (existingContracts === 0) {
-        await prisma.operator.update({
-          where: { id: contract.operator_id },
-          data: { activation_fee_balance: ACTIVATION_FEE_CENTS },
-        });
-      }
     }
 
     const updated = await prisma.contract.update({

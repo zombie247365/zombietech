@@ -192,7 +192,7 @@ async function main() {
       bank_account_ref: null,
       payout_verified_at: null,
       trust_score: 50,
-      activation_fee_balance: 80000,
+      activation_fee_balance: 0,
       vetting_status: 'pending',
       vetting_approved_at: null,
     },
