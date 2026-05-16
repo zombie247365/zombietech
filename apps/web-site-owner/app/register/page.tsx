@@ -31,6 +31,7 @@ function RegisterForm() {
   const handleRequestOtp = async () => {
     setError('');
     if (!firstName.trim()) { setError('First name is required'); return; }
+    if (!lastName.trim()) { setError('Last name is required'); return; }
     if (!email.trim() || !email.includes('@')) { setError('Valid email is required'); return; }
     if (!mobile.match(/^\+27\d{9}$/)) { setError('Enter a valid South African mobile: +27 followed by 9 digits'); return; }
 
@@ -142,7 +143,7 @@ function RegisterForm() {
                     className="input pl-8"
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
-                    placeholder="Marco"
+                    placeholder="First name"
                   />
                 </div>
               </div>
@@ -150,7 +151,7 @@ function RegisterForm() {
                 <label className="label">Last name</label>
                 <input
                   className="input"
-                  placeholder="Rossi"
+                  placeholder="Last name"
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
                 />
